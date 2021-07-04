@@ -1,0 +1,7 @@
+[deps]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+ImageGeoms = "9ee76f2b-840d-4475-b6d6-e485c9297852"
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+
+[compat]
+ImageGeoms = "0.1"
