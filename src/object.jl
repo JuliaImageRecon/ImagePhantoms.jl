@@ -276,12 +276,71 @@ end
 
 # methods for phantoms: an array of objects
 
+"""
+    image = phantom(oa::Array{<:Object2d})::Function
+Return function `image(x,y)` that user can sample at any `(x,y)` locations
+to make a phantom image.
+"""
 function phantom(oa::Array{<:Object2d})
     return (x,y) -> sum(ob -> phantom(ob)(x,y), oa)
 end
+
+"""
+    image = phantom(x, y, oa::Array{<:Object2d})
+Return a digital image of the phantom sampled at `(x,y)` locations.
+"""
+function phantom(x::AbstractVector, y::AbstractVector, oa::Array{<:Object2d})
+    return sum(ob -> phantom(ob).(x,y'), oa)
+end
+
+function phantom(xx::AbstractArray, yy::AbstractArray, oa::Array{<:Object2d})
+    return sum(ob -> phantom(ob).(xx,yy), oa)
+end
+
+
+"""
+    sino = radon(oa::Array{<:Object2d})::Function
+Return function `sino(r,ϕ)` that user can sample at any `(r,ϕ)` locations
+to make a phantom 2D sinogram.
+"""
 function radon(oa::Array{<:Object2d})
     return (r,ϕ) -> sum(ob -> radon(ob)(r,ϕ), oa)
 end
+
+"""
+    sino = radon(r, ϕ, oa::Array{<:Object2d})
+Return parallel-beam 2D sinogram `sino` sampled at given `(r,ϕ)` locations.
+"""
+function radon(r::AbstractVector, ϕ::AbstractVector, oa::Array{<:Object2d})
+    return sum(ob -> radon(ob).(r,ϕ'), oa)
+end
+
+function radon(rr::AbstractArray, ϕϕ::AbstractArray, oa::Array{<:Object2d})
+    return sum(ob -> radon(ob).(rr,ϕϕ), oa)
+end
+
+
+"""
+    kspace = spectrum(oa::Array{<:Object2d})::Function
+Return function `kspace(fx,fy)` that user can sample at any `(fx,fy)` locations
+to make phantom 2D k-space data.
+"""
 function spectrum(oa::Array{<:Object2d})
     return (fx,fy) -> sum(ob -> spectrum(ob)(fx,fy), oa)
 end
+
+"""
+    kspace = spectrum(fx, fy, oa::Array{<:Object2d})::Function
+Return k-space matrix `kspace` sampled at given `(fx,fy)` locations.
+"""
+function spectrum(fx::AbstractVector, fy::AbstractVector, oa::Array{<:Object2d})
+    return sum(ob -> spectrum(ob).(fx,fy'), oa)
+end
+
+function spectrum(fx::AbstractArray, fy::AbstractArray, oa::Array{<:Object2d})
+    return sum(ob -> spectrum(ob).(fx,fy), oa)
+end
+
+rotate2d(x::RealU, y::RealU, θ::RealU) =
+	(cos(θ) * x + sin(θ) * y, -sin(θ) * x + cos(θ) * y)
+rotate2d(xy::NTuple{RealU,2}, θ::RealU) = rotate2d(xy..., θ)

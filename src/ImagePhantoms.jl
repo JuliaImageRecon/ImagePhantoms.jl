@@ -8,5 +8,6 @@ include("object.jl")
 
 # shapes:
 include("ellipse.jl")
+include("rect.jl")
 
 end # module
