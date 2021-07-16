@@ -56,7 +56,7 @@ makedocs(;
 
 if isci
     deploydocs(;
-        repo = "github.com/juliaimagerecon/ImagePhantoms.jl,
+        repo = "github.com/juliaimagerecon/ImagePhantoms.jl",
         devbranch = "main",
         devurl = "dev",
         versions = ["stable" => "v^", "dev" => "dev"],
