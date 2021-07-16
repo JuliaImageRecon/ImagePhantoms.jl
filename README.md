@@ -11,11 +11,12 @@ https://github.com/JuliaImageRecon/ImagePhantoms.jl
 [![code-style][code-blue-img]][code-blue-url]
 
 This Julia language repo
-provides tools for working with software defined image phantoms
+provides tools for working with software-defined image phantoms
 like the Shepp-Logan phantom.
 
 For explanations see the documentation
 using the blue "docs" links above.
+
 
 ### Getting started
 
@@ -37,21 +38,23 @@ todo
 
 For more examples with graphics,
 see the
-[documentation](https://juliaimagerecon.github.io/ImagePhantoms.jl/stable).
+[documentation][docs-stable-url].
 
 
-### [Dependents](https://juliahub.com/ui/Packages/ImagePhantoms/itbva)
+### Dependents
 
 * [Michigan Image Reconstruction Toolbox (MIRT)](https://github.com/JeffFessler/MIRT.jl)
 * [Sinograms.jl](https://github.com/todo/Sinograms.jl)
 * [SPECTrecon.jl](https://github.com/todo/SPECTrecon.jl)
+* See [juliahub](https://juliahub.com/ui/Search?q=ImagePhantoms&type=packages)
 
 
 ### Related packages
 
 * [AxisArrays](https://github.com/JuliaArrays/AxisArrays.jl)
-* ImageGeoms
-* JuliaImages phantom
+* [ImageGeoms](https://github.com/JuliaImageRecon/ImageGeoms.jl)
+* [JuliaImages/Images.jl](https://github.com/JuliaImages/Images.jl) `shepp_logan`
+* [TestImages.jl](https://github.com/JuliaImages/TestImages.jl): `shepp_logan`
 
 
 ### Compatibility
