@@ -66,7 +66,7 @@ struct Object{S, D, V, W, C, A, P} <: AbstractObject
         param::P,
     ) where {S <: AbstractShape, D, V <: Number, W, C <: RealU, Da, A <: RealU, P}
         1 ≤ Da == D-1 || throw(ArgumentError("Dϕ=$Dϕ != D-1, where D=$D"))
-        all(width .> 0) || throw(ArgumentError("widths must be positive"))
+        all(width .> zero(eltype(width))) || throw(ArgumentError("widths must be positive"))
         new{S,D,V,W,C,A,P}(shape, center, width, angle, value, param)
     end
 end
@@ -266,11 +266,8 @@ translate(ob::Object2d, x::RealU, y::RealU) = translate(ob, (x,y))
 Put coordinates `(x,y)` in canonical axes associated with `object`.
 """
 function coords(ob::Object2d, x::RealU, y::RealU)
-	x = (x - ob.center[1]) ./ ob.width[1]
-	y = (y - ob.center[2]) ./ ob.width[2]
-	c = cos(ob.angle[1])
-	s = sin(ob.angle[1])
-	return (x * c + y * s, -x * s + y * c) # todo check +/-
+    (x, y) = rotate2d(x - ob.center[1], y - ob.center[2], ob.angle[1])
+    return (x / ob.width[1], y / ob.width[2]) # unitless
 end
 
 
@@ -302,6 +299,10 @@ end
     sino = radon(oa::Array{<:Object2d})::Function
 Return function `sino(r,ϕ)` that user can sample at any `(r,ϕ)` locations
 to make a phantom 2D sinogram.
+
+The coordinate system used here is such that `ϕ=0` corresponds to
+line integrals along the ``y`` axis for an object ``f(x,y)``.
+Then as `ϕ` increases, the line integrals rotate counter-clockwise.
 """
 function radon(oa::Array{<:Object2d})
     return (r,ϕ) -> sum(ob -> radon(ob)(r,ϕ), oa)
@@ -341,6 +342,13 @@ function spectrum(fx::AbstractArray, fy::AbstractArray, oa::Array{<:Object2d})
     return sum(ob -> spectrum(ob).(fx,fy), oa)
 end
 
-rotate2d(x::RealU, y::RealU, θ::RealU) =
-	(cos(θ) * x + sin(θ) * y, -sin(θ) * x + cos(θ) * y)
-rotate2d(xy::NTuple{RealU,2}, θ::RealU) = rotate2d(xy..., θ)
+
+# helpers
+
+
+function rotate2d(x::RealU, y::RealU, θ::RealU)
+    (s, c) = sincos(θ)
+    return (c * x + s * y, -s * x + c * y)
+end
+
+rotate2d(xy::NTuple{2,RealU}, θ::RealU) = rotate2d(xy..., θ)

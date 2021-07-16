@@ -84,8 +84,8 @@ phantom(ob::Object2d{Ellipse}) =
 Radon transform of ellipse at point `(r,ϕ)`.
 """
 function radon_ellipse(r, ϕ, cx, cy, rx, ry, θ)
-	(sinϕ, cosϕ) = sincos(ϕ)
-	(sinθ, cosθ) = sincos(θ)
+    (sinϕ, cosϕ) = sincos(ϕ)
+    (sinθ, cosθ) = sincos(θ)
     # square of projected radius:
     rp2 = (rx * (cosϕ * cosθ + sinϕ * sinθ))^2 +
           (ry * (sinϕ * cosθ - cosϕ * sinθ))^2

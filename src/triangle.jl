@@ -20,9 +20,9 @@ The (width and height can be scaled when constructing an object).
 struct Triangle{T} <: AbstractShape2
     param::T # fraction in interval (0,1) 
     function Triangle{T}(param::T=0.5) where {T <: Real}
-		0 < param < 1 || throw(ArgumentError("param=$param"))
-		new{T}(param)
-	end
+        0 < param < 1 || throw(ArgumentError("param=$param"))
+        new{T}(param)
+    end
 end
 
 
@@ -38,13 +38,13 @@ end
 
 function phantom(ob:Triangle)
     ob.shape == 1/2 || throw("todo")
-	y
+    y
     return (x,y) -> (0 ≤ y ≤ 1) && (
 end
 
 # todo:
 function phantom(ob::Object2d{Triangle})
-	@show ob.shape.param
+    @show ob.shape.param
 end
 
 
