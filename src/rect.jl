@@ -114,7 +114,7 @@ Radon transform at `(r,ϕ)` of rectangle (involves a trapezoid).
 """
 function radon_rect(r, ϕ, cx, cy, wx, wy, θ)
     (sinϕ, cosϕ) = sincos(ϕ)
-    r = r - (cx * cosϕ + cy * sinϕ) # Radon translation property
+    r -= cx * cosϕ + cy * sinϕ # Radon translation property
     (sinϕ, cosϕ) = sincos(ϕ - θ) # Radon rotation property
     xmax = wx * abs(cosϕ)
     ymax = wy * abs(sinϕ)

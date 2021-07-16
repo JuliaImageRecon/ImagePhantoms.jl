@@ -2,8 +2,8 @@
 rect.jl
 =#
 
-#using Revise # todo
 #using MIRTjim: jim, prompt
+include("helper.jl")
 
 using ImagePhantoms #: Object2d, AbstractShape2
 using ImagePhantoms #: Rect, Square
@@ -12,7 +12,6 @@ using Unitful: m, unit
 #using Plots; default(markerstrokecolor=:auto)
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
-include("infer.jl")
 
 (shape, shape2) = (Rect, Square)
 
@@ -61,8 +60,8 @@ end
 
 
 @testset "method" begin
-    x = LinRange(-1,1,501)*5
-    y = LinRange(-1,1,500)*5
+    x = LinRange(-1,1,51)*5
+    y = LinRange(-1,1,50)*5
     ob = @inferred shape((2, 1.), (4//1, 3), π/6, 5.0f0)
 
     show(devnull, ob)
@@ -85,11 +84,6 @@ end
 
 
 @testset "spectrum" begin
-# https://github.com/PainterQubits/Unitful.jl/issues/465
-#   reale = (x) -> (@assert x ≈ real(x); real(x))
-    myisreal = (z) -> maximum(abs ∘ imag, z) / maximum(abs, z) < sqrt(eps(eltype(real(z)))) * 10
-    reale = (z) -> (@assert myisreal(z); real(z))
-
     dx = 0.02m
     dy = 0.025m
     (M,N) = (2^10,2^10+2)
@@ -98,22 +92,22 @@ end
     width = (2m, 8m)
     ob = shape((4m, 3m), width, π/6, 1.0f0)
     img = phantom(x, y, [ob])
-#   p1 = jim(x, y, img, "phantom")
 
-    zscale = 1 / prod(width) # normalize spectra
+    zscale = 1 / prod(width) # normalize spectra by area
     fx = (-M÷2:M÷2-1) / M / dx
     fy = (-N÷2:N÷2-1) / N / dy
-    X = fftshift(fft(fftshift(img))) * dx * dy * zscale
-
-    clim = (-6, 0)
-    sp = z -> max(log10(abs(z)/one(abs(z))), -6)
-#   p2 = jim(fx, fy, sp.(X), "log10|DFT|"; clim)
-
+    X = myfft(img) * dx * dy * zscale
     kspace = spectrum(fx, fy, [ob]) * zscale
-#   p3 = jim(fx, fy, sp.(kspace), "log10|Spectrum|"; clim)
-#   p4 = jim(fx, fy, abs.(kspace - X), "Difference")
 
-#   jim(p1, p4, p2, p3)
+#=
+    clim = (-6, 0)
+    sp = z -> max(log10(abs(z)/oneunit(abs(z))), -6)
+    p1 = jim(x, y, img, "phantom")
+    p2 = jim(fx, fy, sp.(X), "log10|DFT|"; clim)
+    p3 = jim(fx, fy, sp.(kspace), "log10|Spectrum|"; clim)
+    p4 = jim(fx, fy, abs.(kspace - X), "Difference")
+    jim(p1, p4, p2, p3)
+=#
     @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
 
 
@@ -123,35 +117,31 @@ end
     nr = 2^10
     r = (-nr÷2:nr÷2-1) * dr
     fr = (-nr÷2:nr÷2-1) / nr / dr
-    ϕ = deg2rad.(0:180) # * Unitful.rad # todo round unitful
+    ϕ = deg2rad.(0:180) # * Unitful.rad # todo round unitful Unitful.°
     sino = radon(r, ϕ, [ob])
-#   p2 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram")
-
-#   jim(p1, p2)
-
-function myfft(x)
-    u = unit(eltype(x))
-    return fft(x / u) * u
-end
 
     ia = argmin(abs.(ϕ .- deg2rad(55)))
     slice = sino[:,ia]
-    Slice = fftshift(myfft(fftshift(slice))) * dr
+    Slice = myfft(slice) * dr
     angle = round(rad2deg(ϕ[ia]), digits=1)
-#   p3 = plot(r, slice, title="profile at ϕ = $angle", label="")
-
-#   p4 = scatter(fr, abs.(Slice), label="abs fft", color=:blue)
-#   scatter!(fr, real(Slice), label="real fft", color=:green)
-#   scatter!(fr, imag(Slice), label="imag fft", color=:red,
-#       xlims=(-1,1).*(1.2/m), title="1D spectra")
 
     kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
     ideal = spectrum(ob).(kx, ky)
 
-#   plot!(fr, abs.(ideal), label="abs", color=:blue)
-#   plot!(fr, real(ideal), label="real", color=:green)
-#   plot!(fr, imag(ideal), label="imag", color=:red)
+#=
+    p2 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram")
+    jim(p1, p2)
+    p3 = plot(r, slice, title="profile at ϕ = $angle", label="")
+    p4 = scatter(fr, abs.(Slice), label="abs fft", color=:blue)
+    scatter!(fr, real(Slice), label="real fft", color=:green)
+    scatter!(fr, imag(Slice), label="imag fft", color=:red,
+        xlims=(-1,1).*(1.2/m), title="1D spectra")
 
-    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 1e-4
-#   plot(p1, p2, p3, p4)
+    plot!(fr, abs.(ideal), label="abs", color=:blue)
+    plot!(fr, real(ideal), label="real", color=:green)
+    plot!(fr, imag(ideal), label="imag", color=:red)
+    plot(p1, p2, p3, p4)
+=#
+
+    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
 end
