@@ -1,6 +1,6 @@
 # ImagePhantoms.jl
 
-https://github.com/JuliaImageRecon/ImagePhantoms.jl
+https://github.com/JuliaImageRecon/ImagePhantoms.jl (_WIP!_)
 
 [![action status][action-img]][action-url]
 [![pkgeval status][pkgeval-img]][pkgeval-url]
