@@ -7,12 +7,14 @@ ellipse.jl
 
 export Ellipse
 export Circle
+export phantom, radon, spectrum
 
 
 """
     Ellipse <: AbstractShape2
 """
 struct Ellipse <: AbstractShape2 end
+
 
 # constructors
 
@@ -74,10 +76,19 @@ function Circle(v::AbstractVector{<:Number})
 end
 
 
+# helper
+
+
 # methods
 
+
+"""
+    phantom(ob::Object2d{Ellipse})
+Returns function of `(x,y)` for making image.
+"""
 phantom(ob::Object2d{Ellipse}) =
     (x,y) -> (sum(abs2, coords(ob, x, y)) ≤ 1) * ob.value
+
 
 """
     radon_ellipse(r, ϕ, cx, cy, rx, ry, θ)
@@ -85,16 +96,29 @@ Radon transform of ellipse at point `(r,ϕ)`.
 """
 function radon_ellipse(r, ϕ, cx, cy, rx, ry, θ)
     (sinϕ, cosϕ) = sincos(ϕ)
-    (sinθ, cosθ) = sincos(θ)
-    # square of projected radius:
-    rp2 = (rx * (cosϕ * cosθ + sinϕ * sinθ))^2 +
-          (ry * (sinϕ * cosθ - cosϕ * sinθ))^2
-    sp = cx * cosϕ + cy * sinϕ # radial shift
-    dis2 = abs2(r - sp) # square of distances from center
-    return 1 / rp2 * sqrt(max(rp2 - dis2, 0))
+    r -= cx * cosϕ + cy * sinϕ # Radon translation property
+    (sinϕ, cosϕ) = sincos(ϕ - θ) # Radon rotation property
+    rp2 = abs2(rx * cosϕ) + abs2(ry * sinϕ) # square of projected radius
+    return 2rx*ry / rp2 * sqrt(max(rp2 - abs2(r), 0*oneunit(r)^2))
 end
 
+"""
+    radon(ob::Object2d{Ellipse})
+Returns function of `(r,ϕ)` for making a sinogram.
+"""
 radon(ob::Object2d{Ellipse}) = (r,ϕ) -> ob.value *
     radon_ellipse(r, ϕ, ob.center..., ob.width..., ob.angle[1])
 
-spectrum(ob::Object2d{Ellipse}) = (fx,fy) -> throw("todo")
+
+function spectrum_ellipse(fx, fy, cx, cy, rx, ry, θ)
+    (kx, ky) = rotate2d(fx, fy, θ) # rect is rotated first, then translated
+    return 2rx * exp(-2im*π*fx*cx) * # width=diameter=2*radius
+           2ry * exp(-2im*π*fy*cy) * jinc(2sqrt(abs2(kx * rx) + abs2(ky * ry)))
+end
+
+"""
+    spectrum(ob::Object2d{Ellipse})
+Returns function of ``(f_x,f_y)`` for the spectrum (2D Fourier transform).
+"""
+spectrum(ob::Object2d{Ellipse}) = (fx,fy) -> ob.value *
+    spectrum_ellipse(fx, fy, ob.center..., ob.width..., ob.angle[1])
