@@ -2,16 +2,16 @@
 gauss2.jl
 =#
 
-using Revise # todo
-using MIRTjim: jim, prompt
-include("helper.jl")
+#using Revise # todo
+#using MIRTjim: jim, prompt
+#include("helper.jl")
 
 using ImagePhantoms #: Object2d, AbstractShape2
 using ImagePhantoms #: Gauss2
 using Unitful: m, unit, °
-using UnitfulRecipes
-using Plots: plot, plot!, scatter, scatter!, default
-default(markerstrokecolor=:auto)
+#using UnitfulRecipes
+#using Plots: plot, plot!, scatter, scatter!, default
+#default(markerstrokecolor=:auto)
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
 
@@ -80,7 +80,6 @@ end
 
 
 @testset "spectrum" begin
-end
     dx = 0.02m
     dy = 0.025m
     (M,N) = (2^10,2^10+2)
@@ -97,7 +96,6 @@ end
     kspace = spectrum(fx, fy, [ob]) * zscale
 
 #=
-=#
     clim = (-6, 0)
     sp = z -> max(log10(abs(z)/oneunit(abs(z))), -6)
     p1 = jim(x, y, img, "phantom")
@@ -105,6 +103,7 @@ end
     p3 = jim(fx, fy, sp.(kspace), "log10|Spectrum|"; clim)
     p4 = jim(fx, fy, abs.(kspace - X), "Difference")
     jim(p1, p4, p2, p3)
+=#
     @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
 
 
@@ -127,7 +126,6 @@ end
     ideal = spectrum(ob).(kx, ky)
 
 #=
-=#
     p2 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram")
     jim(p1, p2)
     p3 = plot(r, slice, title="profile at ϕ = $angle", label="")
@@ -139,7 +137,8 @@ end
     plot!(fr, abs.(ideal), label="abs", color=:blue)
     plot!(fr, real(ideal), label="real", color=:green)
     plot!(fr, imag(ideal), label="imag", color=:red)
+    plot(p1, p2, p3, p4)
+=#
 
     @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
-    plot(p1, p2, p3, p4)
-#end
+end
