@@ -12,4 +12,7 @@ include("ellipse.jl")
 include("gauss2.jl")
 include("rect.jl")
 
+# phantoms:
+include("shepplogan.jl")
+
 end # module

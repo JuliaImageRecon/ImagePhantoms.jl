@@ -6,20 +6,30 @@ using Unitful: m
 
 using Test: @test, @testset, @test_throws, @inferred
 
-@testset "construct" begin
-    ell = Ellipse()
-    @test ell isa Ellipse
-#   ig = ImageGeom()
-# todo
-end
-
 @testset "methods" begin
-#   show(isinteractive() ? stdout : devnull, ig)
-#   show(isinteractive() ? stdout : devnull, MIME("text/plain"), ig)
-# todo
+    ob = Circle(1)
+    show(isinteractive() ? stdout : devnull, ob)
+    show(isinteractive() ? stdout : devnull, MIME("text/plain"), ob)
+
+    @test phantom([ob]) isa Function
+    @test phantom([ob])(0,0) == 1
+    @test phantom(zeros(2), zeros(3), [ob]) == ones(2,3)
+    @test phantom(zeros(2,3), zeros(2,3), [ob]) == ones(2,3)
+
+    @test radon([ob]) isa Function
+    @test radon([ob])(0,0) == 2
+    @test radon(zeros(2), zeros(3), [ob]) == 2*ones(2,3)
+    @test radon(zeros(2,3), zeros(2,3), [ob]) == 2*ones(2,3)
+
+    @test spectrum([ob]) isa Function
+    @test spectrum([ob])(0,0) ≈ π
+    @test spectrum(zeros(2), zeros(3), [ob]) ≈ π*ones(2,3)
+    @test spectrum(zeros(2,3), zeros(2,3), [ob]) ≈ π*ones(2,3)
+
 end
 
 @testset "helpers" begin
     @test collect(@inferred rotate2d(2, 1, π/2)) ≈ [1,-2]
+    @test all((@inferred rotate2d((2, 1), π/2)) .≈ (1,-2))
     @test (@inferred coords(Square(3m), 9m, 6m)) == (3, 2)
 end
