@@ -2,13 +2,10 @@
 gauss2.jl
 =#
 
-#using Revise # todo
-#using MIRTjim: jim, prompt
-#include("helper.jl")
-
 using ImagePhantoms #: Object2d, AbstractShape2
 using ImagePhantoms #: Gauss2
 using Unitful: m, unit, °
+#using MIRTjim: jim, prompt
 #using UnitfulRecipes
 #using Plots: plot, plot!, scatter, scatter!, default
 #default(markerstrokecolor=:auto)

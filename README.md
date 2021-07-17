@@ -30,9 +30,12 @@ Pkg.add("ImagePhantoms")
 
 ```julia
 using ImagePhantoms
-using ImageGeoms # not required, but helpful
-todo
+image = shepp_logan(256)
+
+p = shepp_logan(SheppLoganToft())
+sinogram = radon(LinRange(-1,1,101), deg2rad.(0:180), p) # 101 × 181
 ```
+
 
 ### Documentation
 
