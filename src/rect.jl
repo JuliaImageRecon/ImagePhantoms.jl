@@ -24,7 +24,8 @@ struct Rect <: AbstractShape2 end
     Rect(center::NTuple{2,RealU}, width::NTuple{2,RealU}, ϕ::RealU, v)
     Rect([6-vector])
     Rect(r, v=1) (square of radius `r`)
-Construct `Rect` object from parameters
+Construct `Rect` object from parameters;
+here `width` is the full-width.
 """
 function Rect(
     cx::RealU,

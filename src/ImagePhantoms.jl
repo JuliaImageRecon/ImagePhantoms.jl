@@ -9,6 +9,7 @@ include("jinc.jl")
 
 # shapes:
 include("ellipse.jl")
+include("gauss2.jl")
 include("rect.jl")
 
 end # module

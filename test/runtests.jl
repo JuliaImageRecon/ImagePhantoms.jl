@@ -5,6 +5,7 @@ using ImagePhantoms
 
 include("core.jl")
 include("ellipse.jl")
+include("gauss2.jl")
 include("rect.jl")
 
 @testset "ImagePhantoms" begin
