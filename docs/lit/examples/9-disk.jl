@@ -42,7 +42,7 @@ function disk_phantom(title::String)
 	params = disk_phantom_params( ; rhead = () -> rand(100:105))
 	objects = Ellipse(params) # vector of Ellipse objects
 	img = phantom(x, y, objects)
-	jim(x, y, img; title)
+	jim(x, y, img; title, clim=(0,1300))
 end
 disk_phantom("A single disk phantom realization")
 
@@ -52,4 +52,4 @@ disk_phantom("A single disk phantom realization")
 anim = @animate for i in 1:8
 	disk_phantom("Realization $i")
 end
-gif(anim, "disk.gif", fps = 15)
+gif(anim, "disk.gif", fps = 8)
