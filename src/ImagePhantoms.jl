@@ -14,5 +14,6 @@ include("rect.jl")
 
 # phantoms:
 include("shepplogan.jl")
+include("disk-phantom.jl")
 
 end # module

@@ -10,6 +10,7 @@ include("ellipse.jl")
 include("gauss2.jl")
 include("rect.jl")
 include("shepplogan.jl")
+include("disk-phantom.jl")
 
 @testset "ImagePhantoms" begin
     @test isempty(detect_ambiguities(ImagePhantoms))

@@ -52,13 +52,13 @@ struct SouthPark <: EllipsePhantomVersion end
     values = shepp_logan_values(::EllipsePhantomVersion)
 Return 10 Shepp-Logan ellipse amplitudes for various versions.
 """
-shepp_logan_values(SheppLogan) =
+shepp_logan_values(::SheppLogan) =
     [2.0, -0.98, -0.02, -0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
-shepp_logan_values(SheppLoganEmis) =
+shepp_logan_values(::SheppLoganEmis) =
     [1, 1, -2, 2, 3, 4, 5, 6, 1, 1]
-shepp_logan_values(SheppLoganBrainWeb) =
+shepp_logan_values(::SheppLoganBrainWeb) =
     [1, 0, 2, 3, 4, 5, 6, 7, 8, 9] # brainweb uses index 1-10
-shepp_logan_values(SheppLoganToft) =
+shepp_logan_values(::SheppLoganToft) =
     [1.0, -0.8, -0.2, -0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 
 
