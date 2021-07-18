@@ -49,15 +49,17 @@ struct SouthPark <: EllipsePhantomVersion end
 
 
 """
-    shepp_logan_dict
-Dictionary of 10 Shepp-Logan ellipse amplitudes for various versions.
+    values = shepp_logan_values(::EllipsePhantomVersion)
+Return 10 Shepp-Logan ellipse amplitudes for various versions.
 """
-shepp_logan_dict = Dict([
-    (SheppLogan, [2.0, -0.98, -0.02, -0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]),
-    (SheppLoganEmis, [1, 1, -2, 2, 3, 4, 5, 6, 1, 1]),
-    (SheppLoganBrainWeb, [1, 0, 2, 3, 4, 5, 6, 7, 8, 9]), # brainweb uses index 1-10
-    (SheppLoganToft, [1.0, -0.8, -0.2, -0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]),
-])
+shepp_logan_values(SheppLogan) =
+    [2.0, -0.98, -0.02, -0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
+shepp_logan_values(SheppLoganEmis) =
+    [1, 1, -2, 2, 3, 4, 5, 6, 1, 1]
+shepp_logan_values(SheppLoganBrainWeb) =
+    [1, 0, 2, 3, 4, 5, 6, 7, 8, 9] # brainweb uses index 1-10
+shepp_logan_values(SheppLoganToft) =
+    [1.0, -0.8, -0.2, -0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 
 
 """
@@ -128,7 +130,7 @@ function ellipse_parameters(
     params[:,[1,3]] .*= xfov/2
     params[:,[2,4]] .*= yfov/2
     params[:,5] .*= π/180
-    params[:,6] = shepp_logan_dict[typeof(case)]
+    params[:,6] = shepp_logan_values(typeof(case))
 
     return Number[params[:,1:4] * u[1] params[:,5] * u[2] params[:,6] * u[3]]
 end
