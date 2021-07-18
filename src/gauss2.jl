@@ -60,7 +60,7 @@ Gauss2(r::RealU, v::Number = 1) = Gauss2((zero(r),zero(r)), (r,r), 0, v)
 
 """
     σ = fwhm2sigma(w)
-Convert FWHM `w` to equivalent Gaussian `σ`
+Convert FWHM `w` to equivalent Gaussian `σ` for ``\\exp(-π (x/σ)^2)``.
 """
 @inline fwhm2sigma(w) = w / sqrt(log(256))
 

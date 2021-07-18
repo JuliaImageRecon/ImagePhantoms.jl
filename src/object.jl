@@ -29,7 +29,7 @@ General container for 2D and 3D objects for defining image phantoms.
 
 Example
 
-`jldoctest
+```jldoctest
 julia> Object(Ellipse(), (0,0), (1,2), 0.0, 1//2, nothing)
 
 Object2d{Ellipse, Rational{Int64}, 2, Int64, Float64, Nothing} (S, D, V, ...)
@@ -38,7 +38,7 @@ Object2d{Ellipse, Rational{Int64}, 2, Int64, Float64, Nothing} (S, D, V, ...)
  angle::Tuple{Float64} (0.0,)
  value::Rational{Int64} 1//2
  param::Nothing nothing
-`
+```
 """
 struct Object{S, D, V, W, C, A, P} <: AbstractObject
     shape::S
@@ -238,8 +238,8 @@ scale(ob::Object{S,D,V,W}, factor::RealU) where {S,D,V,W} =
 
 # scale value
 """
-   (*)(ob::Object, x::Number)
-   (*)(x::Number, ob::Object)
+    (*)(ob::Object, x::Number)
+    (*)(x::Number, ob::Object)
 Scale object `value` by `x`.
 """
 Base.:(*)(ob::AbstractObject, x::Number) =
