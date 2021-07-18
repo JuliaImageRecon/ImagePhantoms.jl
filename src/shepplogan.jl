@@ -130,7 +130,7 @@ function ellipse_parameters(
     params[:,[1,3]] .*= xfov/2
     params[:,[2,4]] .*= yfov/2
     params[:,5] .*= π/180
-    params[:,6] = shepp_logan_values(typeof(case))
+    params[:,6] = shepp_logan_values(case)
 
     return Number[params[:,1:4] * u[1] params[:,5] * u[2] params[:,6] * u[3]]
 end
