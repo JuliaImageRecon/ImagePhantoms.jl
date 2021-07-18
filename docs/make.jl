@@ -44,7 +44,6 @@ format = Documenter.HTML(;
 makedocs(;
     modules = [ImagePhantoms],
     authors = "Jeff Fessler and contributors",
-#   repo = "https://github.com/juliaimagerecon/ImagePhantoms.jl/blob/{commit}{path}#{line}",
     sitename = "ImagePhantoms.jl",
     format,
     pages = [
@@ -56,7 +55,7 @@ makedocs(;
 
 if isci
     deploydocs(;
-        repo = "github.com/juliaimagerecon/ImagePhantoms.jl",
+        repo = "github.com/JuliaImageRecon/ImagePhantoms.jl",
         devbranch = "main",
         devurl = "dev",
         versions = ["stable" => "v^", "dev" => "dev"],

@@ -33,6 +33,7 @@ Example
 julia> Object(Ellipse(), (0,0), (1,2), 0.0, 1//2, nothing)
 
 Object2d{Ellipse, Rational{Int64}, 2, Int64, Float64, Nothing} (S, D, V, ...)
+ shape::Ellipse Ellipse()
  center::Tuple{Int64, Int64} (0, 0)
  width::Tuple{Int64, Int64} (1, 2)
  angle::Tuple{Float64} (0.0,)
