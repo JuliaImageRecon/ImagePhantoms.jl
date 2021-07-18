@@ -7,7 +7,7 @@ ellipses, rectangles, and gaussian bumps.
 
 export AbstractObject
 export Object, Object2d, Object3d
-export rotate, scale, translate
+#export rotate, scale, translate # no: to avoid conflicts with Plots
 export phantom, radon, spectrum
 
 atuple(x::Any, n::Int) = ntuple(i -> x, n)
@@ -27,11 +27,10 @@ General container for 2D and 3D objects for defining image phantoms.
 * `value::V` "intensity" value for this object
 * `param` optional additional shape parameters (often `nothing`)
 
-Example
+# Example
 
 ```jldoctest
 julia> Object(Ellipse(), (0,0), (1,2), 0.0, 1//2, nothing)
-
 Object2d{Ellipse, Rational{Int64}, 2, Int64, Float64, Nothing} (S, D, V, ...)
  shape::Ellipse Ellipse()
  center::Tuple{Int64, Int64} (0, 0)
