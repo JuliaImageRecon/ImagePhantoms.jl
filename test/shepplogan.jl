@@ -8,9 +8,11 @@ using Test: @test, @testset, @test_throws, @inferred
 
 
 @testset "shepp" begin
-    for case in (SheppLoganToft, SheppLoganEmis, SheppLoganBrainWeb, SouthPark)
+    for case in (SheppLogan, SheppLoganToft, SheppLoganEmis, SheppLoganBrainWeb)
+        @test ImagePhantoms.shepp_logan_values(case()) isa Vector
         @test ellipse_parameters(case()) isa Matrix
     end
+    @test ellipse_parameters(SouthPark()) isa Matrix
 
     image = shepp_logan(256, SheppLoganEmis())
     @test image isa Matrix

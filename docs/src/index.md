@@ -39,7 +39,7 @@ for simulating data:
   that one can sample to simulate k-space data (e.g., in MRI).
 
 See the
-[Examples](@ref 1-overview)
+[Examples](@ref)
 tab to the left for details.
 
 The
