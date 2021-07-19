@@ -1,9 +1,10 @@
 #=
-rect.jl
+cuboid.jl
 =#
 
-using ImagePhantoms #: Object2d, AbstractShape2
-using ImagePhantoms #: Rect, Square
+include("helper.jl") # todo
+using ImagePhantoms #: Object3d, AbstractShape3
+using ImagePhantoms #: Cuboid, Cube
 import ImagePhantoms as IP
 using Unitful: m, unit
 #using MIRTjim: jim, prompt
@@ -12,36 +13,36 @@ using Unitful: m, unit
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
 
-(shape, shape2) = (Rect, Square)
+(shape, shape3) = (Cuboid, Cube)
 
-macro isob(ex) # macro to streamline tests
-    :(@test $(esc(ex)) isa Object2d{shape})
+macro isob3(ex) # macro to streamline tests
+    :(@test $(esc(ex)) isa Object3d{shape})
 end
 
 
 @testset "construct" begin
-    @test shape <: AbstractShape2
+    @test shape <: AbstractShape3
 
     # constructors
-    @isob @inferred Object(shape(), (1,2), (3,4), π, 5.0f0)
-    @isob @inferred Object(shape(), (1,2), (3,4), (π,), 5.0f0)
-    @isob @inferred Object(shape(), center=(1,2))
-    @isob @inferred shape((1,2.), (3,4//1), π, 5.0f0)
-    @isob @inferred shape(1, 2., 3, 4//1, π, 5.0f0)
-    @isob @NOTinferred shape(Number[1, 2., 3, 4//1, π, 5.0f0])
+    @isob3 @inferred Object(shape(), (1,2,3), (4,5,6), (π, π/4), 5.0f0)
+    @isob3 @inferred Object(shape(), (1,2,3), (4,5,6), (0, 0), 5.0f0)
+    @isob3 @inferred Object(shape(), center=(1,2,3))
+    @isob3 @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
+    @isob3 @inferred shape(1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0)
+    @isob3 @NOTinferred shape(Number[1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0])
 
-    @isob @inferred shape(1, 5.0f0)
-    @isob @inferred shape2(1, 5.0f0)
-    @isob @inferred shape2(1, 2, 3., 5.0f0)
-    @isob @inferred shape2((1, 2), 3., 5.0f0)
-    @isob @NOTinferred shape2(Number[1, 2, 3., 5.0f0])
+    @isob3 @inferred shape(1, 5.0f0)
+    @isob3 @inferred shape3(1, 5.0f0)
+    @isob3 @inferred shape3(1, 2, 3, 4., 5.0f0)
+    @isob3 @inferred shape3((1, 2, 3), 4., 5.0f0)
+    @isob3 @NOTinferred shape3(Number[1, 2, 3, 4., 5.0f0])
 end
 
 
 @testset "operations" begin
     # basic methods
 
-    ob = @inferred shape((1,2.), (3,4//1), π, 5.0f0)
+    ob = @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
 
     @isob @NOTinferred IP.rotate(ob, π)
 
@@ -50,17 +51,18 @@ end
     @isob @inferred ob * 2//1
     @isob @inferred 2 * ob
     @isob @inferred ob / 2.0f0
-    @isob @inferred IP.scale(ob, (2,3))
+    @isob @inferred IP.scale(ob, (2,3,4))
     @isob @inferred IP.scale(ob, 2)
-    @isob @inferred IP.translate(ob, (2, 3))
-    @isob @inferred IP.translate(ob, 2, 3)
+    @isob @inferred IP.translate(ob, (2, 3, 4))
+    @isob @inferred IP.translate(ob, 2, 3, 4)
 end
 
 
 @testset "method" begin
-    x = LinRange(-1,1,51)*5
-    y = LinRange(-1,1,50)*5
-    ob = @inferred shape((2, 1.), (4//1, 3), π/6, 5.0f0)
+    x = LinRange(-1,1,32)*5
+    y = LinRange(-1,1,31)*5
+    z = LinRange(-1,1,30)*5
+    ob = @inferred shape((1, 2., 3), (4//1, 5, 6), (π/6, 0), 5.0f0)
 
     show(devnull, ob)
     @test (@inferred eltype(ob)) == Float32
@@ -70,11 +72,13 @@ end
     @test fun(ob.center...) == ob.value
     @test fun((ob.center .+ 2 .* ob.width)...) == 0
 
-    img = @inferred phantom(x, y, [ob])
+    img = @inferred phantom(x, y, z, [ob])
 
+#=
     fun = @inferred radon(ob)
     @test fun isa Function
-    fun(0,0)
+    fun(0,0,0,0)
+=#
 
     fun = @inferred spectrum(ob)
     @test fun isa Function
@@ -82,20 +86,23 @@ end
 
 
 @testset "spectrum" begin
-    dx = 0.02m
-    dy = 0.025m
-    (M,N) = (2^10,2^10+2)
-    x = (-M÷2:M÷2-1) * dx
-    y = (-N÷2:N÷2-1) * dy
-    width = (2m, 8m)
-    ob = shape((4m, 3m), width, π/6, 1.0f0)
-    img = phantom(x, y, [ob])
+    dx = 0.020m
+    dy = 0.022m
+    dz = 0.025m
+    (L,M,N) = (2^8,2^8+2,2^8+4)
+    x = (-L÷2:L÷2-1) * dx
+    y = (-M÷2:M÷2-1) * dy
+    z = (-N÷2:N÷2-1) * dz
+    width = (2m, 8m, 3m)
+    ob = shape((4m, 3m, 2m), width, (π/6, 0), 1.0f0)
+    img = phantom(x, y, z, [ob])
 
-    zscale = 1 / prod(width) # normalize spectra by area
-    fx = (-M÷2:M÷2-1) / M / dx
-    fy = (-N÷2:N÷2-1) / N / dy
-    X = myfft(img) * dx * dy * zscale
-    kspace = spectrum(fx, fy, [ob]) * zscale
+    zscale = 1 / prod(width) # normalize spectra
+    fx = (-L÷2:L÷2-1) / L / dx
+    fy = (-M÷2:M÷2-1) / M / dy
+    fz = (-N÷2:N÷2-1) / N / dz
+    X = myfft(img) * (dx * dy * dz * zscale)
+    kspace = spectrum(fx, fy, fz, [ob]) * zscale
 
 #=
     clim = (-6, 0)
@@ -109,6 +116,8 @@ end
     @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
 
 
+#=
+todo
     # test sinogram with projection-slice theorem
 
     dr = 0.02m
@@ -125,6 +134,8 @@ end
 
     kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
     ideal = spectrum(ob).(kx, ky)
+    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
+=#
 
 #=
     p2 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram")
@@ -141,5 +152,4 @@ end
     plot(p1, p2, p3, p4)
 =#
 
-    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
 end

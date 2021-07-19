@@ -12,6 +12,8 @@ include("ellipse.jl")
 include("gauss2.jl")
 include("rect.jl")
 
+include("cuboid.jl")
+
 # phantoms:
 include("shepplogan.jl")
 include("disk-phantom.jl")
