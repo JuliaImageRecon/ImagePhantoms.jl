@@ -35,14 +35,14 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 # Make a digital image of it using `phantom` and display it.
 function disk_phantom(title::String)
-	(dx,dy) = (1, 1)
-	(M,N) = (2^8,2^8)
-	x = (-M÷2:M÷2-1) * dx
-	y = (-N÷2:N÷2-1) * dy
-	params = disk_phantom_params( ; rhead = () -> rand(100:105))
-	objects = Ellipse(params) # vector of Ellipse objects
-	img = phantom(x, y, objects)
-	jim(x, y, img; title, clim=(0,1300))
+    (dx,dy) = (1, 1)
+    (M,N) = (2^8,2^8)
+    x = (-M÷2:M÷2-1) * dx
+    y = (-N÷2:N÷2-1) * dy
+    params = disk_phantom_params( ; rhead = () -> rand(100:105))
+    objects = Ellipse(params) # vector of Ellipse objects
+    img = phantom(x, y, objects)
+    jim(x, y, img; title, clim=(0,1300))
 end
 disk_phantom("A single disk phantom realization")
 
@@ -50,6 +50,6 @@ disk_phantom("A single disk phantom realization")
 # ### Several realizations
 
 anim = @animate for i in 1:8
-	disk_phantom("Realization $i")
+    disk_phantom("Realization $i")
 end
-gif(anim, "disk.gif", fps = 8)
+gif(anim, "disk.gif", fps = 6)

@@ -37,6 +37,31 @@ sinogram = radon(LinRange(-1,1,101), deg2rad.(0:180), p) # 101 × 181
 ```
 
 
+### Example
+
+```julia
+using ImagePhantoms
+using MIRTjim: jim
+using Plots # @animate, gif
+function disk_phantom(title::String)
+    (dx,dy) = (1, 1)
+    (M,N) = (2^8,2^8)
+    x = (-M÷2:M÷2-1) * dx
+    y = (-N÷2:N÷2-1) * dy
+    params = disk_phantom_params( ; rhead = () -> rand(100:105))
+    objects = Ellipse(params) # vector of Ellipse objects
+    img = phantom(x, y, objects)
+    jim(x, y, img; title, clim=(0,1300))
+end
+anim = @animate for i in 1:8
+    disk_phantom("Realization $i")
+end
+gif(anim, "disk.gif", fps = 8)
+```
+
+![animated phantom gif](https://github.com/JuliaImageRecon/ImagePhantoms.jl/blob/gh-pages/dev/examples/disk.gif)
+
+
 ### Documentation
 
 For more examples with graphics,
@@ -47,15 +72,15 @@ see the
 ### Dependents
 
 * [Michigan Image Reconstruction Toolbox (MIRT)](https://github.com/JeffFessler/MIRT.jl)
-* [Sinograms.jl](https://github.com/todo/Sinograms.jl)
-* [SPECTrecon.jl](https://github.com/todo/SPECTrecon.jl)
+* [Sinograms.jl](https://github.com/JuliaImageRecon/Sinograms.jl)
+* [SPECTrecon.jl](https://github.com/JuliaImageRecon/SPECTrecon.jl)
 * See [juliahub](https://juliahub.com/ui/Search?q=ImagePhantoms&type=packages)
 
 
 ### Related packages
 
-* [AxisArrays](https://github.com/JuliaArrays/AxisArrays.jl)
-* [ImageGeoms](https://github.com/JuliaImageRecon/ImageGeoms.jl)
+* [AxisArrays.jl](https://github.com/JuliaArrays/AxisArrays.jl)
+* [ImageGeoms.jl](https://github.com/JuliaImageRecon/ImageGeoms.jl)
 * [JuliaImages/Images.jl](https://github.com/JuliaImages/Images.jl) `shepp_logan`
 * [TestImages.jl](https://github.com/JuliaImages/TestImages.jl): `shepp_logan`
 
