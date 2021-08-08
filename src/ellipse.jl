@@ -24,7 +24,7 @@ struct Ellipse <: AbstractShape2 end
     Ellipse(center::NTuple{2,RealU}, radii::NTuple{2,RealU}, ϕ::RealU, v)
     Ellipse([6-vector])
     Ellipse(r, v=1) (circle of radius `r`)
-Construct `Ellipse` object from parameters
+Construct `Ellipse` object from parameters.
 """
 function Ellipse(
     cx::RealU,
