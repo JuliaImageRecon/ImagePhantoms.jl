@@ -27,8 +27,8 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 # it can be helpful to simulate data (e.g., sinograms)
 # using software-defined images called phantoms.
 
-# The simplest method here is to make Shepp-Logan phantom image
-# similar to other its use in other packages.
+# The simplest method here is to make a Shepp-Logan phantom image
+# similar its use in other packages.
 
 image = shepp_logan(256) # CT version by default
 jim(image, "SheppLogan", clim=(0.9, 1.1), yflip=false)
