@@ -17,8 +17,8 @@ using Test: @test, @testset, @test_throws, @inferred
     image0 = @NOTinferred shepp_logan(256, SheppLoganEmis())
     @test image0 isa Matrix
     image1 = @NOTinferred shepp_logan(256, SheppLoganEmis(); oversample=1)
-    @test image0 == image1
     image2 = @NOTinferred shepp_logan(256, SheppLoganEmis(); oversample=3)
+    @test image0 == image2
 #   jim(jim(image1), jim(image2))
 
     ob = shepp_logan(SheppLoganEmis())
