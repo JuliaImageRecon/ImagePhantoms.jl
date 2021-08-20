@@ -47,5 +47,5 @@ using Test: @test, @testset, @test_throws, @inferred
 #   jim(kx, ky, kspace)
 
     image = shepp_logan(80, 100, SouthPark(), fovs=(1,1))
-#   jim(image; yflip=false)
+#   jim(image)
 end
