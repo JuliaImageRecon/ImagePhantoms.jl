@@ -286,7 +286,23 @@ end
     image = phantom(x, y, oa::Array{<:Object2d})
 Return a digital image of the phantom sampled at `(x,y)` locations.
 """
-function phantom(x::AbstractVector, y::AbstractVector, oa::Array{<:Object2d})
+function phantom(
+    x::AbstractVector,
+    y::AbstractVector,
+    oa::Array{<:Object2d};
+    oversample::Int = 1,
+)
+    oversample < 1 && throw(ArgumentError("oversample $oversample"))
+    if oversample > 1
+        dx = x[2] - x[1]
+        dy = y[2] - y[1]
+        all(≈(dx), diff(x)) || throw("oversample requires uniform x")
+        all(≈(dy), diff(y)) || throw("oversample requires uniform y")
+        tmp = ((1:over) .- (over+1)/2) / over
+        ophantom = ob ->
+           (x,y) -> sum(phantom(ob).(x .+ dx*tmp, y .+ dy*tmp')) / oversample^2
+        return sum(ob -> ophantom(ob).(x,y'), oa)
+    end
     return sum(ob -> phantom(ob).(x,y'), oa)
 end
 

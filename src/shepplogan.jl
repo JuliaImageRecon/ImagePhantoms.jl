@@ -83,12 +83,13 @@ Convenience method for generating `M×N` samples of Shepp-Logan phantom.
 function shepp_logan(
     M::Int, N::Int,
     case::EllipsePhantomVersion = SheppLogan() ;
+    oversample::Int = 1,
     kwargs...
 )
     ob = shepp_logan(case ; kwargs...)
     x = LinRange(-0.5, 0.5, M)
     y = LinRange(-0.5, 0.5, N)
-    return phantom(x, y, ob)
+    return phantom(x, y, ob; oversample)
 end
 
 shepp_logan(M::Int, case::EllipsePhantomVersion = SheppLogan(); kwargs...) =
