@@ -283,10 +283,38 @@ function phantom(oa::Array{<:Object2d})
 end
 
 """
+    image = phantom(x, y, oa::Array{<:Object2d}, oversample::Int; T)
+Return a digital image of the phantom sampled at `(x,y)` locations,
+with over-sampling factor `oversample` and element type `T`.
+"""
+function phantom(
+    x::AbstractVector,
+    y::AbstractVector,
+    oa::Array{<:Object2d},
+    oversample::Int;
+    T::DataType = promote_type(eltype.(oa)..., Float32),
+)
+    oversample < 1 && throw(ArgumentError("oversample $oversample"))
+    dx = x[2] - x[1]
+    dy = y[2] - y[1]
+    all(≈(dx), diff(x)) || throw("oversample requires uniform x")
+    all(≈(dy), diff(y)) || throw("oversample requires uniform y")
+    tmp = ((1:oversample) .- (oversample+1)/2) / oversample
+    ophantom = ob ->
+       (x,y) -> T(sum(phantom(ob).(x .+ dx*tmp, y .+ dy*tmp')) / abs2(oversample))
+    return sum(ob -> ophantom(ob).(x,y'), oa)
+end
+
+"""
     image = phantom(x, y, oa::Array{<:Object2d})
 Return a digital image of the phantom sampled at `(x,y)` locations.
 """
-function phantom(x::AbstractVector, y::AbstractVector, oa::Array{<:Object2d})
+function phantom(
+    x::AbstractVector,
+    y::AbstractVector,
+    oa::Array{<:Object2d},
+)
+
     return sum(ob -> phantom(ob).(x,y'), oa)
 end
 

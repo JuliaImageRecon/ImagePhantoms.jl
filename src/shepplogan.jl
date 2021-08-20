@@ -77,18 +77,24 @@ end
 
 
 """
-    image = shepp_logan(M, N, case = SheppLogan(); kwargs...)
+    image = shepp_logan(M, [N,] case = SheppLogan(); oversample=3, kwargs...)
 Convenience method for generating `M×N` samples of Shepp-Logan phantom. 
+
+The default here is 3× over-sampling along both axes (9 samples per pixel),
+except for the `SheppLoganBrainWeb` phantom that consists of integer indices.
 """
 function shepp_logan(
     M::Int, N::Int,
     case::EllipsePhantomVersion = SheppLogan() ;
+    oversample::Int = case == SheppLoganBrainWeb() ? 1 : 3,
     kwargs...
 )
     ob = shepp_logan(case ; kwargs...)
     x = LinRange(-0.5, 0.5, M)
     y = LinRange(-0.5, 0.5, N)
-    return phantom(x, y, ob)
+    return oversample > 1 ?
+        phantom(x, y, ob, oversample) :
+        phantom(x, y, ob) # type unstable because of over-sampling
 end
 
 shepp_logan(M::Int, case::EllipsePhantomVersion = SheppLogan(); kwargs...) =
