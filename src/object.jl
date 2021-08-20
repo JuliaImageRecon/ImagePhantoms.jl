@@ -292,7 +292,7 @@ function phantom(
     y::AbstractVector,
     oa::Array{<:Object2d},
     oversample::Int;
-    T = promote_type(eltype.(oa)..., Float32),
+    T::DataType = promote_type(eltype.(oa)..., Float32),
 )
     oversample < 1 && throw(ArgumentError("oversample $oversample"))
     dx = x[2] - x[1]

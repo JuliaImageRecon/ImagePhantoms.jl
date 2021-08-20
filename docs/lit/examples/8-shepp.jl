@@ -36,7 +36,26 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 # with a narrow window the using `clim` option:
 
 image1 = shepp_logan(256) # CT version by default
-jim(image1, "SheppLogan (original CT version)", clim=(0.9, 1.1), yflip=false)
+jim(image1, "SheppLogan (original CT version)", clim=(0.95, 1.05), yflip=false)
+
+
+# ### Over-sampling
+
+# When generating ellipse phantoms,
+# it is generally preferable
+# to "over-sample" the ellipse values within each pixel
+# to account for partial volume effect.
+# A factor of 3 over-sampling (along both axes) typically suffices,
+# so this factor is the default for the `shepp_logan` method.
+# Here is how the phantom image looks without over-sampling:
+
+image1o = shepp_logan(256; oversample=1)
+jim(image1o, "No over sampling", clim=(0.95,1.05), yflip=false)
+
+
+# Notice that boundaries of the interior ellipses look smoother
+# in the original version with the default 3× over-sampling.
+# Most of the remaining examples use the recommended default over-sampling.
 
 
 # ### Toft version
@@ -78,7 +97,11 @@ image4 = shepp_logan(256, SheppLoganBrainWeb())
 jim(image4, "SheppLoganBrainWeb", yflip=false)
 
 
+# For the BrainWeb version, there is no over-sampling by default,
+# to preserve the integer indices.
+
+
 # ### Comedy version
 
-image5 = shepp_logan(256, SouthPark(); fovs=(1,1))
+image5 = shepp_logan(256, SouthPark(); fovs=(1,1), oversample=3)
 jim(image5, "SouthPark", yflip=false)
