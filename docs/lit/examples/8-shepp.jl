@@ -103,5 +103,5 @@ jim(image4, "SheppLoganBrainWeb", yflip=false)
 
 # ### Comedy version
 
-image5 = shepp_logan(256, SouthPark(); fovs=(1,1), oversample=3)
+image5 = shepp_logan(256, SouthPark(); fovs=(1,1))
 jim(image5, "SouthPark", yflip=false)
