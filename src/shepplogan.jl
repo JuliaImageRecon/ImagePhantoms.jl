@@ -89,7 +89,9 @@ function shepp_logan(
     ob = shepp_logan(case ; kwargs...)
     x = LinRange(-0.5, 0.5, M)
     y = LinRange(-0.5, 0.5, N)
-    return phantom(x, y, ob; oversample)
+    return oversample > 1 ?
+        phantom(x, y, ob, oversample) :
+        phantom(x, y, ob) # type unstable because of over-sampling
 end
 
 shepp_logan(M::Int, case::EllipsePhantomVersion = SheppLogan(); kwargs...) =
