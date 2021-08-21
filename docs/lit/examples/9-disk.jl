@@ -41,7 +41,8 @@ function disk_phantom(title::String)
     y = (-N÷2:N÷2-1) * dy
     params = disk_phantom_params( ; rhead = () -> rand(100:105))
     objects = Ellipse(params) # vector of Ellipse objects
-    img = phantom(x, y, objects)
+    oversample = 3
+    img = phantom(x, y, objects, oversample)
     jim(x, y, img; title, clim=(0,1300))
 end
 disk_phantom("A single disk phantom realization")
