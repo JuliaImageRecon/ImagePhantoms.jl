@@ -36,7 +36,7 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 # with a narrow window the using `clim` option:
 
 image1 = shepp_logan(256) # CT version by default
-jim(image1, "SheppLogan (original CT version)", clim=(0.95, 1.05), yflip=false)
+jim(image1, "SheppLogan (original CT version)", clim=(0.95, 1.05))
 
 
 # ### Over-sampling
@@ -50,7 +50,7 @@ jim(image1, "SheppLogan (original CT version)", clim=(0.95, 1.05), yflip=false)
 # Here is how the phantom image looks without over-sampling:
 
 image1o = shepp_logan(256; oversample=1)
-jim(image1o, "No over sampling", clim=(0.95,1.05), yflip=false)
+jim(image1o, "No over sampling", clim=(0.95,1.05))
 
 
 # Notice that boundaries of the interior ellipses look smoother
@@ -67,7 +67,7 @@ jim(image1o, "No over sampling", clim=(0.95,1.05), yflip=false)
 # [pdf](https://files.openpdfs.org/1ra51GP6gJO.pdf)
 
 image2 = shepp_logan(256, SheppLoganToft())
-jim(image2, "SheppLoganToft", yflip=false)
+jim(image2, "SheppLoganToft")
 
 
 # ### Emission tomography version
@@ -80,7 +80,7 @@ jim(image2, "SheppLoganToft", yflip=false)
 # have low signal from bone.
 
 image3 = shepp_logan(256, SheppLoganEmis())
-jim(image3, "SheppLoganEmis", yflip=false)
+jim(image3, "SheppLoganEmis")
 
 
 # ### BrainWeb version
@@ -94,7 +94,7 @@ jim(image3, "SheppLoganEmis", yflip=false)
 # to each of the integer indices.
 
 image4 = shepp_logan(256, SheppLoganBrainWeb())
-jim(image4, "SheppLoganBrainWeb", yflip=false)
+jim(image4, "SheppLoganBrainWeb")
 
 
 # For the BrainWeb version, there is no over-sampling by default,
@@ -104,4 +104,4 @@ jim(image4, "SheppLoganBrainWeb", yflip=false)
 # ### Comedy version
 
 image5 = shepp_logan(256, SouthPark(); fovs=(1,1))
-jim(image5, "SouthPark", yflip=false)
+jim(image5, "SouthPark")
