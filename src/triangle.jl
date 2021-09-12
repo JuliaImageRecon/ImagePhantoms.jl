@@ -4,7 +4,7 @@ triangle.jl
 =#
 
 
-using ImagePhantoms #: Object, Object2d
+#using ImagePhantoms #: Object, Object2d
 
 export Triangle
 export phantom, radon, spectrum
@@ -40,17 +40,17 @@ end
 
 
 """
-    Triangle(cx, cy, wx, wy, ϕ, value::Number, param::Real)
-    Triangle(center::NTuple{2,RealU}, width::NTuple{2,RealU}, ϕ::RealU, v, param)
+    Triangle(cx, cy, wx=1, wy=wx, ϕ=0, value::Number=1, param::Real=0.5)
+    Triangle(center::NTuple{2,RealU}, width::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1, param=0.5)
     Triangle([6-vector] or [7-vector])
 Construct `Triangle` object from parameters.
-In the typical case where `param=0.5` and `width[1]==width[2]`,
+In the typical case where `param=0.5` and `width[1] == width[2]`,
 this is an equilateral triangle with base `width[1]` centered along the x axis.
 """
 function Triangle(
     cx::RealU,
     cy::RealU,
-    wx::RealU = 1,
+    wx::RealU = oneunit(cx),
     wy::RealU = wx,
     ϕ::RealU = 0,
     value::Number = 1,
@@ -62,7 +62,7 @@ end
 
 function Triangle(
     center::NTuple{2,RealU},
-    width::NTuple{2,RealU} = (1,1),
+    width::NTuple{2,RealU} = (1,1) .* oneunit(center[1]),
     ϕ::RealU = 0,
     value::Number = 1,
     param::Real = 0.5,

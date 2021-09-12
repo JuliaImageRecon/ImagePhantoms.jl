@@ -20,18 +20,17 @@ struct Rect <: AbstractShape2 end
 
 
 """
-    Rect(cx, cy, wx, wy, ϕ, value::Number)
-    Rect(center::NTuple{2,RealU}, width::NTuple{2,RealU}, ϕ::RealU, v)
+    Rect(cx, cy, wx=1, wy=wx, ϕ=0, value::Number=1)
+    Rect(center::NTuple{2,RealU}, width::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1)
     Rect([6-vector])
-    Rect(r, v=1) (square of radius `r`)
 Construct `Rect` object from parameters;
 here `width` is the full-width.
 """
 function Rect(
     cx::RealU,
     cy::RealU,
-    wx::RealU,
-    wy::RealU,
+    wx::RealU = oneunit(cx),
+    wy::RealU = wx,
     ϕ::RealU = 0,
     value::Number = 1,
 )
@@ -41,7 +40,7 @@ end
 
 function Rect(
     center::NTuple{2,RealU},
-    width::NTuple{2,RealU},
+    width::NTuple{2,RealU} = (1,1) .* oneunit(center[1]),
     ϕ::RealU = 0,
     value::Number = 1,
 )
@@ -53,23 +52,21 @@ function Rect(v::AbstractVector{<:Number})
     Rect(v...)
 end
 
-Rect(r::RealU, v::Number = 1) = Rect((zero(r),zero(r)), (r,r), 0, v)
-
 
 # squares as a special case
 
 """
     Square(x,y,w,v=1) (square of width `w` centered at `(x,y)`)
-    Square((x,y), w, v=1) ditto
+    Square((x,y), w=1, v=1) ditto
     Square([4-vector]) ditto
     Square(w, v=1) centered at origin
 Construct `Square` objects as special cases of `Rect` objects.
 """
-Square(w::RealU, v::Number = 1) = Rect(w, v)
 Square(cx::RealU, cy::RealU, w::RealU, v::Number = 1) =
     Rect(cx, cy, w, w, 0, v)
-Square(center::NTuple{2,RealU}, w::RealU, v::Number = 1) =
-    Rect(center, (w, w), 0, v)
+Square(center::NTuple{2,RealU}, w::RealU = oneunit(center[1]), v::Number = 1) =
+    Square(center..., w, v)
+Square(w::RealU, v::Number = 1) = Square((zero(w),zero(w)), w, v)
 
 function Square(v::AbstractVector{<:Number})
     length(v) == 4 || throw(ArgumentError("$v wrong length"))
