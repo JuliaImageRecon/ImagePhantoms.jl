@@ -9,6 +9,7 @@ include("core.jl")
 include("ellipse.jl")
 include("gauss2.jl")
 include("rect.jl")
+include("triangle.jl")
 include("shepplogan.jl")
 include("disk-phantom.jl")
 

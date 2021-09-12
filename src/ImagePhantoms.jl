@@ -11,6 +11,7 @@ include("jinc.jl")
 include("ellipse.jl")
 include("gauss2.jl")
 include("rect.jl")
+include("triangle.jl")
 
 # phantoms:
 include("shepplogan.jl")

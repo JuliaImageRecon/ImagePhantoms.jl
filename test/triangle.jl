@@ -2,15 +2,20 @@
 triangle.jl
 =#
 
-using ImagePhantoms #: Object2d, AbstractShape2
-using ImagePhantoms #: Triangle
+const DEBUG = false
+
+using ImagePhantoms: Object, AbstractShape2, phantom, radon, spectrum
+using ImagePhantoms: Triangle
 import ImagePhantoms as IP
 using Unitful: m, unit
-#using MIRTjim: jim, prompt
-#using UnitfulRecipes
-#using Plots; default(markerstrokecolor=:auto)
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
+if DEBUG
+    include("helper.jl")
+    using MIRTjim: jim, prompt; # jim(:prompt,true)
+    using UnitfulRecipes
+    using Plots; default(markerstrokecolor=:auto, markersize=2)
+end
 
 shape = Triangle
 
@@ -82,38 +87,44 @@ end
     (M,N) = (2^10,2^10+2)
     x = (-M÷2:M÷2-1) * dx
     y = (-N÷2:N÷2-1) * dy
-    width = (2m, 8m)
-    ob = shape((4m, 3m), width, π/6, 1.0f0)
+    width = (13m, 14m)
+    ob = shape((-3m, -7m), width, π/6, 1.0f0)
     img = phantom(x, y, [ob])
 
-    zscale = 1 / prod(width) # normalize spectra by area
+    zscale = 1 / (sqrt(3)/4 * prod(width)) # normalize spectra by area
     fx = (-M÷2:M÷2-1) / M / dx
     fy = (-N÷2:N÷2-1) / N / dy
     X = myfft(img) * dx * dy * zscale
     kspace = spectrum(fx, fy, [ob]) * zscale
 
-#=
+if DEBUG
     clim = (-6, 0)
     sp = z -> max(log10(abs(z)/oneunit(abs(z))), -6)
     p1 = jim(x, y, img, "phantom")
     p2 = jim(fx, fy, sp.(X), "log10|DFT|"; clim)
     p3 = jim(fx, fy, sp.(kspace), "log10|Spectrum|"; clim)
     p4 = jim(fx, fy, abs.(kspace - X), "Difference")
-    jim(p1, p4, p2, p3)
-=#
+    jim(p1, p4, p2, p3) #; prompt()
+end
+
+#   @show maximum(abs, X)
+#   @show maximum(abs, kspace)
+    @test abs(maximum(abs, X) - 1) < 1e-2
+    @test abs(maximum(abs, kspace) - 1) < 1e-5
+#   @show maximum(abs, kspace - X) / maximum(abs, kspace)
     @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
 
 
     # test sinogram with projection-slice theorem
 
     dr = 0.02m
-    nr = 2^10
+    nr = 2^12
     r = (-nr÷2:nr÷2-1) * dr
     fr = (-nr÷2:nr÷2-1) / nr / dr
-    ϕ = deg2rad.(0:180) # * Unitful.rad # todo round unitful Unitful.°
+    ϕ = deg2rad.(0:360) # * Unitful.rad # todo round unitful Unitful.°
     sino = radon(r, ϕ, [ob])
 
-    ia = argmin(abs.(ϕ .- deg2rad(55)))
+    ia = argmin(abs.(ϕ .- deg2rad(35)))
     slice = sino[:,ia]
     Slice = myfft(slice) * dr
     angle = round(rad2deg(ϕ[ia]), digits=1)
@@ -121,7 +132,7 @@ end
     kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
     ideal = spectrum(ob).(kx, ky)
 
-#=
+if DEBUG
     p2 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram")
     jim(p1, p2)
     p3 = plot(r, slice, title="profile at ϕ = $angle", label="")
@@ -133,8 +144,8 @@ end
     plot!(fr, abs.(ideal), label="abs", color=:blue)
     plot!(fr, real(ideal), label="real", color=:green)
     plot!(fr, imag(ideal), label="imag", color=:red)
-    plot(p1, p2, p3, p4)
-=#
+    plot(p1, p2, p3, p4); gui()
+end
 
     @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
 end
