@@ -108,20 +108,25 @@ end
 
 For a line integral at radial position `r` and angle `ϕ`,
 the locus of points along the line is
-``{(r cos(ϕ), r sin(ϕ)) + τ (-sin(ϕ), cos(ϕ)) : τ ∈ \\mathbb{R}}``.
-This function treat the triangle as the intersection of three half planes:
-H0 is `{(x,y) : y ≥ 0}`,
-H1 is `y ≤ √3 (1/2 - x)`
-H2 is `y ≤ √3 (1/2 + x)`.
+`{(r cos(ϕ), r sin(ϕ)) + τ (-sin(ϕ), cos(ϕ)) : τ ∈ ℝ}`.
+This function treats the equilateral triangle
+with base [-1/2,1/2], pointing upwards,
+as the intersection of three half planes:
+* H0 = `{(x,y) : y ≥ 0}`
+* H1 = `y ≤ √3 (1/2 - x)`
+* H2 = `y ≤ √3 (1/2 + x)`.
 Find the `τ` values where the line locus lies in each half planes,
 then take the length of the intersection of those three intervals.
+
 For example, for H1 we have
 `r sin(ϕ) + τ cos(ϕ) ≤ √3 (1/2 - (r cos(ϕ) - τ sin(ϕ)))`
 or equivalently
 `r (sin(ϕ) + √3 cos(ϕ)) - √3/2 ≤ τ (√3 sin(ϕ) - cos(ϕ))`
 which is a set the form `b1 ≤ a1 τ`, corresponding to some interval `(l1,u1)`.
 Similarly for H0 and H2.
+
 This approach might not be the most efficient, but it is simple.
+
 See Peter Aundal Toft, "The Radon transform - theory and implementation", 1996
 https://orbit.dtu.dk/en/publications/the-radon-transform-theory-and-implementation
 for a different approach to finding the Radon transform of a triangle.
