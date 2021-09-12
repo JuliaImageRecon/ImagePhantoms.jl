@@ -4,17 +4,18 @@ triangle.jl
 
 const DEBUG = false
 
-using ImagePhantoms: Object, AbstractShape2, phantom, radon, spectrum
+using ImagePhantoms: Object, Object2d, AbstractShape2, phantom, radon, spectrum
 using ImagePhantoms: Triangle
 import ImagePhantoms as IP
-using Unitful: m, unit
+using Unitful: m, unit, °
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
 if DEBUG
     include("helper.jl")
-    using MIRTjim: jim, prompt; # jim(:prompt,true)
+    using MIRTjim: jim, prompt
     using UnitfulRecipes
-    using Plots; default(markerstrokecolor=:auto, markersize=2)
+    using Plots: plot, plot!, scatter, scatter!, gui, default
+    default(markerstrokecolor=:auto, markersize=2)
 end
 
 shape = Triangle
@@ -89,13 +90,13 @@ end
     y = (-N÷2:N÷2-1) * dy
     width = (13m, 14m)
     ob = shape((-3m, -7m), width, π/6, 1.0f0)
-    img = phantom(x, y, [ob])
+    img = @inferred phantom(x, y, [ob])
 
     zscale = 1 / (sqrt(3)/4 * prod(width)) # normalize spectra by area
     fx = (-M÷2:M÷2-1) / M / dx
     fy = (-N÷2:N÷2-1) / N / dy
     X = myfft(img) * dx * dy * zscale
-    kspace = spectrum(fx, fy, [ob]) * zscale
+    kspace = @inferred spectrum(fx, fy, [ob]) * zscale
 
 if DEBUG
     clim = (-6, 0)
@@ -104,14 +105,11 @@ if DEBUG
     p2 = jim(fx, fy, sp.(X), "log10|DFT|"; clim)
     p3 = jim(fx, fy, sp.(kspace), "log10|Spectrum|"; clim)
     p4 = jim(fx, fy, abs.(kspace - X), "Difference")
-    jim(p1, p4, p2, p3) #; prompt()
+    jim(p1, p4, p2, p3); prompt()
 end
 
-#   @show maximum(abs, X)
-#   @show maximum(abs, kspace)
     @test abs(maximum(abs, X) - 1) < 1e-2
     @test abs(maximum(abs, kspace) - 1) < 1e-5
-#   @show maximum(abs, kspace - X) / maximum(abs, kspace)
     @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
 
 
@@ -122,7 +120,8 @@ end
     r = (-nr÷2:nr÷2-1) * dr
     fr = (-nr÷2:nr÷2-1) / nr / dr
     ϕ = deg2rad.(0:360) # * Unitful.rad # todo round unitful Unitful.°
-    sino = radon(r, ϕ, [ob])
+#   ϕ = deg2rad.((0:360)°) # not yet due to Unitful issue
+    sino = @inferred radon(r, ϕ, [ob])
 
     ia = argmin(abs.(ϕ .- deg2rad(35)))
     slice = sino[:,ia]
@@ -139,7 +138,7 @@ if DEBUG
     p4 = scatter(fr, abs.(Slice), label="abs fft", color=:blue)
     scatter!(fr, real(Slice), label="real fft", color=:green)
     scatter!(fr, imag(Slice), label="imag fft", color=:red,
-        xlims=(-1,1).*(1.2/m), title="1D spectra")
+        xlims=(-1,1).*(0.6/m), title="1D spectra")
 
     plot!(fr, abs.(ideal), label="abs", color=:blue)
     plot!(fr, real(ideal), label="real", color=:green)
