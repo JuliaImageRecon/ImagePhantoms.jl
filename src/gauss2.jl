@@ -19,18 +19,18 @@ struct Gauss2 <: AbstractShape2 end
 
 
 """
-    Gauss2(cx, cy, wx, wy, ϕ, value::Number)
-    Gauss2(center::NTuple{2,RealU}, width::NTuple{2,RealU}, ϕ::RealU, v)
+    Gauss2(cx, cy, wx, wy=wx, ϕ=0, value::Number=1)
+    Gauss2(center::NTuple{2,RealU}, width::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1)
     Gauss2([6-vector])
-    Gauss2(r, v=1) (square of radius `r`)
+    Gauss2(w, v=1) (isotropic of width `w`)
 Construct `Gauss2` object from parameters;
-here `width` = FWHM (full-width at half-maximum)
+here `width` = FWHM (full-width at half-maximum).
 """
 function Gauss2(
     cx::RealU,
     cy::RealU,
     wx::RealU,
-    wy::RealU,
+    wy::RealU = wx,
     ϕ::RealU = 0,
     value::Number = 1,
 )
@@ -40,7 +40,7 @@ end
 
 function Gauss2(
     center::NTuple{2,RealU},
-    width::NTuple{2,RealU},
+    width::NTuple{2,RealU} = (1,1) .* oneunit(center[1]),
     ϕ::RealU = 0,
     value::Number = 1,
 )
@@ -52,7 +52,7 @@ function Gauss2(v::AbstractVector{<:Number})
     Gauss2(v...)
 end
 
-Gauss2(r::RealU, v::Number = 1) = Gauss2((zero(r),zero(r)), (r,r), 0, v)
+Gauss2(w::RealU, v::Number = 1) = Gauss2((zero(w),zero(w)), (w,w), 0, v)
 
 
 # helper
@@ -91,6 +91,7 @@ function radon_gauss2(r, ϕ, cx, cy, wx, wy, θ)
     return σx * σy / σ * exp(-π * abs2(r / σ))
 end
 
+
 """
     radon(ob::Object2d{Gauss2})
 Returns function of `(r,ϕ)` for making a sinogram.
@@ -101,7 +102,7 @@ radon(ob::Object2d{Gauss2}) = (r,ϕ) -> ob.value *
 
 function spectrum_gauss2(fx, fy, cx, cy, wx, wy, θ)
     (σx, σy) = fwhm2sigma.((wx, wy))
-    (kx, ky) = rotate2d(fx, fy, θ) # shape is rotated first, then translated
+    (kx, ky) = rotate2d(fx, fy, θ) # rotate first, then translate
     return σx * exp(-2im*π*fx*cx) *
            σy * exp(-2im*π*fy*cy) * exp(-π * (abs2(σx*kx) + abs2(σy*ky)))
 end

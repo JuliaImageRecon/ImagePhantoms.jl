@@ -1,11 +1,11 @@
 #=
-gauss2.jl
+triangle.jl
 =#
 
 const DEBUG = false
 
 using ImagePhantoms: Object, Object2d, AbstractShape2, phantom, radon, spectrum
-using ImagePhantoms: Gauss2
+using ImagePhantoms: Triangle
 import ImagePhantoms as IP
 using Unitful: m, unit, °
 using FFTW: fftshift, fft
@@ -18,7 +18,7 @@ if DEBUG
     default(markerstrokecolor=:auto, markersize=2)
 end
 
-shape = Gauss2
+shape = Triangle
 
 macro isob(ex) # @isob macro to streamline tests
     :(@test $(esc(ex)) isa Object2d{shape})
@@ -58,6 +58,14 @@ end
 end
 
 
+@testset "helpers" begin
+    for (a,b) in [(1, 1), (-1, 1),(0, -1), (0, 1)]
+        @inferred IP._interval(a, b)
+        @inferred IP._interval(a, b*1m)
+    end
+end
+
+
 @testset "method" begin
     x = LinRange(-1,1,51)*5
     y = LinRange(-1,1,50)*5
@@ -69,7 +77,7 @@ end
     fun = @inferred phantom(ob)
     @test fun isa Function
     @test fun(ob.center...) == ob.value
-    @test fun((ob.center .+ 9 .* ob.width)...) < 1e-20
+    @test fun((ob.center .+ 2 .* ob.width)...) == 0
 
     img = @inferred phantom(x, y, [ob])
 
@@ -88,11 +96,11 @@ end
     (M,N) = (2^10,2^10+2)
     x = (-M÷2:M÷2-1) * dx
     y = (-N÷2:N÷2-1) * dy
-    width = (2m, 8m)
-    ob = shape((4m, 3m), width, π/6, 1.0f0)
+    width = (13m, 14m)
+    ob = shape((-3m, -7m), width, π/6, 1.0f0)
     img = @inferred phantom(x, y, [ob])
 
-    zscale = 1 /  IP.fwhm2sigma(1)^2 / prod(width) # normalize spectra by area
+    zscale = 1 / (sqrt(3)/4 * prod(width)) # normalize spectra by area
     fx = (-M÷2:M÷2-1) / M / dx
     fy = (-N÷2:N÷2-1) / N / dy
     X = myfft(img) * dx * dy * zscale
@@ -116,14 +124,14 @@ end
     # test sinogram with projection-slice theorem
 
     dr = 0.02m
-    nr = 2^10
+    nr = 2^12
     r = (-nr÷2:nr÷2-1) * dr
     fr = (-nr÷2:nr÷2-1) / nr / dr
     ϕ = deg2rad.(0:360) # * Unitful.rad # todo round unitful Unitful.°
-#   ϕ = deg2rad.((0:180)°) # not yet due to Unitful issue
+#   ϕ = deg2rad.((0:360)°) # not yet due to Unitful issue
     sino = @inferred radon(r, ϕ, [ob])
 
-    ia = argmin(abs.(ϕ .- deg2rad(55)))
+    ia = argmin(abs.(ϕ .- deg2rad(35)))
     slice = sino[:,ia]
     Slice = myfft(slice) * dr
     angle = round(rad2deg(ϕ[ia]), digits=1)
@@ -138,7 +146,7 @@ if DEBUG
     p4 = scatter(fr, abs.(Slice), label="abs fft", color=:blue)
     scatter!(fr, real(Slice), label="real fft", color=:green)
     scatter!(fr, imag(Slice), label="imag fft", color=:red,
-        xlims=(-1,1).*(1.2/m), title="1D spectra")
+        xlims=(-1,1).*(0.6/m), title="1D spectra")
 
     plot!(fr, abs.(ideal), label="abs", color=:blue)
     plot!(fr, real(ideal), label="real", color=:green)
