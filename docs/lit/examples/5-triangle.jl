@@ -110,9 +110,9 @@ p5 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram", yflip=fals
 
 #src clim=(0, 2*maximum(width)*ob.value), # todo
 
-# Note that the maximum sinogram value is about 7mm which makes sense
+# The maximum sinogram value is about 7mm, which makes sense
 # for a triangle whose height is `8mm * sqrt(3) / 2` and whose base is 2mm,
-so the longest side is `sqrt(1^2 + (8mm * sqrt(3) / 2)^2) =` 7 mm.
+# so the longest side is `sqrt(1^2 + (8mm * sqrt(3) / 2)^2) =` 7 mm.
 
 # The above sampling generated a parallel-beam sinogram,
 # but one could make a fan-beam sinogram simply by sampling `(r, ϕ)` appropriately.
