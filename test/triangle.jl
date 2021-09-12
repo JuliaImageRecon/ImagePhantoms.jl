@@ -58,6 +58,14 @@ end
 end
 
 
+@testset "helpers" begin
+    for (a,b) in [(1, 1), (-1, 1),(0, -1), (0, 1)]
+        @inferred IP._interval(a, b)
+        @inferred IP._interval(a, b*1m)
+    end
+end
+
+
 @testset "method" begin
     x = LinRange(-1,1,51)*5
     y = LinRange(-1,1,50)*5

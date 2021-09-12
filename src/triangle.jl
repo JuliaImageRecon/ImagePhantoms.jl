@@ -93,13 +93,14 @@ end
 """
     (lower, upper) = _interval(a, b)
 Determine the interval `[lower, upper]` corresponding to the set
-`{x : b ≤ a x}`
+`{x : b ≤ a x}` where `a` is unitless but `b` and `x` have same units.
 """
 function  _interval(a::Real, b::RealU)
-    return a > 0 ? (b/a, Inf) :
-        a < 0 ? (-Inf, b/a) :
-        b ≤ 0 ? (-Inf, Inf) : # a == 0
-        (T = typeof(one(b)/one(a)); (zero(T),zeros(T)))
+    Infu = Inf * oneunit(b)
+    return a > 0 ? (b/a, Infu) :
+        a < 0 ? (-Infu, b/a) :
+        b ≤ zero(b) ? (-Infu, Infu) : # a == 0
+        (T = typeof(oneunit(b)/one(a)); (zero(T),zero(T)))
 end
 
 function radon_tri(r, sinϕ, cosϕ)
