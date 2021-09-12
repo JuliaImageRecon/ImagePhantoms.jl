@@ -31,8 +31,8 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 # (Using units is recommended but not required.)
 
 # Define an ellipse object, using physical units.
-width = (2mm, 8mm)
-ob = Ellipse((4mm, 3mm), width, π/6, 1.0f0)
+radii = (2mm, 8mm)
+ob = Ellipse((4mm, 3mm), radii, π/6, 1.0f0)
 
 
 # ### Phantom image using `phantom`
@@ -62,7 +62,7 @@ p1 = jim(axes(ig)..., img, "Ellipse phantom", xlabel="x", ylabel="y")
 # * applying the DFT via FFT to the digital image.
 # Because the shape has units `mm`, the spectra axes have units cycles/mm.
 
-zscale = 4 / π / prod(width) # normalize spectra by area
+zscale = 1 / π / prod(radii) # normalize spectra by area
 spectrum_exact = spectrum(axesf(ig)..., [ob]) * zscale
 sp = z -> max(log10(abs(z)/oneunit(abs(z))), -6) # log-scale for display
 clim = (-6, 0) # colorbar limit for display
@@ -102,7 +102,7 @@ fr = (-nr÷2:nr÷2-1) / nr / dr # corresponding spectral axis
 sino = radon(ob).(r, ϕ') # sample Radon transform of a single shape object
 p5 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram", yflip=false, xlabel="r", ylabel="ϕ")
 
-#src clim=(0, 2*maximum(width)*ob.value), # todo
+#src clim=(0, 2*maximum(radii)*ob.value), # todo
 
 # Note that the maximum sinogram value is about 16mm which makes sense
 # for an ellipse whose long axis has "radius" 8mm.

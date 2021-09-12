@@ -89,8 +89,8 @@ p3 = jim(axesf(ig)..., sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
 
 # Compare the DFT and analytical spectra to validate the code
-@show maximum(abs, spectrum_exact - spectrum_fft) /
-        maximum(abs, spectrum_exact) < 2e-2 # todo
+@assert maximum(abs, spectrum_exact - spectrum_fft) /
+        maximum(abs, spectrum_exact) < 2e-2
 p4 = jim(axesf(ig)..., abs.(spectrum_fft - spectrum_exact), "Difference"; xlabel, ylabel)
 jim(p1, p4, p2, p3)
 
@@ -106,13 +106,13 @@ r = (-nr÷2:nr÷2-1) * dr # radial samples
 fr = (-nr÷2:nr÷2-1) / nr / dr # corresponding spectral axis
 ϕ = deg2rad.(0:180) # * Unitful.rad # todo round unitful Unitful.°
 sino = radon(ob).(r, ϕ') # sample Radon transform of a single shape object
-#sino = dr * ones(size(sino)) # todo
 p5 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram", yflip=false, xlabel="r", ylabel="ϕ")
 
 #src clim=(0, 2*maximum(width)*ob.value), # todo
 
-# Note that the maximum sinogram value is about 16mm which makes sense
-# for a triangle whose long axis has "radius" 8mm. # todo
+# Note that the maximum sinogram value is about 7mm which makes sense
+# for a triangle whose height is `8mm * sqrt(3) / 2` and whose base is 2mm,
+so the longest side is `sqrt(1^2 + (8mm * sqrt(3) / 2)^2) =` 7 mm.
 
 # The above sampling generated a parallel-beam sinogram,
 # but one could make a fan-beam sinogram simply by sampling `(r, ϕ)` appropriately.
@@ -128,7 +128,7 @@ angle = round(rad2deg(ϕ[ia]), digits=1)
 
 kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
 slice_ft = spectrum(ob).(kx, ky)
-@assert maximum(abs, slice_ft - slice_fft) / maximum(abs, slice_ft) < 2e-4 # todo
+@assert maximum(abs, slice_ft - slice_fft) / maximum(abs, slice_ft) < 2e-4
 
 p3 = plot(r, slice, title="profile at ϕ = $angle", label="")
 p4 = plot(title="1D spectra")
