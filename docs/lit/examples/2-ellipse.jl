@@ -13,7 +13,7 @@ using ImagePhantoms: Ellipse, phantom, radon, spectrum
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
 using FFTW: fft, fftshift
-using Unitful: mm, unit
+using Unitful: mm, unit, °
 using UnitfulRecipes
 using Plots: plot, plot!, scatter!, default; default(markerstrokecolor=:auto)
 
@@ -114,7 +114,7 @@ p5 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram", yflip=fals
 # ### Fourier-slice theorem illustration
 
 # Pick one particular view angle (55°) and look at its slice and spectra.
-ia = argmin(abs.(ϕ .- deg2rad(55)))
+ia = argmin(abs.(ϕ .- 55°))
 slice = sino[:,ia]
 slice_fft = myfft(slice) * dr
 angle = round(rad2deg(ϕ[ia]), digits=1)

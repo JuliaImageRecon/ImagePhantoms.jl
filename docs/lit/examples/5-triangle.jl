@@ -13,7 +13,7 @@ using ImagePhantoms: Triangle, phantom, radon, spectrum
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
 using FFTW: fft, fftshift
-using Unitful: mm, unit
+using Unitful: mm, unit, °
 using UnitfulRecipes
 using Plots: plot, plot!, scatter!, default; default(markerstrokecolor=:auto)
 
@@ -121,7 +121,7 @@ so the longest side is `sqrt(1^2 + (8mm * sqrt(3) / 2)^2) =` 7 mm.
 # ### Fourier-slice theorem illustration
 
 # Pick one particular view angle (55°) and look at its slice and spectra.
-ia = argmin(abs.(ϕ .- deg2rad(55)))
+ia = argmin(abs.(ϕ .- 55°))
 slice = sino[:,ia]
 slice_fft = myfft(slice) * dr
 angle = round(rad2deg(ϕ[ia]), digits=1)
@@ -150,12 +150,6 @@ plot(p1, p5, p3, p4)
 
 ### Spectrum
 
-# The spectrum of a triangle is not widely available
-# so we include its derivation here for completeness. (WIP)
-
-# ```math
-# \begin{aligned}
-# F(u,v) &= \int_0^{\sqrt{3}/2} \int_{-1/2 - y / \sqrt{3}}^{-1/2 + y / \sqrt{3}}
-# e^{i 2\pi u x} e^{i 2\pi v y} dx dy \\
-# \end{aligned}
-# ```
+# The spectrum of a triangle is not widely available;
+# for a derivation, see
+# [overleaf file.](https://www.overleaf.com/read/pcrttymdkdcx)
