@@ -69,6 +69,11 @@ see the
 [documentation][docs-stable-url].
 
 
+Currently the package supports
+the following 2D shapes:
+ellipses/circles, rectangles/squares, gaussians, triangles.
+
+
 ### Dependents
 
 * [Michigan Image Reconstruction Toolbox (MIRT)](https://github.com/JeffFessler/MIRT.jl)
