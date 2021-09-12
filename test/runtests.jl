@@ -12,6 +12,7 @@ include("rect.jl")
 include("triangle.jl")
 include("shepplogan.jl")
 include("disk-phantom.jl")
+include("focus-chart.jl")
 
 @testset "ImagePhantoms" begin
     @test isempty(detect_ambiguities(ImagePhantoms))

@@ -16,5 +16,6 @@ include("triangle.jl")
 # phantoms:
 include("shepplogan.jl")
 include("disk-phantom.jl")
+include("focus-chart.jl")
 
 end # module
