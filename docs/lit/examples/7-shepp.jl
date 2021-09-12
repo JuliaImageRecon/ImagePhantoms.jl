@@ -1,5 +1,5 @@
 #---------------------------------------------------------
-# # [Shepp-Logan Phantoms](@id 8-shepp)
+# # [Shepp-Logan Phantoms](@id 7-shepp)
 #---------------------------------------------------------
 
 # This page illustrates the Shepp-Logan phantoms in the Julia package

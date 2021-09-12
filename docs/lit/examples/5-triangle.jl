@@ -1,15 +1,15 @@
 #---------------------------------------------------------
-# # [Ellipse](@id 2-ellipse)
+# # [Triangle](@id 5-triangle)
 #---------------------------------------------------------
 
-# This page illustrates the `Ellipse` shape in the Julia package
+# This page illustrates the `Triangle` shape in the Julia package
 # [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
 
 # ### Setup
 
 # Packages needed here.
 
-using ImagePhantoms: Ellipse, phantom, radon, spectrum
+using ImagePhantoms: Triangle, phantom, radon, spectrum
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
 using FFTW: fft, fftshift
@@ -24,15 +24,21 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 # ### Overview
 
-# One of the most basic shapes used in constructing 2D digital image phantoms
-# is the ellipse, specified by its center, radii, angle and value.
+# For completeness, this package includes a triangle shape
+# for constructing 2D digital image phantoms.
+# (One could describe quite complicated phantoms with a triangular mesh.)
+# The basic shape here is an equilateral triangle
+# whose base is [-1/2,1/2] along the x axis,
+# pointing upwards along the y axis.
+# When defining such a `Triangle` object one can specify
+# its center, widths, angle and value.
 # All of the methods in `ImagePhantoms` support physical units,
 # so we use such units throughout this example.
 # (Using units is recommended but not required.)
 
-# Define an ellipse object, using physical units.
-radii = (2mm, 8mm)
-ob = Ellipse((4mm, 3mm), radii, π/6, 1.0f0)
+# Define a triangle object, using physical units.
+width = (2mm, 8mm)
+ob = Triangle((4mm, 3mm), width, π/6, 1.0f0)
 
 
 # ### Phantom image using `phantom`
@@ -51,18 +57,18 @@ jim(x, y, img)
 
 ig = ImageGeom(dims=(M,N), deltas=(dx,dy), offsets=(0.5,0.5))
 @assert all(axes(ig) .≈ (x,y))
-p1 = jim(axes(ig)..., img, "Ellipse phantom", xlabel="x", ylabel="y")
+p1 = jim(axes(ig)..., img, "Triangle phantom", xlabel="x", ylabel="y")
 
 
 # ### Spectrum using `spectrum`
 
 # Let's examine the spectrum of this image.
 # There are two ways to do this:
-# * using the analytical Fourier transform of the ellipse via `spectrum`
+# * using the analytical Fourier transform of the triangle via `spectrum`
 # * applying the DFT via FFT to the digital image.
 # Because the shape has units `mm`, the spectra axes have units cycles/mm.
 
-zscale = 1 / π / prod(radii) # normalize spectra by area
+zscale = 1 / (sqrt(3) / 4 * prod(width)) # normalize spectra by area
 spectrum_exact = spectrum(axesf(ig)..., [ob]) * zscale
 sp = z -> max(log10(abs(z)/oneunit(abs(z))), -6) # log-scale for display
 clim = (-6, 0) # colorbar limit for display
@@ -91,7 +97,7 @@ jim(p1, p4, p2, p3)
 
 # ### Radon transform using `radon`
 
-# Examine the Radon transform of the ellipse using `radon`,
+# Examine the Radon transform of the triangle using `radon`,
 # and validate it using the projection-slice theorem aka Fourier-slice theorem.
 
 dr = 0.02mm # radial sample spacing
@@ -102,10 +108,11 @@ fr = (-nr÷2:nr÷2-1) / nr / dr # corresponding spectral axis
 sino = radon(ob).(r, ϕ') # sample Radon transform of a single shape object
 p5 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram", yflip=false, xlabel="r", ylabel="ϕ")
 
-#src clim=(0, 2*maximum(radii)*ob.value), # todo
+#src clim=(0, 2*maximum(width)*ob.value), # todo
 
-# Note that the maximum sinogram value is about 16mm which makes sense
-# for an ellipse whose long axis has "radius" 8mm.
+# The maximum sinogram value is about 7mm, which makes sense
+# for a triangle whose height is `8mm * sqrt(3) / 2` and whose base is 2mm,
+# so the longest side is `sqrt(1^2 + (8mm * sqrt(3) / 2)^2) =` 7 mm.
 
 # The above sampling generated a parallel-beam sinogram,
 # but one could make a fan-beam sinogram simply by sampling `(r, ϕ)` appropriately.
@@ -138,4 +145,11 @@ plot(p1, p5, p3, p4)
 # The good agreement between the analytical spectra (solid lines)
 # and the DFT samples (disks)
 # validates that `phantom`, `radon`, and `spectrum`
-# are all self consistent for this `Ellipse` object.
+# are all self consistent for this `Triangle` object.
+
+
+### Spectrum
+
+# The spectrum of a triangle is not widely available;
+# for a derivation, see
+# [overleaf file.](https://www.overleaf.com/read/pcrttymdkdcx)

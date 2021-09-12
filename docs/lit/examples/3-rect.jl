@@ -1,19 +1,19 @@
 #---------------------------------------------------------
-# # [Triangle](@id 4-triangle)
+# # [Rectangle](@id 3-rect)
 #---------------------------------------------------------
 
-# This page illustrates the `Triangle` shape in the Julia package
+# This page illustrates the `Rect` shape in the Julia package
 # [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
 
 # ### Setup
 
 # Packages needed here.
 
-using ImagePhantoms: Triangle, phantom, radon, spectrum
+using ImagePhantoms: Rect, phantom, radon, spectrum
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
 using FFTW: fft, fftshift
-using Unitful: mm, unit
+using Unitful: mm, unit, °
 using UnitfulRecipes
 using Plots: plot, plot!, scatter!, default; default(markerstrokecolor=:auto)
 
@@ -24,21 +24,15 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 # ### Overview
 
-# For completeness, this package includes a triangle shape
-# for constructing 2D digital image phantoms.
-# (One could describe quite complicated phantoms with a triangular mesh.)
-# The basic shape here is an equilateral triangle
-# whose base is [-1/2,1/2] along the x axis,
-# pointing upwards along the y axis.
-# When defining such a `Triangle` object one can specify
-# its center, widths, angle and value.
+# One of the most basic shapes used in constructing 2D digital image phantoms
+# is the rectangle, specified by its center, widths, angle and value.
 # All of the methods in `ImagePhantoms` support physical units,
 # so we use such units throughout this example.
 # (Using units is recommended but not required.)
 
-# Define a triangle object, using physical units.
+# Define an rectangle object, using physical units.
 width = (2mm, 8mm)
-ob = Triangle((4mm, 3mm), width, π/6, 1.0f0)
+ob = Rect((4mm, 3mm), width, π/6, 1.0f0)
 
 
 # ### Phantom image using `phantom`
@@ -57,18 +51,18 @@ jim(x, y, img)
 
 ig = ImageGeom(dims=(M,N), deltas=(dx,dy), offsets=(0.5,0.5))
 @assert all(axes(ig) .≈ (x,y))
-p1 = jim(axes(ig)..., img, "Triangle phantom", xlabel="x", ylabel="y")
+p1 = jim(axes(ig)..., img, "Rect phantom", xlabel="x", ylabel="y")
 
 
 # ### Spectrum using `spectrum`
 
 # Let's examine the spectrum of this image.
 # There are two ways to do this:
-# * using the analytical Fourier transform of the triangle via `spectrum`
+# * using the analytical Fourier transform of the rect via `spectrum`
 # * applying the DFT via FFT to the digital image.
 # Because the shape has units `mm`, the spectra axes have units cycles/mm.
 
-zscale = 1 / (sqrt(3) / 4 * prod(width)) # normalize spectra by area
+zscale = 1 / prod(width) # normalize spectra by area
 spectrum_exact = spectrum(axesf(ig)..., [ob]) * zscale
 sp = z -> max(log10(abs(z)/oneunit(abs(z))), -6) # log-scale for display
 clim = (-6, 0) # colorbar limit for display
@@ -89,15 +83,15 @@ p3 = jim(axesf(ig)..., sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
 
 # Compare the DFT and analytical spectra to validate the code
-@show maximum(abs, spectrum_exact - spectrum_fft) /
-        maximum(abs, spectrum_exact) < 2e-2 # todo
+@assert maximum(abs, spectrum_exact - spectrum_fft) /
+        maximum(abs, spectrum_exact) < 2e-2
 p4 = jim(axesf(ig)..., abs.(spectrum_fft - spectrum_exact), "Difference"; xlabel, ylabel)
 jim(p1, p4, p2, p3)
 
 
 # ### Radon transform using `radon`
 
-# Examine the Radon transform of the triangle using `radon`,
+# Examine the Radon transform of the rect using `radon`,
 # and validate it using the projection-slice theorem aka Fourier-slice theorem.
 
 dr = 0.02mm # radial sample spacing
@@ -106,13 +100,12 @@ r = (-nr÷2:nr÷2-1) * dr # radial samples
 fr = (-nr÷2:nr÷2-1) / nr / dr # corresponding spectral axis
 ϕ = deg2rad.(0:180) # * Unitful.rad # todo round unitful Unitful.°
 sino = radon(ob).(r, ϕ') # sample Radon transform of a single shape object
-#sino = dr * ones(size(sino)) # todo
 p5 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram", yflip=false, xlabel="r", ylabel="ϕ")
 
-#src clim=(0, 2*maximum(width)*ob.value), # todo
+#src clim=(0, maximum(width)*ob.value), # todo
 
-# Note that the maximum sinogram value is about 16mm which makes sense
-# for a triangle whose long axis has "radius" 8mm. # todo
+# Note that the maximum sinogram value is about sqrt(8^2+2^2) = 8.2mm,
+# which makes sense for a 8mm × 2mm rect.
 
 # The above sampling generated a parallel-beam sinogram,
 # but one could make a fan-beam sinogram simply by sampling `(r, ϕ)` appropriately.
@@ -121,14 +114,14 @@ p5 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram", yflip=fals
 # ### Fourier-slice theorem illustration
 
 # Pick one particular view angle (55°) and look at its slice and spectra.
-ia = argmin(abs.(ϕ .- deg2rad(55)))
+ia = argmin(abs.(ϕ .- 55°))
 slice = sino[:,ia]
 slice_fft = myfft(slice) * dr
 angle = round(rad2deg(ϕ[ia]), digits=1)
 
 kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
 slice_ft = spectrum(ob).(kx, ky)
-@assert maximum(abs, slice_ft - slice_fft) / maximum(abs, slice_ft) < 2e-4 # todo
+@assert maximum(abs, slice_ft - slice_fft) / maximum(abs, slice_ft) < 2e-4
 
 p3 = plot(r, slice, title="profile at ϕ = $angle", label="")
 p4 = plot(title="1D spectra")
@@ -145,17 +138,4 @@ plot(p1, p5, p3, p4)
 # The good agreement between the analytical spectra (solid lines)
 # and the DFT samples (disks)
 # validates that `phantom`, `radon`, and `spectrum`
-# are all self consistent for this `Triangle` object.
-
-
-### Spectrum
-
-# The spectrum of a triangle is not widely available
-# so we include its derivation here for completeness. (WIP)
-
-# ```math
-# \begin{aligned}
-# F(u,v) &= \int_0^{\sqrt{3}/2} \int_{-1/2 - y / \sqrt{3}}^{-1/2 + y / \sqrt{3}}
-# e^{i 2\pi u x} e^{i 2\pi v y} dx dy \\
-# \end{aligned}
-# ```
+# are all self consistent for this `Rect` object.
