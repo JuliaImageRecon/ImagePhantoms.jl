@@ -92,7 +92,7 @@ end
     ob = shape((4m, 3m), width, π/6, 1.0f0)
     img = @inferred phantom(x, y, [ob])
 
-    zscale = 1 /  IP.fwhm2sigma(1)^2 / prod(width) # normalize spectra by area
+    zscale = 1 / IP.fwhm2sigma(1)^2 / prod(width) # normalize spectra by area
     fx = (-M÷2:M÷2-1) / M / dx
     fy = (-N÷2:N÷2-1) / N / dy
     X = myfft(img) * dx * dy * zscale

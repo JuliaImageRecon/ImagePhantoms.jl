@@ -1,5 +1,5 @@
 #---------------------------------------------------------
-# # [Triangle](@id 4-triangle)
+# # [Triangle](@id 5-triangle)
 #---------------------------------------------------------
 
 # This page illustrates the `Triangle` shape in the Julia package
