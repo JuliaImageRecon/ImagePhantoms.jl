@@ -62,7 +62,13 @@ Gauss2(w::RealU, v::Number = 1) = Gauss2((zero(w),zero(w)), (w,w), 0, v)
     σ = fwhm2sigma(w)
 Convert FWHM `w` to equivalent Gaussian `σ` for ``\\exp(-π (x/σ)^2)``.
 """
-@inline fwhm2sigma(w) = w / sqrt(log(256))
+@inline fwhm2sigma(w) = w / sqrt(log(256)) # todo: obsolete
+
+"""
+    s = fwhm2spread(w)
+Convert FWHM `w` to equivalent Gaussian spread `s` for ``\\exp(-π (x/s)^2)``.
+"""
+@inline fwhm2spread(w) = w / sqrt(log(256) * 2π)
 
 
 # methods
