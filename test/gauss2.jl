@@ -3,8 +3,6 @@ gauss2.jl
 =#
 
 const DEBUG = false
-#const DEBUG = true # todo
-#using Revise
 
 using ImagePhantoms: Object, Object2d, AbstractShape2, phantom, radon, spectrum
 using ImagePhantoms: Gauss2
