@@ -32,16 +32,16 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 # (Using units is recommended but not required.)
 
 # Define a 2D Gaussian object, using physical units.
-width = (2mm, 8mm) # full-width at half-maximum (FHWM)
-ob = Gauss2((4mm, 3mm), width, π/6, 1.0f0)
+width = (5mm, 2mm) # full-width at half-maximum (FHWM)
+ob = Gauss2((2mm, 3mm), width, π/6, 1.0f0)
 
 
 # ### Phantom image using `phantom`
 
 # Make a digital image of it using `phantom` and display it.
 dx = 0.02mm
-dy = 0.025mm
-(M,N) = (2^10,2^10+2)
+dy = 0.024mm
+(M,N) = (3*2^9, 2^10+2)
 x = (-M÷2:M÷2-1) * dx
 y = (-N÷2:N÷2-1) * dy
 img = phantom(x, y, [ob])
@@ -57,13 +57,12 @@ p1 = jim(axes(ig)..., img, "2D Gaussian phantom", xlabel="x", ylabel="y")
 
 # ### Spectrum using `spectrum`
 
-# Let's examine the spectrum of this image.
-# There are two ways to do this:
+# There are two ways to examine the spectrum of this image:
 # * using the analytical Fourier transform of the 2D Gaussian via `spectrum`
 # * applying the DFT via FFT to the digital image.
 # Because the shape has units `mm`, the spectra axes have units cycles/mm.
 
-zscale = 1 / IP.fwhm2sigma(1)^2 / prod(width) # normalize spectra by area
+zscale = 1 / IP.fwhm2spread(1)^2 / prod(width) # normalize spectra by area
 spectrum_exact = spectrum(axesf(ig)..., [ob]) * zscale
 sp = z -> max(log10(abs(z)/oneunit(abs(z))), -6) # log-scale for display
 clim = (-6, 0) # colorbar limit for display
@@ -72,7 +71,7 @@ p2 = jim(axesf(ig)..., sp.(spectrum_exact), "log10|Spectrum|"; clim, xlabel, yla
 
 
 # Sadly `fft` cannot handle units currently, so this function is a work-around:
-function myfft(x)
+function myfft(x::AbstractArray{<:Any})
     u = unit(eltype(x))
     return fftshift(fft(fftshift(x) / u)) * u
 end
@@ -84,9 +83,10 @@ p3 = jim(axesf(ig)..., sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
 
 # Compare the DFT and analytical spectra to validate the code
-@assert maximum(abs, spectrum_exact - spectrum_fft) /
-        maximum(abs, spectrum_exact) < 2e-2
-p4 = jim(axesf(ig)..., abs.(spectrum_fft - spectrum_exact), "Difference"; xlabel, ylabel)
+err = maximum(abs, spectrum_exact - spectrum_fft) /
+        maximum(abs, spectrum_exact)
+@assert err < 1e-6
+p4 = jim(axesf(ig)..., 1e6*abs.(spectrum_fft - spectrum_exact), "Difference × 1e6"; xlabel, ylabel)
 jim(p1, p4, p2, p3)
 
 
@@ -122,13 +122,15 @@ angle = round(rad2deg(ϕ[ia]), digits=1)
 
 kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
 slice_ft = spectrum(ob).(kx, ky)
-@assert maximum(abs, slice_ft - slice_fft) / maximum(abs, slice_ft) < 2e-4
+err = maximum(abs, slice_ft - slice_fft) / maximum(abs, slice_ft)
+@assert err < 4e-4
 
 p3 = plot(r, slice, title="profile at ϕ = $angle", label="")
 p4 = plot(title="1D spectra")
 scatter!(fr, abs.(slice_fft), label="abs fft", color=:blue)
 scatter!(fr, real(slice_fft), label="real fft", color=:green)
-scatter!(fr, imag(slice_fft), label="imag fft", color=:red, xlims=(-1,1).*(1.0/mm))
+scatter!(fr, imag(slice_fft), label="imag fft", color=:red,
+    xlims=(-1,1).*(0.8/mm))
 
 plot!(fr, abs.(slice_ft), label="abs", color=:blue)
 plot!(fr, real(slice_ft), label="real", color=:green)

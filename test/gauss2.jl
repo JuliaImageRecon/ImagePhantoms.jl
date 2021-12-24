@@ -82,17 +82,33 @@ end
 end
 
 
+@testset "fwhm" begin
+    fwhm = 10
+    ob = @inferred shape((0, 0), (fwhm, Inf), 0, 1)
+    tmp = @inferred phantom((-1:1)*fwhm/2, [0], [ob])
+    @test tmp ≈ [0.5, 1, 0.5]
+
+if DEBUG # check profile
+    x = -2fwhm:2fwhm
+    profile = @inferred phantom(x, [0], [ob])
+    scatter(x, profile, label="profile")
+    scatter!([-1,1]*fwhm/2, [1,1]*0.5, label="fwhm/2")
+#   prompt()
+end
+end
+
+
 @testset "spectrum" begin
     dx = 0.02m
-    dy = 0.025m
-    (M,N) = (2^10,2^10+2)
+    dy = 0.024m
+    (M,N) = (1.5*2^10,2^10+2)
     x = (-M÷2:M÷2-1) * dx
     y = (-N÷2:N÷2-1) * dy
-    width = (2m, 8m)
-    ob = shape((4m, 3m), width, π/6, 1.0f0)
+    width = (5m, 2m)
+    ob = shape((2m, 3m), width, π/6, 1.0f0)
     img = @inferred phantom(x, y, [ob])
 
-    zscale = 1 / IP.fwhm2sigma(1)^2 / prod(width) # normalize spectra by area
+    zscale = 1 / IP.fwhm2spread(1)^2 / prod(width) # normalize spectra by area
     fx = (-M÷2:M÷2-1) / M / dx
     fy = (-N÷2:N÷2-1) / N / dy
     X = myfft(img) * dx * dy * zscale
@@ -104,13 +120,13 @@ if DEBUG
     p1 = jim(x, y, img, "phantom")
     p2 = jim(fx, fy, sp.(X), "log10|DFT|"; clim)
     p3 = jim(fx, fy, sp.(kspace), "log10|Spectrum|"; clim)
-    p4 = jim(fx, fy, abs.(kspace - X), "Difference")
+    p4 = jim(fx, fy, 1e6*abs.(kspace - X), "Difference * 1e6")
     jim(p1, p4, p2, p3); prompt()
 end
 
-    @test abs(maximum(abs, X) - 1) < 1e-2
-    @test abs(maximum(abs, kspace) - 1) < 1e-5
-    @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
+    @test abs(maximum(abs, X) - 1) < 7e-6
+    @test abs(maximum(abs, kspace) - 1) < 5e-6
+    @test maximum(abs, kspace - X) / maximum(abs, kspace) < 7e-6
 
 
     # test sinogram with projection-slice theorem
@@ -132,6 +148,7 @@ end
     ideal = spectrum(ob).(kx, ky)
 
 if DEBUG
+    @show maximum(abs, ideal - Slice) / maximum(abs, ideal)
     p2 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram")
     jim(p1, p2)
     p3 = plot(r, slice, title="profile at ϕ = $angle", label="")
@@ -146,5 +163,5 @@ if DEBUG
     plot(p1, p2, p3, p4); gui()
 end
 
-    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
+    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 4e-4
 end
