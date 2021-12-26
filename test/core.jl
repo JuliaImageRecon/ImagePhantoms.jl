@@ -13,10 +13,10 @@ using Test: @test, @testset, @test_throws, @inferred
 
     @test ndims(ob) == 2
     @test eltype(ob) == Int64
-    @inferred copymod(ob)
-    @inferred copymod(ob; value = 2//3)
-    @test copymod(ob) == ob
-    @test copymod(ob ; value = 3).value == 3
+    @inferred Object(ob)
+    @inferred Object(ob; value = 2//3)
+    @test Object(ob) == ob
+    @test Object(ob ; value = 3).value == 3
 
     @test phantom([ob]) isa Function
     @test phantom([ob])(0,0) == 1

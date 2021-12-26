@@ -8,7 +8,7 @@ ellipses, rectangles, and gaussian bumps.
 export AbstractObject
 export Object, Object2d, Object3d
 #export rotate, scale, translate # no: to avoid conflicts with Plots
-export phantom, radon, spectrum, copymod
+export phantom, radon, spectrum
 
 atuple(x::Any, n::Int) = ntuple(i -> x, n)
 
@@ -186,6 +186,22 @@ end
 =#
 
 
+"""
+    Object(ob::Object ; center, width, angle, value, param)
+Make a copy of Object `ob`, optionally modifying some values.
+"""
+function Object(ob::Object{S,D} ;
+    center::NTuple{D} = ob.center,
+    width::NTuple{D} = ob.width,
+    angle::NTuple{Da,<:RealU} = ob.angle,
+    value::Number = ob.value,
+    param = ob.param,
+) where {S, D, Da}
+    Da == D-1 || throw(ArgumentError("Dϕ=$Dϕ != D-1, where D=$D"))
+    Object(ob.shape, center, width, angle, value, param)
+end
+
+
 # Methods for objects
 
 Base.eltype(::Object{S,D,V}) where {S,D,V} = V
@@ -201,23 +217,6 @@ function Base.show(io::IO, ::MIME"text/plain", ob::Object{S,D}) where {S,D}
         p = getproperty(ob, f)
         println(io, " ", f, "::", typeof(p), " ", p)
     end
-end
-
-
-# copymod
-"""
-    copymod(ob::Object ; center, width, angle, value, param)
-Make a copy of Object `ob`, optionally modifying some values.
-"""
-function copymod(ob::Object{S,D} ;
-    center::NTuple{D} = ob.center,
-    width::NTuple{D} = ob.width,
-    angle::NTuple{Da,<:RealU} = ob.angle,
-    value::Number = ob.value,
-    param = ob.param,
-) where {S, D, Da}
-    Da == D-1 || throw(ArgumentError("Dϕ=$Dϕ != D-1, where D=$D"))
-    Object(ob.shape, center, width, angle, value, param)
 end
 
 
