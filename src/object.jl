@@ -186,9 +186,26 @@ end
 =#
 
 
+"""
+    Object(ob::Object ; center, width, angle, value, param)
+Make a copy of Object `ob`, optionally modifying some values.
+"""
+function Object(ob::Object{S,D} ;
+    center::NTuple{D} = ob.center,
+    width::NTuple{D} = ob.width,
+    angle::NTuple{Da,<:RealU} = ob.angle,
+    value::Number = ob.value,
+    param = ob.param,
+) where {S, D, Da}
+    Da == D-1 || throw(ArgumentError("Dϕ=$Dϕ != D-1, where D=$D"))
+    Object(ob.shape, center, width, angle, value, param)
+end
+
+
 # Methods for objects
 
 Base.eltype(::Object{S,D,V}) where {S,D,V} = V
+Base.ndims(::Object{S,D}) where {S,D} = D
 
 
 """
