@@ -215,7 +215,9 @@ function Base.show(io::IO, ::MIME"text/plain", ob::Object{S,D}) where {S,D}
     println(io, typeof(ob), " (S, D, V, ...)")
     for f in (:shape, :center, :width, :angle, :value, :param)
         p = getproperty(ob, f)
-        println(io, " ", f, "::", typeof(p), " ", p)
+        t = typeof(p)
+        t = t == NTuple{D,eltype(t)} ? "NTuple{$D,$(eltype(t))}" : "$t"
+        println(io, " ", f, "::", t, " ", p)
     end
 end
 
