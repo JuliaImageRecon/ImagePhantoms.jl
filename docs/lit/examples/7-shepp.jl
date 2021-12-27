@@ -101,7 +101,23 @@ jim(image4, "SheppLoganBrainWeb")
 # to preserve the integer indices.
 
 
+# ### Disjoint middle ellipses
+
+# Sometimes it can be more convenient
+# to have the middle ellipses be non-overlapping:
+
+ob = ellipse_parameters(SheppLoganBrainWeb(), disjoint=true)
+ob[:,end] = 1:10
+ob = Ellipse(ob)
+x = LinRange(-0.4, 0.4, 206)
+y = LinRange(-0.5, 0.5, 256)
+oversample = 3
+image5 = phantom(x, y, ob, oversample)
+jim(x, y, image5, "Disjoint")
+throw(5)
+
+
 # ### Comedy version
 
-image5 = shepp_logan(256, SouthPark(); fovs=(1,1))
-jim(image5, "SouthPark")
+image6 = shepp_logan(256, SouthPark(); fovs=(1,1))
+jim(image6, "SouthPark")
