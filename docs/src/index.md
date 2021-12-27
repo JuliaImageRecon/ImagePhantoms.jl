@@ -17,14 +17,16 @@ from this
 as the
 logo for the
 [JuliaImageRecon](https://github.com/JuliaImageRecon)
-suite of tools.
+suite of tools.)
 
 A phantom is a collection (iterable) of shapes
 (e.g., ellipses, rectangles).
-This package allows the shapes to be described
-with physical units,
-e.g., using
-[Unitful.jl](https://github.com/PainterQubits/Unitful.jl).
+One purpose of this package
+is to avoid
+the
+[inverse crime](http://doi.org/10.1016/j.cam.2005.09.027)
+of using a discretized or sampled image
+to generate sinograms or spectra.
 
 The shapes in this package
 have methods useful
@@ -49,3 +51,27 @@ similar to the functions of the same name in the
 [Matlab version of MIRT](https://github.com/JeffFessler/mirt)
 provided for backward compatibility.
 Using `ImagePhantoms` is recommended for Julia work.
+
+
+## Units
+
+This package allows the shapes to be described
+with physical units,
+e.g., using
+[Unitful.jl](https://github.com/PainterQubits/Unitful.jl).
+Using units is recommended but not required.
+If units are not used explicitly,
+then the user
+must be especially careful
+to use values
+corresponding to consistent units.
+For example,
+if the shape sizes are in cm,
+then
+* the arguments to `phantom`
+  must also be in cm units,
+* the first (`r`) argument to `radon`
+  must also be in cm
+  and the `ϕ` argument must be in radians,
+* the spatial frequency arguments to `spectrum`
+  must be in cycles/cm units.
