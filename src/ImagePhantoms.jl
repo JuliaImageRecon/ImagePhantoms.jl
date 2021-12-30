@@ -18,4 +18,7 @@ include("shepplogan.jl")
 include("disk-phantom.jl")
 include("focus-chart.jl")
 
+# MRI SENSE:
+include("mri-sense.jl")
+
 end # module
