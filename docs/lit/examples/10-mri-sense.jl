@@ -96,12 +96,6 @@ jim(x, y, mask, "mask")
 
 ncoil = 2
 smap = ir_mri_sensemap_sim(dims=(nx,ny), ncoil=ncoil, orbit_start=[0])
-#=
-smap = cat(dims=3,
-	7 * exp.(im * 2pi * ((0:nx-1) .- 27) / nx * 3) * ones(ny)',
-    5 * ones(nx) * exp.(-im * 2pi * ((0:ny-1) .+ 39) / ny * 1)',
-)
-=#
 jim(x, y, cfun(smap), "Sensitivity maps raw")
 
 # Typical sensitivity map estimation methods
@@ -175,3 +169,8 @@ jim(
  jim(fx, fy, real(kspace2[1]), "FFT-based"; xlims, ylims),
  jim(fx, fy, real(kspace2[1] - kspace1[1]), "Error"; xlims, ylims),
 )
+
+
+# In summary, the `smap_fit` and `spectra` methods here
+# reproduce the approach in the 2012 Guerquin-Kern paper, cited above,
+# enabling parallel MRI simulations that avoid an inverse crime.

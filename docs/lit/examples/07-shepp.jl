@@ -114,7 +114,6 @@ y = LinRange(-0.5, 0.5, 256)
 oversample = 3
 image5 = phantom(x, y, ob, oversample)
 jim(x, y, image5, "Disjoint")
-throw(5)
 
 
 # ### Comedy version
