@@ -13,8 +13,7 @@
 # Packages needed here.
 
 using ImagePhantoms: ellipse_parameters, SheppLoganBrainWeb, Ellipse
-using ImagePhantoms: phantom, spectrum
-using ImagePhantoms: smap_fit, spectra
+using ImagePhantoms: phantom, smap_fit, spectra
 using FFTW: fft, fftshift
 using ImageGeoms: embed
 using LazyGrids: ndgrid
@@ -22,7 +21,6 @@ using MIRT: ir_mri_sensemap_sim
 using MIRTjim: jim, prompt; jim(:prompt, true)
 using Random: seed!
 using Unitful: mm
-#using LinearAlgebra: norm
 
 # The following line is helpful when running this example.jl file as a script;
 # this way it will prompt user to hit a key after each figure is displayed.
