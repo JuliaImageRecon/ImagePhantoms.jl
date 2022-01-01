@@ -2,7 +2,7 @@
 # # [MRI SENSE](@id 10-mri-sense)
 #---------------------------------------------------------
 
-# This page illustrates the `smap_fit` and `spectra` methods
+# This page illustrates the `mri_smap_fit` and `mri_spectra` methods
 # in the Julia package
 # [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl)
 # for performing MRI simulations with realistic sensitivity encoding (SENSE).
@@ -13,7 +13,7 @@
 # Packages needed here.
 
 using ImagePhantoms: ellipse_parameters, SheppLoganBrainWeb, Ellipse
-using ImagePhantoms: phantom, smap_fit, spectra
+using ImagePhantoms: phantom, mri_smap_fit, mri_spectra
 using FFTW: fft, fftshift
 using ImageGeoms: embed
 using LazyGrids: ndgrid
@@ -41,7 +41,7 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 # that combines analytical k-space values of the phantom
 # with an analytical model for the sensitivity maps.
 # This package follows the recommended approach from that paper.
-# We used the `smap_fit` function to fit each sensitivity map
+# We used the `mri_smap_fit` function to fit each sensitivity map
 # with a modest number of complex exponential signals.
 # Then, instead of using the `spectrum` function
 # we use the `spectra` function
@@ -117,14 +117,14 @@ jim(x, y, cfun(smaps), "Sensitivity maps (masked and normalized)")
 
 # ### Sensitivity map fitting using complex exponentials
 
-# The `smap_fit` function fits each smap
+# The `mri_smap_fit` function fits each `smap`
 # with a linear combination of complex exponential signals.
 # (These signals are not orthogonal due to the `mask`.)
 # With frequencies `-7:7/N`, the maximum error is ≤ 0.2%.
 
 deltas = (dx, dy)
 kmax = 7
-fit = smap_fit(smaps, embed; mask, kmax, deltas)
+fit = mri_smap_fit(smaps, embed; mask, kmax, deltas)
 jim(
  jim(x, y, cfun(smaps), "Original maps"; prompt=false, clim=(-1,1)),
  jim(x, y, cfun(fit.smaps), "Fit maps"; prompt=false, clim=(-1,1)),
@@ -141,13 +141,13 @@ jim(-kmax:kmax, -kmax:kmax, cfun(coefs), "coefs", prompt=false)
 # ### Compare FFT with analytical spectra
 
 # Frequency sample vectors:
-fx = (-(nx÷2):(nx÷2-1)) / (nx*dx) # crucial to match smap_basis internals!
+fx = (-(nx÷2):(nx÷2-1)) / (nx*dx) # crucial to match `mri_smap_basis` internals!
 fy = (-(ny÷2):(ny÷2-1)) / (ny*dy)
 gx, gy = ndgrid(fx, fy);
 
 # Analytical spectra computation for complex phantom using all smaps.
 # Note the `fit` argument.
-kspace1 = spectra(vec(gx), vec(gy), oa, fit)
+kspace1 = mri_spectra(vec(gx), vec(gy), oa, fit)
 kspace1 = [reshape(k, nx, ny) for k in kspace1]
 p1 = jim(fx, fy, cfun(kspace1), "Analytical")
 
@@ -171,6 +171,6 @@ jim(
 )
 
 
-# In summary, the `smap_fit` and `spectra` methods here
+# In summary, the `mri_smap_fit` and `mri_spectra` methods here
 # reproduce the approach in the 2012 Guerquin-Kern paper, cited above,
 # enabling parallel MRI simulations that avoid an inverse crime.

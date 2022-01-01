@@ -3,17 +3,17 @@ mri-sense.jl
 Methods for generating phantom spectra based on the 2012 paper
 [Guerquin-Kern et al.](http://doi.org/10.1109/TMI.2011.2174158)
 that combines analytical k-space values of the phantom
-with an analytical model for the sensitivity maps.
+with an analytical model for MRI sensitivity maps.
 =#
 
 using LazyGrids: ndgrid
 using ImagePhantoms: spectrum, Object2d
 
-export smap_basis, smap_fit, spectrum, spectra
+export mri_smap_basis, mri_smap_fit, spectrum, mri_spectra
 
 
 """
-   smap_basis(mask ; kmax, kt, ki)
+   mri_smap_basis(mask ; kmax, kt, ki)
 
 Construct Fourier basis for representing MRI sensitivity maps
 in terms of separable complex exponential signals, products of
@@ -37,7 +37,7 @@ leading to better boundary behavior than the DFT frequencies `k/N`.
   and `ν` is `nk` frequency tuples;
   each tuple has form `ν = kfun.(Tuple(k), size(mask)) ./ deltas`.
 """
-function smap_basis(
+function mri_smap_basis(
     mask::AbstractArray{Bool,D} ;
     kmax::Int = 5,
     kmaxs::NTuple{D, Int} = ntuple(i -> kmax, D),
@@ -62,24 +62,24 @@ end
 
 
 """
-    smap_fit(smaps, embed ; mask, kwargs...)
+    mri_smap_fit(smaps, embed ; mask, kwargs...)
 
-Fit MRI sensitivity maps `smaps` using `smap_basis(mask ; kwargs...)`.
+Fit MRI sensitivity maps `smaps` using `mri_smap_basis(mask ; kwargs...)`.
 Caller provides `ImageGeoms.embed` or equivalent.
 
 Return named tuple `(B, ν, coefs, nrmse, smaps)`:
-* `(B, ν)` from `smap_basis`
+* `(B, ν)` from `mri_smap_basis`
 * `coefs::Vector` : `[ncoil]` each of length `nk`
 * `nrmse::Real` : `smaps` vs `smaps_fit`
 * `smaps::Vector{Array{D}}` : `smaps_fit`
 """
-function smap_fit(
+function mri_smap_fit(
     smaps::Vector{<:AbstractArray{<:Number,D}},
-	embed::Function ;
+    embed::Function ;
     mask::AbstractArray{Bool,D} = trues(size(smaps[1])),
     kwargs...
 ) where D
-    (B, ν) = smap_basis(mask ; kwargs...)
+    (B, ν) = mri_smap_basis(mask ; kwargs...)
     coefs = [B \ smap[mask] for smap in smaps] # coefficients for each smap
 
     smaps_fit = [embed(B * coef, mask) for coef in coefs]
@@ -92,8 +92,8 @@ end
 """
     spectrum(ob::Object2d, coefs::AbstractVector, f::)
 Version of `spectrum(ob)` suitable for parallel MRI with sensitivity maps
-that were fit previously using `smap_fit` for a single coil
-with fit coefficients `coefs` and frequencies `f` (vector of tuples).
+that were fit previously using `mri_smap_fit` for a single coil
+with fit coefficients `coefs` and frequencies `f` (array of tuples).
 """
 function spectrum(ob::Object2d, coefs::AbstractVector, f::Any)
     return (fx,fy) -> sum(
@@ -106,19 +106,19 @@ end
 """
     spectrum(ob::Object2d, fit::NamedTuple, coil::Int)
 Version of `spectrum(ob)` suitable for parallel MRI with sensitivity maps
-that were fit previously using `smap_fit`.
+that were fit previously using `mri_smap_fit`.
 """
 spectrum(ob::Object2d, fit::NamedTuple, coil::Int) =
     spectrum(ob, fit.coefs[coil], fit.ν)
 
 
 """
-    spectra(fx, fy, oa::Array{<:Object2d}, fit::NamedTuple)
+    mri_spectra(fx, fy, oa::Array{<:Object2d}, fit::NamedTuple)
 Version of `spectrum` suitable for parallel MRI with sensitivity maps
-that were fit previously using `smap_fit`.
+that were fit previously using `mri_smap_fit`.
 Returns a Vector of `ncoil` kspace data Vectors of dimension `length(fx)`
 """
-function spectra(
+function mri_spectra(
     fx::AbstractVector,
     fy::AbstractVector,
     oa::Array{<:Object2d},
