@@ -119,7 +119,7 @@ shepp_logan(M::Int, case::EllipsePhantomVersion = SheppLogan(); kwargs...) =
 
 
 """
-    params = ellipse_parameters(case::Symbol; fovs::NTuple{2}, u::Tuple)
+    params = ellipse_parameters(case::Symbol; fovs::NTuple{2}, u::Tuple, disjoint::Bool)
 
 By default the first four columns are unitless "fractions of field of view",
 so columns 1,3 are scaled by `xfov` and columns 2,4 are scaled by `yfov`,
@@ -128,27 +128,34 @@ The optional 3-tuple `u` specifies scaling and/or units:
 * columns 1-4 (center, radii) are scaled by `u[1]` (e.g., mm),
 * column 5 (angle) is scaled by `u[2]` (e.g., `1` or `°`),
 * column 6 (value) is scaled by `u[3]` (e.g., `1/cm`) for an attenuation map.
+If `disjoint==true` then the middle ellipse positions are adjusted to avoid overlap.
 """
 function ellipse_parameters(
     case::EllipsePhantomVersion = SheppLogan() ;
     fovs::NTuple{2,RealU} = (1,1),
     u::NTuple{3,Any} = (1,1,1), # unit scaling
+    disjoint::Bool = false,
 )
     (xfov, yfov) = fovs
 
     # The "Number" here is to enable units
     params = Number[ # original CT version
-    0       0       0.92    0.69    90    2
-    0       -0.0184 0.874   0.6624  90    -0.98
-    0.22    0       0.31    0.11    72    -0.02
-    -0.22   0       0.41    0.16   108    -0.02
-    0       0.35    0.25    0.21    90    0.01
-    0       0.1     0.046   0.046    0    0.01
-    0       -0.1    0.046   0.046    0    0.01
-    -0.08   -0.605  0.046   0.023    0    0.01
-    0       -0.605  0.023   0.023    0    0.01
-    0.06    -0.605  0.046   0.023   90    0.01
+    0       0       0.92    0.69    90    2     # skull
+    0       -0.0184 0.874   0.6624  90    -0.98 # brain
+    0.22    0       0.31    0.11    72    -0.02 # right big
+    -0.22   0       0.41    0.16   108    -0.02 # left big
+    0       0.35    0.25    0.21    90    0.01 # top
+    0       0.1     0.046   0.046    0    0.01 # middle high
+    0       -0.1    0.046   0.046    0    0.01 # middle low
+    -0.08   -0.605  0.046   0.023    0    0.01 # bottom left
+    0       -0.605  0.023   0.023    0    0.01 # bottom center
+    0.06    -0.605  0.046   0.023   90    0.01 # bottom right
     ]
+
+    if disjoint # tweak so that middle ellipses are disjoint
+        params[4,1] += -0.04
+        params[5,2] += 0.07
+    end
 
     params[:,[1,3]] .*= xfov/2
     params[:,[2,4]] .*= yfov/2
