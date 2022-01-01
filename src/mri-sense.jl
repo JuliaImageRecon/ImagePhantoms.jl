@@ -17,7 +17,8 @@ export smap_basis, smap_fit, spectrum, spectra
 
 Construct Fourier basis for representing MRI sensitivity maps
 in terms of separable complex exponential signals, products of
-of the form `basis = (k,N) -> exp.(2im * π * (0:N-1) * kfun(k,N))`.
+of the form `basis = (k,N) -> exp.(2im * π * nfun(N) * kfun(k,N))`.
+The default is `nfun(N) = -(N÷2):(N÷2)-1` which is suitable for even `N` only.
 The default is `kfun(k,N) = k / 2N`, which is DCT-II like frequencies,
 leading to better boundary behavior than the DFT frequencies `k/N`.
 
@@ -44,10 +45,10 @@ function smap_basis(
     ki::CartesianIndices{D} = CartesianIndices(kt),
     deltas::NTuple{D,<:Number} = ones(D),
     kfun::Function = (k,N) -> k / (2N), # DCT-II frequency
-    basis::Function = (k,N) -> exp.(2im * π * (0:N-1) * kfun(k,N)), # 1D basis
+    nfun::Function = (N) -> -(N÷2):(N÷2)-1,
+    basis::Function = (k,N) -> exp.(2im * π * nfun(N) * kfun(k,N)), # 1D basis
     T::DataType = ComplexF32,
 ) where D
-@show kmax
     B = zeros(T, count(mask), length(ki))
     for (i, k) in enumerate(ki)
         tmp = ndgrid([basis(k[d], size(mask,d)) for d = 1:D]...)
@@ -64,7 +65,8 @@ end
     smap_fit(smaps, embed ; mask, kwargs...)
 
 Fit MRI sensitivity maps `smaps` using `smap_basis(mask ; kwargs...)`.
-Provide `ImageGeoms.embed` or equivalent.
+Caller provides `ImageGeoms.embed` or equivalent.
+
 Return named tuple `(B, ν, coefs, nrmse, smaps)`:
 * `(B, ν)` from `smap_basis`
 * `coefs::Vector` : `[ncoil]` each of length `nk`
