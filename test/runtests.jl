@@ -14,6 +14,10 @@ include("shepplogan.jl")
 include("disk-phantom.jl")
 include("focus-chart.jl")
 
+@testset "mri-sense" begin
+    include("mri-sense.jl")
+end
+
 @testset "ImagePhantoms" begin
     @test isempty(detect_ambiguities(ImagePhantoms))
 end
