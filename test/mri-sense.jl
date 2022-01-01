@@ -1,6 +1,8 @@
 # mri-sense.jl test
 # todo: move most to lit, simplify here
 
+include("helper.jl") # todo
+
 using MIRTjim: jim, prompt; jim(:prompt, true)
 using ImagePhantoms: ellipse_parameters, SheppLoganBrainWeb, Ellipse
 using ImagePhantoms: phantom, spectrum
@@ -21,7 +23,7 @@ oa = ellipse_parameters(SheppLoganBrainWeb() ; disjoint=true, fovs)
 seed!(0)
 oa[:,end] = [1; 2; rand(ComplexF32,8)] # random phases
 oa = Ellipse(oa)
-oa = oa[1:3] # todo simplify
+	oa = oa[1:3] # todo simplify
 dx, dy = fovs ./ (nx,ny)
 x = (-(nx÷2):(nx÷2-1)) * dx
 y = (-(ny÷2):(ny÷2-1)) * dy
@@ -35,7 +37,7 @@ mask = trues(nx,ny)
 mask[:,[1:2;end-2:end]] .= false
 mask[[1:8;end-8:end],:] .= false
 @assert mask .* image1 == image1
-#jim(x, y, mask)
+#jim(x, y, mask, "mask")
 
 
 # smaps
@@ -43,12 +45,13 @@ ncoil = 2
 #smap = ir_mri_sensemap_sim(dims=(nx,ny), ncoil=ncoil, orbit_start=[45])
 #smap[:,:,1] .= 7 * exp.(2im * pi * (0:nx-1) / nx * 3)
 smap = cat(dims=3,
-	8 * exp.(im * 2pi * (0:nx-1) / nx * 3) * ones(ny)',
-    ones(nx) * 5 * exp.(-im * 2pi * (0:ny-1) / ny * 1)',
+	7 * exp.(im * 2pi * (0:nx-1) / nx * 3) * ones(ny)',
+    5 * ones(nx) * exp.(-im * 2pi * (0:ny-1) / ny * 1)',
 )
 #=
 =#
-p1 = jim(smap, "Sensitivity maps raw"; prompt=false)
+sfun = smap -> [real(smap);;;imag(smap)]
+p1 = jim(x, y, sfun(smap), "Sensitivity maps raw"; prompt=false)
 
 ssos = sqrt.(sum(abs.(smap).^2, dims=ndims(smap))) # SSoS
 ssos = selectdim(ssos, ndims(smap), 1)
@@ -60,7 +63,7 @@ for ic=1:ncoil
 end
 =#
 smap .*= mask
-p3 = jim(smap, "Sensitivity maps (masked)"; prompt=false)
+p3 = jim(x, y, sfun(smap), "Sensitivity maps (masked)"; prompt=false)
 #jim(p1, p2, p3)
 
 #=
@@ -79,7 +82,7 @@ layout=(2,2),
 #stacker = x -> [selectdim(x, ndims(x), i) for i=1:size(x)[end]]
 stacker = x -> [(@view x[:,:,i]) for i=1:size(x,3)]
 smaps = stacker(smap)
-#jim(smaps)
+#jim(sfun(smaps), "smaps")
 
 
 # fit each smap
@@ -125,13 +128,14 @@ fit = smap_fit(smaps, embed; mask, kmax, deltas)
 
 coefs = map(x -> reshape(x,15,15), fit.coefs)
 jim(
- jim(x, y, smaps, "orig", prompt=false),
- jim(x, y, fit.smaps, "fit", prompt=false),
- jim(x, y, 1e6*(fit.smaps - smaps), "err * 1e6", prompt=false),
- jim(-kmax:kmax, -kmax:kmax, real(coefs[1]), prompt=false),
- jim(-kmax:kmax, -kmax:kmax, imag(coefs[1]), prompt=false),
- jim(-kmax:kmax, -kmax:kmax, real(coefs[2]), prompt=false),
- jim(-kmax:kmax, -kmax:kmax, imag(coefs[2]), prompt=false),
+ jim(x, y, sfun(smaps), "orig", prompt=false),
+ jim(x, y, sfun(fit.smaps), "fit", prompt=false),
+ jim(x, y, sfun(1e6*(fit.smaps - smaps)), "err * 1e6", prompt=false),
+ jim(-kmax:kmax, -kmax:kmax, sfun(coefs), "coefs", prompt=false),
+#jim(-kmax:kmax, -kmax:kmax, real(coefs[1]), prompt=false),
+#jim(-kmax:kmax, -kmax:kmax, imag(coefs[1]), prompt=false),
+#jim(-kmax:kmax, -kmax:kmax, real(coefs[2]), prompt=false),
+#jim(-kmax:kmax, -kmax:kmax, imag(coefs[2]), prompt=false),
 )
 
 fx = (-(nx÷2):(nx÷2-1)) / (nx*dx)
@@ -158,15 +162,17 @@ kspace1 = myfft(image1) * dx * dy
 p0 = jim(fx, fy, kspace0; prompt=false)
 p1 = jim(fx, fy, kspace1; prompt=false)
 p2 = jim(fx, fy, kspace1 - kspace0; prompt=false)
-jim(p0, p1, p2)
+#jim(p0, p1, p2)
+
 
 # test one object with one smap
 
 image2 = image1 .* smaps[coil]
-p1 = jim(x, y, image1; prompt=false)
-p2 = jim(x, y, image2; prompt=false)
-p3 = jim(x, y, smaps[coil]; prompt=false)
-#jim(p1, p2, p3)
+p1 = jim(x, y, sfun(image1); prompt=false)
+p2 = jim(x, y, sfun(image2); prompt=false)
+p3 = jim(x, y, sfun(smaps[coil]); prompt=false)
+jim(p1, p2, p3)
+throw(7)
 
 
 kspace2 = myfft(image2) * dx * dy
