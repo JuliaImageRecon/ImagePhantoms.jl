@@ -84,7 +84,7 @@ function smap_fit(
 
     smaps_fit = [embed(B * coef, mask) for coef in coefs]
     ss(v) = sum(x -> sum(abs2, x), v)
-    @show nrmse = sqrt( ss(smaps_fit - smaps) / ss(smaps) )
+    nrmse = sqrt( ss(smaps_fit - smaps) / ss(smaps) )
     return (; B, ν, coefs, nrmse, smaps = smaps_fit)
 end
 
