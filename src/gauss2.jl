@@ -27,7 +27,7 @@ Construct `Gauss2` object from parameters;
 here `width` = FWHM (full-width at half-maximum).
 
 In 1D, the formula is `g(x) = exp(-π ((x - cx) / sx)^2)`
-where `sx = fwhm2spread(w) = w / sqrt(log(256) * 2π)`,
+where `sx = fwhm2spread(w) = w * sqrt(π / log(16))`,
 which, for `cx=0`,  has 1D FT `G(ν) = sx^2 exp(π (sx νx)^2)`.
 """
 function Gauss2(
