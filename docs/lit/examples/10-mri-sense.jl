@@ -75,7 +75,7 @@ oa[:,end] = [1; randn(ComplexF32, 9)] # random phases
 oa = Ellipse(oa)
 oversample = 3
 image0 = phantom(x, y, oa, oversample)
-cfun = z -> [real(z) ;;; imag(z)]
+cfun = z -> cat(dims = ndims(z)+1, real(z), imag(z))
 jim(x, y, cfun(image0), "Digital phantom\n (real | imag)"; ncol=1)
 
 # In practice, sensitivity maps are usually estimated

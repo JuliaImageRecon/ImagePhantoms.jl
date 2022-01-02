@@ -35,7 +35,7 @@ oa[:,end] = [1; rand(ComplexF32,9)] # random phases
 oa = Ellipse(oa)
 oversample = 3
 image0 = phantom(x, y, oa, oversample)
-cfun = smap -> [real(smap);;;imag(smap)]
+cfun = z -> cat(dims = ndims(z)+1, real(z), imag(z))
 jim(x, y, cfun(image0), "image0")
 
 @test spectrum(oa[1]) isa Function
