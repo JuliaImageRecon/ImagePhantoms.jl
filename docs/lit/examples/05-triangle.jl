@@ -1,9 +1,25 @@
 #---------------------------------------------------------
-# # [Triangle](@id 5-triangle)
+# # [Triangle](@id 05-triangle)
 #---------------------------------------------------------
 
-# This page illustrates the `Triangle` shape in the Julia package
-# [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
+#=
+This page illustrates the `Triangle` shape in the Julia package
+[`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
+
+This page was generated from a single Julia file:
+[05-triangle.jl](@__REPO_ROOT_URL__/05-triangle.jl).
+=#
+
+#md # In any such Julia documentation,
+#md # you can access the source code
+#md # using the "Edit on GitHub" link in the top right.
+
+#md # The corresponding notebook can be viewed in
+#md # [nbviewer](http://nbviewer.jupyter.org/) here:
+#md # [`05-triangle.ipynb`](@__NBVIEWER_ROOT_URL__/05-triangle.ipynb),
+#md # and opened in [binder](https://mybinder.org/) here:
+#md # [`05-triangle.ipynb`](@__BINDER_ROOT_URL__/05-triangle.ipynb).
+
 
 # ### Setup
 
@@ -24,19 +40,22 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 # ### Overview
 
-# For completeness, this package includes a triangle shape
-# for constructing 2D digital image phantoms.
-# (One could describe quite complicated phantoms with a triangular mesh.)
-# The basic shape here is an equilateral triangle
-# whose base is [-1/2,1/2] along the x axis,
-# pointing upwards along the y axis.
-# When defining such a `Triangle` object one can specify
-# its center, widths, angle and value.
-# All of the methods in `ImagePhantoms` support physical units,
-# so we use such units throughout this example.
-# (Using units is recommended but not required.)
+#=
+For completeness, this package includes a triangle shape
+for constructing 2D digital image phantoms.
+(One could describe quite complicated phantoms with a triangular mesh.)
+The basic shape here is an equilateral triangle
+whose base is [-1/2,1/2] along the x axis,
+pointing upwards along the y axis.
+When defining such a `Triangle` object one can specify
+its center, widths, angle and value.
+All of the methods in `ImagePhantoms` support physical units,
+so we use such units throughout this example.
+(Using units is recommended but not required.)
 
-# Define a triangle object, using physical units.
+Define a triangle object, using physical units.
+=#
+
 width = (2mm, 8mm)
 ob = Triangle((4mm, 3mm), width, π/6, 1.0f0)
 
@@ -62,11 +81,12 @@ p1 = jim(axes(ig)..., img, "Triangle phantom", xlabel="x", ylabel="y")
 
 # ### Spectrum using `spectrum`
 
-# Let's examine the spectrum of this image.
-# There are two ways to do this:
-# * using the analytical Fourier transform of the triangle via `spectrum`
-# * applying the DFT via FFT to the digital image.
-# Because the shape has units `mm`, the spectra axes have units cycles/mm.
+#=
+There are two ways to examine the spectrum of this image:
+* using the analytical Fourier transform of the triangle via `spectrum`
+* applying the DFT via FFT to the digital image.
+Because the shape has units `mm`, the spectra axes have units cycles/mm.
+=#
 
 zscale = 1 / (sqrt(3) / 4 * prod(width)) # normalize spectra by area
 spectrum_exact = spectrum(axesf(ig)..., [ob]) * zscale
@@ -82,8 +102,8 @@ function myfft(x)
     return fftshift(fft(fftshift(x) / u)) * u
 end
 
-# fx = (-M÷2:M÷2-1) / M / dx # appropriate frequency axes for DFT,
-# fy = (-N÷2:N÷2-1) / N / dy # that are provided by axesf(ig)
+#src fx = (-M÷2:M÷2-1) / M / dx # appropriate frequency axes for DFT,
+#src fy = (-N÷2:N÷2-1) / N / dy # that are provided by axesf(ig)
 spectrum_fft = myfft(img) * dx * dy * zscale
 p3 = jim(axesf(ig)..., sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
@@ -110,12 +130,14 @@ p5 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram", yflip=fals
 
 #src clim=(0, 2*maximum(width)*ob.value), # todo
 
-# The maximum sinogram value is about 7mm, which makes sense
-# for a triangle whose height is `8mm * sqrt(3) / 2` and whose base is 2mm,
-# so the longest side is `sqrt(1^2 + (8mm * sqrt(3) / 2)^2) =` 7 mm.
+#=
+The maximum sinogram value is about 7mm, which makes sense
+for a triangle whose height is `8mm * sqrt(3) / 2` and whose base is 2mm,
+so the longest side is `sqrt(1^2 + (8mm * sqrt(3) / 2)^2) =` 7 mm.
 
-# The above sampling generated a parallel-beam sinogram,
-# but one could make a fan-beam sinogram simply by sampling `(r, ϕ)` appropriately.
+The above sampling generated a parallel-beam sinogram,
+but one could make a fan-beam sinogram by sampling `(r, ϕ)` appropriately.
+=#
 
 
 # ### Fourier-slice theorem illustration
@@ -142,14 +164,18 @@ plot!(fr, imag(slice_ft), label="imag", color=:red)
 plot(p1, p5, p3, p4)
 
 
-# The good agreement between the analytical spectra (solid lines)
-# and the DFT samples (disks)
-# validates that `phantom`, `radon`, and `spectrum`
-# are all self consistent for this `Triangle` object.
+#=
+The good agreement between the analytical spectra (solid lines)
+and the DFT samples (disks)
+validates that `phantom`, `radon`, and `spectrum`
+are all self consistent for this `Triangle` object.
+=#
 
 
-### Spectrum
+# ### Spectrum
 
-# The spectrum of a triangle is not widely available;
-# for a derivation, see
-# [overleaf file.](https://www.overleaf.com/read/pcrttymdkdcx)
+#=
+The spectrum of a triangle is not widely available;
+for a derivation, see this
+[overleaf file.](https://www.overleaf.com/read/pcrttymdkdcx)
+=#
