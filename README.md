@@ -62,6 +62,21 @@ gif(anim, "disk.gif", fps = 8)
 ![animated phantom gif](https://github.com/JuliaImageRecon/ImagePhantoms.jl/blob/gh-pages/dev/examples/disk.gif)
 
 
+### Parallel MRI (SENSE)
+
+Most of the methods here are of general use
+for any imaging modality.
+There are a few methods
+(`mri_smap_basis`, `mri_smap_fit`, `mri_spectra`)
+that are specific to simulating parallel MRI
+(multiple receive coils)
+based on the
+[2012 paper by Guerquin-Kern et al.](http://doi.org/10.1109/TMI.2011.2174158).
+See the
+[documentation][docs-stable-url]
+for details.
+
+
 ### Documentation
 
 For more examples with graphics,
