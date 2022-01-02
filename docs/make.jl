@@ -13,13 +13,13 @@ lit = joinpath(@__DIR__, "lit")
 src = joinpath(@__DIR__, "src")
 gen = joinpath(@__DIR__, "src/generated")
 
-base = "JuliaImageRecon/ImagePhantoms"
+base = "JuliaImageRecon/ImagePhantoms.jl"
 repo_root_url =
-    "https://github.com/$base/blob/main/docs/lit"
+    "https://github.com/$base/blob/main/docs/lit/examples"
 nbviewer_root_url =
-    "https://nbviewer.org/github/$base/tree/gh-pages/generated"
+    "https://nbviewer.org/github/$base/tree/gh-pages/dev/generated/examples"
 binder_root_url =
-    "https://mybinder.org/v2/gh/$base/gh-pages?filepath=generated"
+    "https://mybinder.org/v2/gh/$base/gh-pages?filepath=dev/generated/examples"
 
 
 DocMeta.setdocmeta!(ImagePhantoms, :DocTestSetup, :(using ImagePhantoms); recursive=true)

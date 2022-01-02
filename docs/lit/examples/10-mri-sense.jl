@@ -17,9 +17,9 @@ This page was generated from a single Julia file:
 
 #md # The corresponding notebook can be viewed in
 #md # [nbviewer](http://nbviewer.jupyter.org/) here:
-#md # [`10-mri-sense.ipynb`](@__NBVIEWER_ROOT_URL__/mri/10-mri-sense.ipynb),
+#md # [`10-mri-sense.ipynb`](@__NBVIEWER_ROOT_URL__/10-mri-sense.ipynb),
 #md # and opened in [binder](https://mybinder.org/) here:
-#md # [`10-mri-sense.ipynb`](@__BINDER_ROOT_URL__/mri/10-mri-sense.ipynb).
+#md # [`10-mri-sense.ipynb`](@__BINDER_ROOT_URL__/10-mri-sense.ipynb).
 
 
 # ### Setup
