@@ -1,9 +1,25 @@
 #---------------------------------------------------------
-# # [2D Gaussian](@id 4-gauss)
+# # [2D Gaussian](@id 04-gauss)
 #---------------------------------------------------------
 
-# This page illustrates the `Gauss2` shape in the Julia package
-# [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
+#=
+This page illustrates the `Gauss2` shape in the Julia package
+[`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
+
+This page was generated from a single Julia file:
+[04-gauss.jl](@__REPO_ROOT_URL__/04-gauss.jl).
+=#
+
+#md # In any such Julia documentation,
+#md # you can access the source code
+#md # using the "Edit on GitHub" link in the top right.
+
+#md # The corresponding notebook can be viewed in
+#md # [nbviewer](http://nbviewer.jupyter.org/) here:
+#md # [`04-gauss.ipynb`](@__NBVIEWER_ROOT_URL__/04-gauss.ipynb),
+#md # and opened in [binder](https://mybinder.org/) here:
+#md # [`04-gauss.ipynb`](@__BINDER_ROOT_URL__/04-gauss.ipynb).
+
 
 # ### Setup
 
@@ -23,15 +39,19 @@ using Plots: plot, plot!, scatter!, default; default(markerstrokecolor=:auto)
 
 isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
+
 # ### Overview
 
-# Another useful shape for constructing 2D digital image phantoms
-# is the 2D Gaussian, specified by its center, widths, angle and value.
-# All of the methods in `ImagePhantoms` support physical units,
-# so we use such units throughout this example.
-# (Using units is recommended but not required.)
+#=
+Another useful shape for constructing 2D digital image phantoms
+is the 2D Gaussian, specified by its center, widths, angle and value.
+All of the methods in `ImagePhantoms` support physical units,
+so we use such units throughout this example.
+(Using units is recommended but not required.)
 
-# Define a 2D Gaussian object, using physical units.
+Define a 2D Gaussian object, using physical units.
+=#
+
 width = (5mm, 2mm) # full-width at half-maximum (FHWM)
 ob = Gauss2((2mm, 3mm), width, π/6, 1.0f0)
 
@@ -57,10 +77,12 @@ p1 = jim(axes(ig)..., img, "2D Gaussian phantom", xlabel="x", ylabel="y")
 
 # ### Spectrum using `spectrum`
 
-# There are two ways to examine the spectrum of this image:
-# * using the analytical Fourier transform of the 2D Gaussian via `spectrum`
-# * applying the DFT via FFT to the digital image.
-# Because the shape has units `mm`, the spectra axes have units cycles/mm.
+#=
+There are two ways to examine the spectrum of this image:
+* using the analytical Fourier transform of the 2D Gaussian via `spectrum`
+* applying the DFT via FFT to the digital image.
+Because the shape has units `mm`, the spectra axes have units cycles/mm.
+=#
 
 zscale = 1 / IP.fwhm2spread(1)^2 / prod(width) # normalize spectra by area
 spectrum_exact = spectrum(axesf(ig)..., [ob]) * zscale
@@ -76,8 +98,8 @@ function myfft(x::AbstractArray{<:Any})
     return fftshift(fft(fftshift(x) / u)) * u
 end
 
-# fx = (-M÷2:M÷2-1) / M / dx # appropriate frequency axes for DFT,
-# fy = (-N÷2:N÷2-1) / N / dy # that are provided by axesf(ig)
+#src fx = (-M÷2:M÷2-1) / M / dx # appropriate frequency axes for DFT,
+#src fy = (-N÷2:N÷2-1) / N / dy # that are provided by axesf(ig)
 spectrum_fft = myfft(img) * dx * dy * zscale
 p3 = jim(axesf(ig)..., sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
@@ -105,11 +127,14 @@ p5 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram", yflip=fals
 
 #src clim=(0, 2*maximum(radii)*ob.value), # todo
 
-# Note that the maximum sinogram value is about 8/sqrt(log(256)) = 3.4mm
-# which makes sense for a 2D Gaussian whose longest axis has FWHM = 8mm.
+#=
+Note that the maximum sinogram value is about
+`fwhm2spread(5mm) = 5mm * sqrt(π / log(16)) ≈ 5.3mm`
+which makes sense for a 2D Gaussian whose longest axis has FWHM = 5mm.
 
-# The above sampling generated a parallel-beam sinogram,
-# but one could make a fan-beam sinogram simply by sampling `(r, ϕ)` appropriately.
+The above sampling generated a parallel-beam sinogram,
+but one could make a fan-beam sinogram by sampling `(r, ϕ)` appropriately.
+=#
 
 
 # ### Fourier-slice theorem illustration
@@ -138,7 +163,9 @@ plot!(fr, imag(slice_ft), label="imag", color=:red)
 plot(p1, p5, p3, p4)
 
 
-# The good agreement between the analytical spectra (solid lines)
-# and the DFT samples (disks)
-# validates that `phantom`, `radon`, and `spectrum`
-# are all self consistent for this `Gauss2` object.
+#=
+The good agreement between the analytical spectra (solid lines)
+and the DFT samples (disks)
+validates that `phantom`, `radon`, and `spectrum`
+are all self consistent for this `Gauss2` object.
+=#

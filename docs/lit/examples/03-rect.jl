@@ -1,9 +1,25 @@
 #---------------------------------------------------------
-# # [Rectangle](@id 3-rect)
+# # [Rectangle](@id 03-rect)
 #---------------------------------------------------------
 
-# This page illustrates the `Rect` shape in the Julia package
-# [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
+#=
+This page illustrates the `Rect` shape in the Julia package
+[`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
+
+This page was generated from a single Julia file:
+[03-rect.jl](@__REPO_ROOT_URL__/03-rect.jl).
+=#
+
+#md # In any such Julia documentation,
+#md # you can access the source code
+#md # using the "Edit on GitHub" link in the top right.
+
+#md # The corresponding notebook can be viewed in
+#md # [nbviewer](http://nbviewer.jupyter.org/) here:
+#md # [`03-rect.ipynb`](@__NBVIEWER_ROOT_URL__/03-rect.ipynb),
+#md # and opened in [binder](https://mybinder.org/) here:
+#md # [`03-rect.ipynb`](@__BINDER_ROOT_URL__/03-rect.ipynb).
+
 
 # ### Setup
 
@@ -24,13 +40,16 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 # ### Overview
 
-# One of the most basic shapes used in constructing 2D digital image phantoms
-# is the rectangle, specified by its center, widths, angle and value.
-# All of the methods in `ImagePhantoms` support physical units,
-# so we use such units throughout this example.
-# (Using units is recommended but not required.)
+#=
+A basic shape used in constructing 2D digital image phantoms
+is the rectangle, specified by its center, widths, angle and value.
+All of the methods in `ImagePhantoms` support physical units,
+so we use such units throughout this example.
+(Using units is recommended but not required.)
 
-# Define an rectangle object, using physical units.
+Define an rectangle object, using physical units.
+=#
+
 width = (2mm, 8mm)
 ob = Rect((4mm, 3mm), width, π/6, 1.0f0)
 
@@ -56,11 +75,12 @@ p1 = jim(axes(ig)..., img, "Rect phantom", xlabel="x", ylabel="y")
 
 # ### Spectrum using `spectrum`
 
-# Let's examine the spectrum of this image.
-# There are two ways to do this:
-# * using the analytical Fourier transform of the rect via `spectrum`
-# * applying the DFT via FFT to the digital image.
-# Because the shape has units `mm`, the spectra axes have units cycles/mm.
+#=
+There are two ways to examine the spectrum of this image:
+* using the analytical Fourier transform of the rect via `spectrum`
+* applying the DFT via FFT to the digital image.
+Because the shape has units `mm`, the spectra axes have units cycles/mm.
+=#
 
 zscale = 1 / prod(width) # normalize spectra by area
 spectrum_exact = spectrum(axesf(ig)..., [ob]) * zscale
@@ -76,8 +96,8 @@ function myfft(x)
     return fftshift(fft(fftshift(x) / u)) * u
 end
 
-# fx = (-M÷2:M÷2-1) / M / dx # appropriate frequency axes for DFT,
-# fy = (-N÷2:N÷2-1) / N / dy # that are provided by axesf(ig)
+#src fx = (-M÷2:M÷2-1) / M / dx # appropriate frequency axes for DFT,
+#src fy = (-N÷2:N÷2-1) / N / dy # that are provided by axesf(ig)
 spectrum_fft = myfft(img) * dx * dy * zscale
 p3 = jim(axesf(ig)..., sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
@@ -104,11 +124,13 @@ p5 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram", yflip=fals
 
 #src clim=(0, maximum(width)*ob.value), # todo
 
-# Note that the maximum sinogram value is about sqrt(8^2+2^2) = 8.2mm,
-# which makes sense for a 8mm × 2mm rect.
+#=
+The maximum sinogram value is about sqrt(8^2+2^2) = 8.2mm,
+which makes sense for a 8mm × 2mm rect.
 
-# The above sampling generated a parallel-beam sinogram,
-# but one could make a fan-beam sinogram simply by sampling `(r, ϕ)` appropriately.
+The above sampling generated a parallel-beam sinogram,
+but one could make a fan-beam sinogram by sampling `(r, ϕ)` appropriately.
+=#
 
 
 # ### Fourier-slice theorem illustration
@@ -135,7 +157,9 @@ plot!(fr, imag(slice_ft), label="imag", color=:red)
 plot(p1, p5, p3, p4)
 
 
-# The good agreement between the analytical spectra (solid lines)
-# and the DFT samples (disks)
-# validates that `phantom`, `radon`, and `spectrum`
-# are all self consistent for this `Rect` object.
+#=
+The good agreement between the analytical spectra (solid lines)
+and the DFT samples (disks)
+validates that `phantom`, `radon`, and `spectrum`
+are all self consistent for this `Rect` object.
+=#

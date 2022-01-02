@@ -11,6 +11,7 @@ for performing MRI simulations with realistic sensitivity encoding (SENSE).
 This page was generated from a single Julia file:
 [10-mri-sense.jl](@__REPO_ROOT_URL__/10-mri-sense.jl).
 =#
+
 #md # In any such Julia documentation,
 #md # you can access the source code
 #md # using the "Edit on GitHub" link in the top right.
