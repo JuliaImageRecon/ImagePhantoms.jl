@@ -2,10 +2,24 @@
 # # [MRI SENSE](@id 10-mri-sense)
 #---------------------------------------------------------
 
-# This page illustrates the `mri_smap_fit` and `mri_spectra` methods
-# in the Julia package
-# [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl)
-# for performing MRI simulations with realistic sensitivity encoding (SENSE).
+#=
+This page illustrates the `mri_smap_fit` and `mri_spectra` methods
+in the Julia package
+[`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl)
+for performing MRI simulations with realistic sensitivity encoding (SENSE).
+
+This page was generated from a single Julia file:
+[10-mri-sense.jl](@__REPO_ROOT_URL__/10-mri-sense.jl).
+=#
+#md # In any such Julia documentation,
+#md # you can access the source code
+#md # using the "Edit on GitHub" link in the top right.
+
+#md # The corresponding notebook can be viewed in
+#md # [nbviewer](http://nbviewer.jupyter.org/) here:
+#md # [`10-mri-sense.ipynb`](@__NBVIEWER_ROOT_URL__/mri/10-mri-sense.ipynb),
+#md # and opened in [binder](https://mybinder.org/) here:
+#md # [`10-mri-sense.ipynb`](@__BINDER_ROOT_URL__/mri/10-mri-sense.ipynb).
 
 
 # ### Setup
@@ -30,23 +44,25 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 # ### Overview
 
-# Modern MRI scanners use multiple receive coils
-# each of which has its own "sensitivity map" (or "coil profile").
-# Realistic MRI simulations should account for the effects of those
-# sensitivity maps analytically, rather than committing the "inverse crime"
-# of using rasterized phantoms and maps.
+#=
+Modern MRI scanners use multiple receive coils
+each of which has its own "sensitivity map" (or "coil profile").
+Realistic MRI simulations should account for the effects of those
+sensitivity maps analytically, rather than committing the "inverse crime"
+of using rasterized phantoms and maps.
 
-# See the 2012 paper
-# [Guerquin-Kern et al.](http://doi.org/10.1109/TMI.2011.2174158)
-# that combines analytical k-space values of the phantom
-# with an analytical model for the sensitivity maps.
-# This package follows the recommended approach from that paper.
-# We used the `mri_smap_fit` function to fit each sensitivity map
-# with a modest number of complex exponential signals.
-# Then, instead of using the `spectrum` function
-# we use the `spectra` function
-# to generate simulated k-space data
-# from analytical phantoms (like ellipses).
+See the 2012 paper
+[Guerquin-Kern et al.](http://doi.org/10.1109/TMI.2011.2174158)
+that combines analytical k-space values of the phantom
+with an analytical model for the sensitivity maps.
+This package follows the recommended approach from that paper.
+We used the `mri_smap_fit` function to fit each sensitivity map
+with a modest number of complex exponential signals.
+Then, instead of using the `spectrum` function
+we use the `spectra` function
+to generate simulated k-space data
+from analytical phantoms (like ellipses).
+=#
 
 
 # Because FFTW.fft cannot handle units, this function is a work-around.
@@ -78,10 +94,12 @@ image0 = phantom(x, y, oa, oversample)
 cfun = z -> cat(dims = ndims(z)+1, real(z), imag(z))
 jim(x, y, cfun(image0), "Digital phantom\n (real | imag)"; ncol=1)
 
-# In practice, sensitivity maps are usually estimated
-# only over portion of the image array,
-# so we define a simple `mask` here
-# to exercise this issue.
+#=
+In practice, sensitivity maps are usually estimated
+only over portion of the image array,
+so we define a simple `mask` here
+to exercise this issue.
+=#
 
 mask = trues(nx,ny)
 mask[:,[1:2;end-2:end]] .= false
@@ -98,9 +116,11 @@ ncoil = 2
 smap = ir_mri_sensemap_sim(dims=(nx,ny), ncoil=ncoil, orbit_start=[0])
 jim(x, y, cfun(smap), "Sensitivity maps raw")
 
-# Typical sensitivity map estimation methods
-# normalize the maps
-# so that the square-root of the sum of squares (SSoS) is unity:
+#=
+Typical sensitivity map estimation methods
+normalize the maps
+so that the square-root of the sum of squares (SSoS) is unity:
+=#
 
 ssos = sqrt.(sum(abs.(smap).^2, dims=ndims(smap))) # SSoS
 ssos = selectdim(ssos, ndims(smap), 1)
@@ -117,10 +137,12 @@ jim(x, y, cfun(smaps), "Sensitivity maps (masked and normalized)")
 
 # ### Sensitivity map fitting using complex exponentials
 
-# The `mri_smap_fit` function fits each `smap`
-# with a linear combination of complex exponential signals.
-# (These signals are not orthogonal due to the `mask`.)
-# With frequencies `-7:7/N`, the maximum error is ≤ 0.2%.
+#=
+The `mri_smap_fit` function fits each `smap`
+with a linear combination of complex exponential signals.
+(These signals are not orthogonal due to the `mask`.)
+With frequencies `-7:7/N`, the maximum error is ≤ 0.2%.
+=#
 
 deltas = (dx, dy)
 kmax = 7
@@ -171,6 +193,8 @@ jim(
 )
 
 
-# In summary, the `mri_smap_fit` and `mri_spectra` methods here
-# reproduce the approach in the 2012 Guerquin-Kern paper, cited above,
-# enabling parallel MRI simulations that avoid an inverse crime.
+#=
+In summary, the `mri_smap_fit` and `mri_spectra` methods here
+reproduce the approach in the 2012 Guerquin-Kern paper, cited above,
+enabling parallel MRI simulations that avoid an inverse crime.
+=#
