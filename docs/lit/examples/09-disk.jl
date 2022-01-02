@@ -29,7 +29,6 @@ using ImagePhantoms: Ellipse, phantom, disk_phantom_params
 using ImageGeoms: ImageGeom
 using MIRTjim: jim, prompt
 using Plots # @animate, gif
-#plot, plot!, scatter!, default; default(markerstrokecolor=:auto)
 
 # The following line is helpful when running this example.jl file as a script;
 # this way it will prompt user to hit a key after each figure is displayed.

@@ -30,7 +30,7 @@ using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
 using UnitfulRecipes
 using Unitful: mm
-#using Plots: scatter, plot!, default; default(markerstrokecolor=:auto)
+using InteractiveUtils: versioninfo
 
 # The following line is helpful when running this example.jl file as a script;
 # this way it will prompt user to hit a key after each figure is displayed.
