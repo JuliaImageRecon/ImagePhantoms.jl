@@ -59,7 +59,7 @@ end
 gif(anim, "disk.gif", fps = 8)
 ```
 
-![animated phantom gif](https://github.com/JuliaImageRecon/ImagePhantoms.jl/blob/gh-pages/dev/examples/disk.gif)
+![animated phantom gif](https://github.com/JuliaImageRecon/ImagePhantoms.jl/blob/gh-pages/dev/generated/examples/disk.gif)
 
 
 ### Parallel MRI (SENSE)
