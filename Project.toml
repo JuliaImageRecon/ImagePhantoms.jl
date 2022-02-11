@@ -1,7 +1,7 @@
 name = "ImagePhantoms"
 uuid = "71a99df6-f52c-4da1-bd2a-69d6f37f3252"
 authors = ["Jeff Fessler <fessler@umich.edu> and contributors"]
-version = "0.0.8"
+version = "0.0.9"
 
 [deps]
 LazyGrids = "7031d0ef-c40d-4431-b2f8-61a8d2f650db"
@@ -10,5 +10,5 @@ SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [compat]
 LazyGrids = "0.2"
-SpecialFunctions = "1.5"
+SpecialFunctions = "1.5, 2"
 julia = "1.6"

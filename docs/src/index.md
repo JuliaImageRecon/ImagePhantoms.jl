@@ -40,9 +40,7 @@ for simulating data:
 * `spectrum` returns a function of spatial frequencies
   that one can sample to simulate k-space data (e.g., in MRI).
 
-See the
-[Examples](@ref)
-tab to the left for details.
+See the Examples tab for details.
 
 The
 [Michigan Image Reconstruction Toolbox (MIRT)](https://github.com/JeffFessler/MIRT.jl)
