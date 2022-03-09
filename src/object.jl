@@ -33,8 +33,8 @@ General container for 2D and 3D objects for defining image phantoms.
 julia> Object(Ellipse(), (0,0), (1,2), 0.0, 1//2, nothing)
 Object2d{Ellipse, Rational{Int64}, 2, Int64, Float64, Nothing} (S, D, V, ...)
  shape::Ellipse Ellipse()
- center::Tuple{Int64, Int64} (0, 0)
- width::Tuple{Int64, Int64} (1, 2)
+ center::NTuple{2,Int64} (0, 0)
+ width::NTuple{2,Int64} (1, 2)
  angle::Tuple{Float64} (0.0,)
  value::Rational{Int64} 1//2
  param::Nothing nothing
@@ -186,9 +186,26 @@ end
 =#
 
 
+"""
+    Object(ob::Object ; center, width, angle, value, param)
+Make a copy of Object `ob`, optionally modifying some values.
+"""
+function Object(ob::Object{S,D} ;
+    center::NTuple{D} = ob.center,
+    width::NTuple{D} = ob.width,
+    angle::NTuple{Da,<:RealU} = ob.angle,
+    value::Number = ob.value,
+    param = ob.param,
+) where {S, D, Da}
+    Da == D-1 || throw(ArgumentError("Dϕ=$Dϕ != D-1, where D=$D"))
+    Object(ob.shape, center, width, angle, value, param)
+end
+
+
 # Methods for objects
 
 Base.eltype(::Object{S,D,V}) where {S,D,V} = V
+Base.ndims(::Object{S,D}) where {S,D} = D
 
 
 """
@@ -198,7 +215,9 @@ function Base.show(io::IO, ::MIME"text/plain", ob::Object{S,D}) where {S,D}
     println(io, typeof(ob), " (S, D, V, ...)")
     for f in (:shape, :center, :width, :angle, :value, :param)
         p = getproperty(ob, f)
-        println(io, " ", f, "::", typeof(p), " ", p)
+        t = typeof(p)
+        t = t == NTuple{D,eltype(t)} ? "NTuple{$D,$(eltype(t))}" : "$t"
+        println(io, " ", f, "::", t, " ", p)
     end
 end
 
@@ -283,10 +302,38 @@ function phantom(oa::Array{<:Object2d})
 end
 
 """
+    image = phantom(x, y, oa::Array{<:Object2d}, oversample::Int; T)
+Return a digital image of the phantom sampled at `(x,y)` locations,
+with over-sampling factor `oversample` and element type `T`.
+"""
+function phantom(
+    x::AbstractVector,
+    y::AbstractVector,
+    oa::Array{<:Object2d},
+    oversample::Int;
+    T::DataType = promote_type(eltype.(oa)..., Float32),
+)
+    oversample < 1 && throw(ArgumentError("oversample $oversample"))
+    dx = x[2] - x[1]
+    dy = y[2] - y[1]
+    all(≈(dx), diff(x)) || throw("oversample requires uniform x")
+    all(≈(dy), diff(y)) || throw("oversample requires uniform y")
+    tmp = ((1:oversample) .- (oversample+1)/2) / oversample
+    ophantom = ob ->
+       (x,y) -> T(sum(phantom(ob).(x .+ dx*tmp, y .+ dy*tmp')) / abs2(oversample))
+    return sum(ob -> ophantom(ob).(x,y'), oa)
+end
+
+"""
     image = phantom(x, y, oa::Array{<:Object2d})
 Return a digital image of the phantom sampled at `(x,y)` locations.
 """
-function phantom(x::AbstractVector, y::AbstractVector, oa::Array{<:Object2d})
+function phantom(
+    x::AbstractVector,
+    y::AbstractVector,
+    oa::Array{<:Object2d},
+)
+
     return sum(ob -> phantom(ob).(x,y'), oa)
 end
 

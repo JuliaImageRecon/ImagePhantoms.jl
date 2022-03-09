@@ -3,7 +3,7 @@ ellipse.jl
 =#
 
 
-#using ImagePhantoms #: Object2d
+#using ImagePhantoms #: Object, Object2d
 
 export Ellipse
 export Circle
@@ -20,17 +20,16 @@ struct Ellipse <: AbstractShape2 end
 
 
 """
-    Ellipse(cx, cy, rx, ry, ϕ, value::Number)
-    Ellipse(center::NTuple{2,RealU}, radii::NTuple{2,RealU}, ϕ::RealU, v)
+    Ellipse(cx, cy, rx=1, ry=rx, ϕ=0, value::Number=1)
+    Ellipse(center::NTuple{2,RealU}, radii::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1)
     Ellipse([6-vector])
-    Ellipse(r, v=1) (circle of radius `r`)
-Construct `Ellipse` object from parameters
+Construct `Ellipse` object from parameters.
 """
 function Ellipse(
     cx::RealU,
     cy::RealU,
-    rx::RealU,
-    ry::RealU,
+    rx::RealU = oneunit(cx),
+    ry::RealU = rx,
     ϕ::RealU = 0,
     value::Number = 1,
 )
@@ -40,7 +39,7 @@ end
 
 function Ellipse(
     center::NTuple{2,RealU},
-    radii::NTuple{2,RealU},
+    radii::NTuple{2,RealU} = (1,1) .* oneunit(center[1]),
     ϕ::RealU = 0,
     value::Number = 1,
 )
@@ -52,23 +51,21 @@ function Ellipse(v::AbstractVector{<:Number})
     Ellipse(v...)
 end
 
-Ellipse(r::RealU, v::Number = 1) = Ellipse((0,0), (r,r), 0, v)
-
 
 # circles as a special case
 
 """
     Circle(x,y,r,v=1) (circle of radius `r` centered at `(x,y)`)
-    Circle((x,y), r, v=1) ditto
+    Circle((x,y), r=1, v=1) ditto
     Circle([4-vector]) ditto
     Circle(r, v=1) centered at origin
 Construct circle objects as special cases of `Ellipse` objects.
 """
-Circle(r::RealU, v::Number = 1) = Ellipse(r, v)
 Circle(cx::RealU, cy::RealU, r::RealU, v::Number = 1) =
     Ellipse(cx, cy,  r, r, 0, v)
-Circle(center::NTuple{2,RealU}, r::RealU, v::Number = 1) =
-    Ellipse(center, (r, r), 0, v)
+Circle(center::NTuple{2,RealU}, r::RealU = oneunit(center[1]), v::Number = 1) =
+    Circle(center..., r, v)
+Circle(r::RealU, v::Number = 1) = Circle((zero(r), zero(r)), r, v)
 
 function Circle(v::AbstractVector{<:Number})
     length(v) == 4 || throw(ArgumentError("$v wrong length"))
@@ -101,6 +98,7 @@ function radon_ellipse(r, ϕ, cx, cy, rx, ry, θ)
     rp2 = abs2(rx * cosϕ) + abs2(ry * sinϕ) # square of projected radius
     return 2rx*ry / rp2 * sqrt(max(rp2 - abs2(r), 0*oneunit(r)^2))
 end
+
 
 """
     radon(ob::Object2d{Ellipse})

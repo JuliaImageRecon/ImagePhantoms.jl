@@ -1,19 +1,35 @@
 #---------------------------------------------------------
-# # [Ellipse](@id 2-ellipse)
+# # [Rectangle](@id 03-rect)
 #---------------------------------------------------------
 
-# This page illustrates the `Ellipse` shape in the Julia package
-# [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
+#=
+This page illustrates the `Rect` shape in the Julia package
+[`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
+
+This page was generated from a single Julia file:
+[03-rect.jl](@__REPO_ROOT_URL__/03-rect.jl).
+=#
+
+#md # In any such Julia documentation,
+#md # you can access the source code
+#md # using the "Edit on GitHub" link in the top right.
+
+#md # The corresponding notebook can be viewed in
+#md # [nbviewer](http://nbviewer.jupyter.org/) here:
+#md # [`03-rect.ipynb`](@__NBVIEWER_ROOT_URL__/03-rect.ipynb),
+#md # and opened in [binder](https://mybinder.org/) here:
+#md # [`03-rect.ipynb`](@__BINDER_ROOT_URL__/03-rect.ipynb).
+
 
 # ### Setup
 
 # Packages needed here.
 
-using ImagePhantoms: Ellipse, phantom, radon, spectrum
+using ImagePhantoms: Rect, phantom, radon, spectrum
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
 using FFTW: fft, fftshift
-using Unitful: mm, unit
+using Unitful: mm, unit, °
 using UnitfulRecipes
 using Plots: plot, plot!, scatter!, default; default(markerstrokecolor=:auto)
 
@@ -24,15 +40,18 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 # ### Overview
 
-# One of the most basic shapes used in constructing 2D digital image phantoms
-# is the ellipse, specified by its center, radii, angle and value.
-# All of the methods in `ImagePhantoms` support physical units,
-# so we use such units throughout this example.
-# (Using units is recommended but not required.)
+#=
+A basic shape used in constructing 2D digital image phantoms
+is the rectangle, specified by its center, widths, angle and value.
+All of the methods in `ImagePhantoms` support physical units,
+so we use such units throughout this example.
+(Using units is recommended but not required.)
 
-# Define an ellipse object, using physical units.
+Define an rectangle object, using physical units.
+=#
+
 width = (2mm, 8mm)
-ob = Ellipse((4mm, 3mm), width, π/6, 1.0f0)
+ob = Rect((4mm, 3mm), width, π/6, 1.0f0)
 
 
 # ### Phantom image using `phantom`
@@ -51,18 +70,19 @@ jim(x, y, img)
 
 ig = ImageGeom(dims=(M,N), deltas=(dx,dy), offsets=(0.5,0.5))
 @assert all(axes(ig) .≈ (x,y))
-p1 = jim(axes(ig)..., img, "Ellipse phantom", xlabel="x", ylabel="y")
+p1 = jim(axes(ig)..., img, "Rect phantom", xlabel="x", ylabel="y")
 
 
 # ### Spectrum using `spectrum`
 
-# Let's examine the spectrum of this image.
-# There are two ways to do this:
-# * using the analytical Fourier transform of the ellipse via `spectrum`
-# * applying the DFT via FFT to the digital image.
-# Because the shape has units `mm`, the spectra axes have units cycles/mm.
+#=
+There are two ways to examine the spectrum of this image:
+* using the analytical Fourier transform of the rect via `spectrum`
+* applying the DFT via FFT to the digital image.
+Because the shape has units `mm`, the spectra axes have units cycles/mm.
+=#
 
-zscale = 4 / π / prod(width) # normalize spectra by area
+zscale = 1 / prod(width) # normalize spectra by area
 spectrum_exact = spectrum(axesf(ig)..., [ob]) * zscale
 sp = z -> max(log10(abs(z)/oneunit(abs(z))), -6) # log-scale for display
 clim = (-6, 0) # colorbar limit for display
@@ -76,8 +96,8 @@ function myfft(x)
     return fftshift(fft(fftshift(x) / u)) * u
 end
 
-# fx = (-M÷2:M÷2-1) / M / dx # appropriate frequency axes for DFT,
-# fy = (-N÷2:N÷2-1) / N / dy # that are provided by axesf(ig)
+#src fx = (-M÷2:M÷2-1) / M / dx # appropriate frequency axes for DFT,
+#src fy = (-N÷2:N÷2-1) / N / dy # that are provided by axesf(ig)
 spectrum_fft = myfft(img) * dx * dy * zscale
 p3 = jim(axesf(ig)..., sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
@@ -91,7 +111,7 @@ jim(p1, p4, p2, p3)
 
 # ### Radon transform using `radon`
 
-# Examine the Radon transform of the ellipse using `radon`,
+# Examine the Radon transform of the rect using `radon`,
 # and validate it using the projection-slice theorem aka Fourier-slice theorem.
 
 dr = 0.02mm # radial sample spacing
@@ -102,19 +122,21 @@ fr = (-nr÷2:nr÷2-1) / nr / dr # corresponding spectral axis
 sino = radon(ob).(r, ϕ') # sample Radon transform of a single shape object
 p5 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram", yflip=false, xlabel="r", ylabel="ϕ")
 
-#src clim=(0, 2*maximum(width)*ob.value), # todo
+#src clim=(0, maximum(width)*ob.value), # todo
 
-# Note that the maximum sinogram value is about 16mm which makes sense
-# for an ellipse whose long axis has "radius" 8mm.
+#=
+The maximum sinogram value is about sqrt(8^2+2^2) = 8.2mm,
+which makes sense for a 8mm × 2mm rect.
 
-# The above sampling generated a parallel-beam sinogram,
-# but one could make a fan-beam sinogram simply by sampling `(r, ϕ)` appropriately.
+The above sampling generated a parallel-beam sinogram,
+but one could make a fan-beam sinogram by sampling `(r, ϕ)` appropriately.
+=#
 
 
 # ### Fourier-slice theorem illustration
 
 # Pick one particular view angle (55°) and look at its slice and spectra.
-ia = argmin(abs.(ϕ .- deg2rad(55)))
+ia = argmin(abs.(ϕ .- 55°))
 slice = sino[:,ia]
 slice_fft = myfft(slice) * dr
 angle = round(rad2deg(ϕ[ia]), digits=1)
@@ -135,7 +157,9 @@ plot!(fr, imag(slice_ft), label="imag", color=:red)
 plot(p1, p5, p3, p4)
 
 
-# The good agreement between the analytical spectra (solid lines)
-# and the DFT samples (disks)
-# validates that `phantom`, `radon`, and `spectrum`
-# are all self consistent for this `Ellipse` object.
+#=
+The good agreement between the analytical spectra (solid lines)
+and the DFT samples (disks)
+validates that `phantom`, `radon`, and `spectrum`
+are all self consistent for this `Rect` object.
+=#

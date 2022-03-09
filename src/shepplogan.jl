@@ -77,18 +77,41 @@ end
 
 
 """
-    image = shepp_logan(M, N, case = SheppLogan(); kwargs...)
-Convenience method for generating `M×N` samples of Shepp-Logan phantom. 
+    image = shepp_logan(M, [N,], case, options...)
+Convenience method for generating `M×N` samples of Shepp-Logan phantoms.
+
+In
+* `M::Int` : horizontal size
+* `N::Int` : vertical size, defaults to `M`
+* `case::EllipsePhantomVersion = SheppLogan()`
+
+# Options
+* `oversample::Int = 3` (usually)
+* `yflip::Bool = true` (reverse `y` samples for convenience.)
+* `kwargs...` remaining options passed to `ellipse_parameters` for parameters.
+
+# Out
+* `image` : `M × N` matrix
+
+The default here is 3× over-sampling along both axes (9 samples per pixel),
+except for the `SheppLoganBrainWeb` phantom that consists of integer indices.
 """
 function shepp_logan(
     M::Int, N::Int,
     case::EllipsePhantomVersion = SheppLogan() ;
+    oversample::Int = case == SheppLoganBrainWeb() ? 1 : 3,
+    yflip::Bool = true,
     kwargs...
 )
     ob = shepp_logan(case ; kwargs...)
     x = LinRange(-0.5, 0.5, M)
     y = LinRange(-0.5, 0.5, N)
-    return phantom(x, y, ob)
+    if yflip
+        y = reverse(y)
+    end
+    return oversample > 1 ?
+        phantom(x, y, ob, oversample) :
+        phantom(x, y, ob) # type unstable because of over-sampling
 end
 
 shepp_logan(M::Int, case::EllipsePhantomVersion = SheppLogan(); kwargs...) =
@@ -96,7 +119,7 @@ shepp_logan(M::Int, case::EllipsePhantomVersion = SheppLogan(); kwargs...) =
 
 
 """
-    params = ellipse_parameters(case::Symbol; fovs::NTuple{2}, u::Tuple)
+    params = ellipse_parameters(case::Symbol; fovs::NTuple{2}, u::Tuple, disjoint::Bool)
 
 By default the first four columns are unitless "fractions of field of view",
 so columns 1,3 are scaled by `xfov` and columns 2,4 are scaled by `yfov`,
@@ -105,27 +128,34 @@ The optional 3-tuple `u` specifies scaling and/or units:
 * columns 1-4 (center, radii) are scaled by `u[1]` (e.g., mm),
 * column 5 (angle) is scaled by `u[2]` (e.g., `1` or `°`),
 * column 6 (value) is scaled by `u[3]` (e.g., `1/cm`) for an attenuation map.
+If `disjoint==true` then the middle ellipse positions are adjusted to avoid overlap.
 """
 function ellipse_parameters(
     case::EllipsePhantomVersion = SheppLogan() ;
     fovs::NTuple{2,RealU} = (1,1),
     u::NTuple{3,Any} = (1,1,1), # unit scaling
+    disjoint::Bool = false,
 )
     (xfov, yfov) = fovs
 
     # The "Number" here is to enable units
     params = Number[ # original CT version
-    0       0       0.92    0.69    90    2
-    0       -0.0184 0.874   0.6624  90    -0.98
-    0.22    0       0.31    0.11    72    -0.02
-    -0.22   0       0.41    0.16   108    -0.02
-    0       0.35    0.25    0.21    90    0.01
-    0       0.1     0.046   0.046    0    0.01
-    0       -0.1    0.046   0.046    0    0.01
-    -0.08   -0.605  0.046   0.023    0    0.01
-    0       -0.605  0.023   0.023    0    0.01
-    0.06    -0.605  0.046   0.023   90    0.01
+    0       0       0.92    0.69    90    2     # skull
+    0       -0.0184 0.874   0.6624  90    -0.98 # brain
+    0.22    0       0.31    0.11    72    -0.02 # right big
+    -0.22   0       0.41    0.16   108    -0.02 # left big
+    0       0.35    0.25    0.21    90    0.01 # top
+    0       0.1     0.046   0.046    0    0.01 # middle high
+    0       -0.1    0.046   0.046    0    0.01 # middle low
+    -0.08   -0.605  0.046   0.023    0    0.01 # bottom left
+    0       -0.605  0.023   0.023    0    0.01 # bottom center
+    0.06    -0.605  0.046   0.023   90    0.01 # bottom right
     ]
+
+    if disjoint # tweak so that middle ellipses are disjoint
+        params[4,1] += -0.04
+        params[5,2] += 0.07
+    end
 
     params[:,[1,3]] .*= xfov/2
     params[:,[2,4]] .*= yfov/2
