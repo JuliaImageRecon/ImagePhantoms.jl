@@ -6,7 +6,9 @@ CurrentModule = ImagePhantoms
 
 ## Overview
 
-This Julia package provides tools
+This Julia package
+[`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl)
+provides tools
 for constructing digital software "phantoms"
 used for testing image reconstruction algorithms.
 The most famous such phantom

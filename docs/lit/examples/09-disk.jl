@@ -30,7 +30,7 @@ using ImageGeoms: ImageGeom
 using MIRTjim: jim, prompt
 using Plots # @animate, gif
 
-# The following line is helpful when running this example.jl file as a script;
+# The following line is helpful when running this file as a script;
 # this way it will prompt user to hit a key after each figure is displayed.
 
 isinteractive() ? jim(:prompt, true) : prompt(:draw);
