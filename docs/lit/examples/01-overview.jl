@@ -62,7 +62,9 @@ we need not only the phantom image, but also its
 and spectrum.
 
 The 2D sinogram coordinate system used here is
-``p(r, ϕ) = \int_{-∞}^{∞} f(r \cos ϕ - ℓ \sin ϕ, r \sin ϕ + ℓ \cos ϕ) \, \mathrm{d} ℓ``.
+```math
+p(r, ϕ) = \int_{-∞}^{∞} f(r \cos ϕ - ℓ \sin ϕ, r \sin ϕ + ℓ \cos ϕ) \, \mathrm{d} ℓ.
+```
 
 We start with the vector of ellipses that defines the phantom,
 using a typical field of view (FOV) of 200mm for a head:
