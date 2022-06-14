@@ -96,7 +96,7 @@ function sphere_transform(f::Real)
          return 4/3 * π
     end
     f2pi = 2π * f
-    (s, c) = sincos(s2pi)
+    (s, c) = sincos(f2pi)
     return (s - f2pi * c) / ((2 * π^2) * f^3)
 end
 
@@ -134,7 +134,7 @@ Translated from ellipsoid_proj.m in MIRT
 Caution: note that `ϕ, θ` denote projection view angles
 whereas `Φ, Θ` denote object rotation angles.
 """
-function xray_ellipsoid(u, v, azim0, polar, cx, cy, cz, rx, ry, rz, xang, zang)
+function xray_ellipsoid(u, v, ϕ, polar, cx, cy, cz, rx, ry, rz, xang, zang)
 #function xray_ellipsoid(u, v, β, θ, cx, cy, cz, rx, ry, rz, xang, zang)
 #function xray_ellipsoid(u, v, β, θ, cx, cy, cz, rx, ry, rz, Φ, Θ)
 #function ellipsoid_proj_do(ss, tt, beta, source_zs, dso, dod, dfs, oversample)
@@ -142,17 +142,15 @@ function xray_ellipsoid(u, v, azim0, polar, cx, cy, cz, rx, ry, rz, xang, zang)
     zang == 0 || throw("Z angle not done")
     (spolar, cpolar) = sincos(polar)
 
-    az = β + azim0
-    sinaz, cosaz = sincos(az)
-
+    sinaz, cosaz = sincos(ϕ)
     ushift = cx * cosaz + cy * sinaz
     vshift = (cx * sinaz - cy * cosaz) * spolar + cz * cpolar
 
-    az -= xang
+    az = ϕ - xang
     sinaz, cosaz = sincos(az)
-    p1 = (uu - ushift) * cosaz + (vv - vshift) * sinaz * spolar
-    p2 = (uu - ushift) * sinaz - (vv - vshift) * cosaz * spolar
-    p3 = (vv - vshift) * cpolar
+    p1 = (u - ushift) * cosaz + (v - vshift) * sinaz * spolar
+    p2 = (u - ushift) * sinaz - (v - vshift) * cosaz * spolar
+    p3 = (v - vshift) * cpolar
 
     e1 = -sinaz * cpolar
     e2 = cosaz * cpolar

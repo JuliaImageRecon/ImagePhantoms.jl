@@ -10,7 +10,7 @@ export Object, Object2d, Object3d
 #export rotate, scale, translate # no: to avoid conflicts with Plots
 export phantom, radon, spectrum
 
-atuple(x::Any, n::Int) = ntuple(i -> x, n)
+_tuple(x::Any, n::Int) = ntuple(i -> x, n)
 
 abstract type AbstractObject end
 
@@ -94,18 +94,18 @@ General outer object constructor where `angle` is a tuple, including 3D case.
 function Object(
     shape::S,
     center::NTuple{D,C},
-    width::NTuple{W,C} where W = atuple(zero(eltype(center)), length(center)),
-    angle::NTuple{Da,RealU} where Da = atuple(0, length(center)-1),
+    width::NTuple{W,C} where W = _tuple(zero(eltype(center)), length(center)),
+    angle::NTuple{Da,RealU} where Da = _tuple(0, length(center)-1),
     value::Number = 1,
     param::Any = nothing,
 ) where {S <: AbstractShape, D, C <: RealU}
-    Object{S}(shape, center, width, angle, value, param)
+    Object{S}(shape, center, width, promote(angle...), value, param)
 end
 
 
 """
     ob = Object(shape, center, width, angle=0, value=1, param=nothing)
-2D object constructor.
+2D object constructor using tuples.
 """
 function Object(
     shape::AbstractShape2,
@@ -125,7 +125,7 @@ end
 function Object(
     shape::AbstractShape2 ;
     center::NTuple{2,C} = (0,0),
-    width::NTuple{W,C} where W = atuple(one(eltype(center)), 2),
+    width::NTuple{W,C} where W = _tuple(one(eltype(center)), 2),
     angle::RealU = 0,
     value::Number = 1,
     param = nothing,
@@ -137,7 +137,7 @@ end
 # not needed due to general case above
 """
     ob = Object(shape, center, width, angle=(0,0), value=1, param=nothing)
-3D object constructor.
+3D object constructor using tuples.
 """
 function Object(
     shape::Shape3d,
@@ -158,7 +158,7 @@ end
 function Object(
     shape::AbstractShape3 ;
     center::NTuple{3,C} = (0,0,0),
-    width::NTuple{W,C} = atuple(one(eltype(center)), 3),
+    width::NTuple{W,C} = _tuple(one(eltype(center)), 3),
     angle::NTuple{2,RealU} = (0,0),
     value::Number = 1,
     param = nothing,
@@ -252,7 +252,7 @@ Scale the width(s) by `factor`.
 scale(ob::Object{S,D,V,W}, factor::NTuple{W,RealU}) where {S,D,V,W} =
     Object(ob.shape, ob.center, ob.width .* factor, ob.angle, ob.value, ob.param)
 scale(ob::Object{S,D,V,W}, factor::RealU) where {S,D,V,W} =
-    scale(ob, atuple(factor,W))
+    scale(ob, _tuple(factor,W))
 
 
 # scale value
@@ -348,7 +348,11 @@ function phantom(
     return sum(ob -> phantom(ob).(x,y'), oa)
 end
 
-function phantom(xx::AbstractArray, yy::AbstractArray, oa::Array{<:Object2d})
+function phantom(
+    xx::AbstractArray,
+    yy::AbstractArray,
+    oa::Array{<:Object2d},
+)
     return sum(ob -> phantom(ob).(xx,yy), oa)
 end
 
@@ -370,11 +374,19 @@ end
     sino = radon(r, ϕ, oa::Array{<:Object2d})
 Return parallel-beam 2D sinogram `sino` sampled at given `(r,ϕ)` locations.
 """
-function radon(r::AbstractVector, ϕ::AbstractVector, oa::Array{<:Object2d})
+function radon(
+    r::AbstractVector,
+    ϕ::AbstractVector,
+    oa::Array{<:Object2d},
+)
     return sum(ob -> radon(ob).(r,ϕ'), oa)
 end
 
-function radon(rr::AbstractArray, ϕϕ::AbstractArray, oa::Array{<:Object2d})
+function radon(
+    rr::AbstractArray,
+    ϕϕ::AbstractArray,
+    oa::Array{<:Object2d},
+)
     return sum(ob -> radon(ob).(rr,ϕϕ), oa)
 end
 
@@ -396,7 +408,11 @@ function spectrum(fx::AbstractVector, fy::AbstractVector, oa::Array{<:Object2d})
     return sum(ob -> spectrum(ob).(fx,fy'), oa)
 end
 
-function spectrum(fx::AbstractArray, fy::AbstractArray, oa::Array{<:Object2d})
+function spectrum(
+    fx::AbstractArray,
+    fy::AbstractArray,
+    oa::Array{<:Object2d},
+)
     return sum(ob -> spectrum(ob).(fx,fy), oa)
 end
 
@@ -410,11 +426,3 @@ function rotate2d(x::RealU, y::RealU, θ::RealU)
 end
 
 rotate2d(xy::NTuple{2,RealU}, θ::RealU) = rotate2d(xy..., θ)
-
-function rotate3d(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU)
-    θ == 0 || throw(ArgumentError("θ ≂̸ 0 unsupported currently"))
-    (s, c) = sincos(ϕ)
-    return (c * x + s * y, -s * x + c * y, z)
-end
-
-rotate3d(xyz::NTuple{3,RealU}, ϕ::RealU, θ::RealU) = rotate3d(xyz..., ϕ, θ)
