@@ -290,6 +290,17 @@ function coords(ob::Object2d, x::RealU, y::RealU)
 end
 
 
+"""
+    coords(object::Object3d, x::RealU, y::RealU, y::RealU)
+Put coordinates `(x,y,z)` in canonical axes associated with `object`.
+"""
+function coords(ob::Object3d, x::RealU, y::RealU, z::RealU)
+    (x, y, z) = rotate3d(x - ob.center[1], y - ob.center[2], z - ob.center[3],
+        ob.angle[1], ob.angle[2])
+    return (x / ob.width[1], y / ob.width[2], z / ob.width[3]) # unitless
+end
+
+
 # methods for phantoms: an array of objects
 
 """
@@ -399,3 +410,11 @@ function rotate2d(x::RealU, y::RealU, θ::RealU)
 end
 
 rotate2d(xy::NTuple{2,RealU}, θ::RealU) = rotate2d(xy..., θ)
+
+function rotate3d(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU)
+    θ == 0 || throw(ArgumentError("θ ≂̸ 0 unsupported currently"))
+    (s, c) = sincos(ϕ)
+    return (c * x + s * y, -s * x + c * y, z)
+end
+
+rotate3d(xyz::NTuple{3,RealU}, ϕ::RealU, θ::RealU) = rotate3d(xyz..., ϕ, θ)
