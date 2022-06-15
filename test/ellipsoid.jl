@@ -97,7 +97,8 @@ end
     y = (-M÷2:M÷2-1) * dy
     z = (-N÷2:N÷2-1) * dz
     width = (30m, 40m, 50m)
-    ob = shape((8m, 7m, 6m), width, (π/6, 0), 1.0f0)
+    ob = shape((4m, 3m, 2m), width, (π/5, 0), 1.0f0) # todo: fails
+#ob = shape((4m, 3m, 2m), width, (π*0, 0), 1.0f0) # todo: works
     img = phantom(x, y, z, [ob])
 
     zscale = 1 / (4/3 * π * prod(width) * ob.value) # normalize spectra
@@ -106,6 +107,18 @@ end
     fz = (-N÷2:N÷2-1) / N / dz
     X = myfft(img) * (dx * dy * dz * zscale)
     kspace = spectrum(fx, fy, fz, [ob]) * zscale
+    @test spectrum(ob)(0/m, 0/m, 0/m) * zscale ≈ 1
+    @test maximum(abs, kspace) ≈ 1
+    @test kspace[L÷2+1,M÷2+1,N÷2+1] ≈ 1
+
+#=
+ffx, ffy, ffz = ndgrid(fx, fy, fz);
+ffx_min = minimum(abs, ffx)
+ffy_min = minimum(abs, ffy) # todo: LazyGrids issue ?
+ffz_min = minimum(abs, ffz)
+spectrum(ob)(ffx_min, ffy_min, ffz_min)
+fx[L÷2+1], fy[M÷2+1], fz[N÷2+1]
+=#
 
 #=
     clim = (-6, 0)

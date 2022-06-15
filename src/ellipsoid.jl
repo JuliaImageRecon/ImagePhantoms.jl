@@ -90,14 +90,19 @@ Fourier transform of unit radius sphere.
 The argument `f` is the radial coordinate in k-space and is unitless.
 See p253 of Bracewell 1978, The Fourier transform and its applications,
 or http://doi.org/10.1002/mrm.21292.
+
+Formula: `4/3 π` for `f ≈ 0`, otherwise
+`(sin(2πf) - 2πf cos(2πf)) / (2 * π^2 * f^3)`.
 """
-function sphere_transform(f::Real)
-    if f == 0
+function sphere_transform(f::T) where {T <: AbstractFloat}
+    atol = eps(T)
+    if abs(f)^3 ≤ atol
          return 4/3 * π
     end
     f2pi = 2π * f
     (s, c) = sincos(f2pi)
-    return (s - f2pi * c) / ((2 * π^2) * f^3)
+    # numerator: s - f2pi * c ≈ (2πf)^3/3 for small f
+    return (s - f2pi * c) / (2 * π^2 * f^3)
 end
 
 
