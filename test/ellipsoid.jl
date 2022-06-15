@@ -2,20 +2,25 @@
 test/ellipsoid.jl
 =#
 
-include("helper.jl") # todo
-using ImagePhantoms #: Object3d, AbstractShape3
-using ImagePhantoms #: Ellipsoid, Sphere
+const DEBUG = false
+
+using ImagePhantoms: Object3d, AbstractShape3, phantom, radon, spectrum
+using ImagePhantoms: Ellipsoid, Sphere
 import ImagePhantoms as IP
-using Unitful: m, unit
-#using MIRTjim: jim, prompt
-#using UnitfulRecipes
-#using Plots; default(markerstrokecolor=:auto)
+using Unitful: m, unit, °
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
+if DEBUG
+    include("helper.jl")
+    using MIRTjim: jim, prompt
+    using UnitfulRecipes
+    using Plots: plot, plot!, scatter, scatter!, gui, default
+    default(markerstrokecolor=:auto, markersize=2)
+end
 
 (shape, shape3) = (Ellipsoid, Sphere)
 
-macro isob3(ex) # macro to streamline tests
+macro isob3(ex) # @isob macro to streamline tests
     :(@test $(esc(ex)) isa Object3d{shape})
 end
 
@@ -31,6 +36,7 @@ end
     @isob3 @inferred shape(1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0)
     @isob3 @NOTinferred shape(Number[1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0])
 
+    # spheres
     @isob3 @inferred shape(1, 5.0f0)
     @isob3 @inferred shape3(1, 5.0f0)
     @isob3 @inferred shape3(1, 2, 3, 4., 5.0f0)
@@ -82,23 +88,20 @@ end
 
     fun = @inferred spectrum(ob)
     @test fun isa Function
-    fun(0,0,0) ≈ 4/3 * π * prod(ob.width) * ob.value
+    @test fun(0,0,0) ≈ 4/3 * π * prod(ob.width) * ob.value
 end
 
 
-#=
 @testset "spectrum" begin
-=#
     dx = 1.0m
     dy = 1.1m
     dz = 1.2m
-    (L,M,N) = (2^8,2^8+2,2^8+4)
+    (L,M,N) = (2^7,2^7+2,2^7+4)
     x = (-L÷2:L÷2-1) * dx
     y = (-M÷2:M÷2-1) * dy
     z = (-N÷2:N÷2-1) * dz
     width = (30m, 40m, 50m)
-    ob = shape((4m, 3m, 2m), width, (π/5, 0), 1.0f0) # todo: fails
-#ob = shape((4m, 3m, 2m), width, (π*0, 0), 1.0f0) # todo: works
+    ob = shape((8m, 7m, 6m), width, (π/6, 0), 5.0f0)
     img = phantom(x, y, z, [ob])
 
     zscale = 1 / (4/3 * π * prod(width) * ob.value) # normalize spectra
@@ -111,16 +114,8 @@ end
     @test maximum(abs, kspace) ≈ 1
     @test kspace[L÷2+1,M÷2+1,N÷2+1] ≈ 1
 
-#=
-ffx, ffy, ffz = ndgrid(fx, fy, fz);
-ffx_min = minimum(abs, ffx)
-ffy_min = minimum(abs, ffy) # todo: LazyGrids issue ?
-ffz_min = minimum(abs, ffz)
-spectrum(ob)(ffx_min, ffy_min, ffz_min)
-fx[L÷2+1], fy[M÷2+1], fz[N÷2+1]
-=#
-
-#=
+#= todo: move to docs
+if DEBUG
     clim = (-6, 0)
     sp = z -> max(log10(abs(z)/oneunit(abs(z))), -6)
     p1 = jim(x, y, img, "phantom")
@@ -128,11 +123,11 @@ fx[L÷2+1], fy[M÷2+1], fz[N÷2+1]
     p3 = jim(fx, fy, sp.(kspace), "log10|Spectrum|"; clim)
     p4 = jim(fx, fy, abs.(kspace - X), "Difference")
     jim(p1, p4, p2, p3)
+end
 =#
-    @show maximum(abs, kspace - X), maximum(abs, kspace), maximum(abs, X)
-#todo
-    @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
 
+    @test abs(maximum(abs, X) - 1) < 1e-2
+    @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
 
 #=
 todo
@@ -143,7 +138,7 @@ todo
     r = (-nr÷2:nr÷2-1) * dr
     fr = (-nr÷2:nr÷2-1) / nr / dr
     ϕ = deg2rad.(0:180) # * Unitful.rad # todo round unitful Unitful.°
-    sino = radon(r, ϕ, [ob])
+    sino = @inferred radon(r, ϕ, [ob])
 
     ia = argmin(abs.(ϕ .- deg2rad(55)))
     slice = sino[:,ia]
@@ -152,10 +147,8 @@ todo
 
     kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
     ideal = spectrum(ob).(kx, ky)
-    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
-=#
 
-#=
+if DEBUG
     p2 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram")
     jim(p1, p2)
     p3 = plot(r, slice, title="profile at ϕ = $angle", label="")
@@ -167,9 +160,10 @@ todo
     plot!(fr, abs.(ideal), label="abs", color=:blue)
     plot!(fr, real(ideal), label="real", color=:green)
     plot!(fr, imag(ideal), label="imag", color=:red)
-    plot(p1, p2, p3, p4)
+    plot(p1, p2, p3, p4); gui()
+end
+
+    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
 =#
 
-#=
 end
-=#

@@ -1,6 +1,5 @@
 #=
 ellipsoid.jl
-based on ellipsoid_proj.m in MIRT
 =#
 
 
@@ -21,7 +20,7 @@ struct Ellipsoid <: AbstractShape3 end
 
 
 """
-    Ellipsoid(cx, cy, cz, rx, ry, rz, Φ, Θ, value::Number)
+    Ellipsoid(cx, cy, cz, rx, ry, rz, Φ, Θ, value::Number = 1)
     Ellipsoid(center::NTuple{3,RealU}, radii::NTuple{3,RealU}, angle::NTuple{2,RealU}, v)
     Ellipsoid([9-vector])
     Ellipsoid(r, v=1) (sphere of radius `r`)
@@ -86,7 +85,7 @@ end
 """
    sphere_transform(f::Real)
 
-Fourier transform of unit radius sphere.
+Fourier transform of unit-radius sphere.
 The argument `f` is the radial coordinate in k-space and is unitless.
 See p253 of Bracewell 1978, The Fourier transform and its applications,
 or http://doi.org/10.1002/mrm.21292.
@@ -150,12 +149,14 @@ function xray_ellipsoid(u, v, ϕ, polar, cx, cy, cz, rx, ry, rz, xang, zang)
     sinaz, cosaz = sincos(ϕ)
     ushift = cx * cosaz + cy * sinaz
     vshift = (cx * sinaz - cy * cosaz) * spolar + cz * cpolar
+    u -= ushift
+    v -= vshift
 
     az = ϕ - xang
     sinaz, cosaz = sincos(az)
-    p1 = (u - ushift) * cosaz + (v - vshift) * sinaz * spolar
-    p2 = (u - ushift) * sinaz - (v - vshift) * cosaz * spolar
-    p3 = (v - vshift) * cpolar
+    p1 = u * cosaz + v * sinaz * spolar
+    p2 = u * sinaz - v * cosaz * spolar
+    p3 = v * cpolar
 
     e1 = -sinaz * cpolar
     e2 = cosaz * cpolar
@@ -181,14 +182,13 @@ radon(ob::Object3d{Ellipsoid}) = (s,t,ϕ,θ) -> ob.value *
 function spectrum_ellipsoid(fx, fy, fz, cx, cy, cz, rx, ry, rz, Φ, Θ)
     (kx, ky, kz) = rotate3d(fx, fy, fz, Φ, Θ) # rotate then translate
     return rx * ry * rz * exp(-2im*π*(fx*cx + fy*cy + fz*cz)) *
-        sphere_transform(sqrt((rx*fx)^2 + (ry*fy)^2 + (rz*fz)^2))
+        sphere_transform(sqrt((rx*kx)^2 + (ry*ky)^2 + (rz*kz)^2))
 end
 
 
 """
     spectrum(ob::Object3d{Ellipsoid})
-Returns function of ``(f_x,f_y,f_z)`` for the spectrum (3D Fourier transform)
-of an Ellipsoid.
+Returns function of ``(f_x,f_y,f_z)`` for the spectrum (3D Fourier transform).
 """
 spectrum(ob::Object3d{Ellipsoid}) = (fx,fy,fz) -> ob.value *
     spectrum_ellipsoid(fx, fy, fz, ob.center..., ob.width..., ob.angle...)
