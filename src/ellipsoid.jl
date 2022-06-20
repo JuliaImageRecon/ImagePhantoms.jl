@@ -181,7 +181,7 @@ radon(ob::Object3d{Ellipsoid}) = (s,t,ϕ,θ) -> ob.value *
 
 function spectrum_ellipsoid(fx, fy, fz, cx, cy, cz, rx, ry, rz, Φ, Θ)
     (kx, ky, kz) = rotate3d(fx, fy, fz, Φ, Θ) # rotate then translate
-    return rx * ry * rz * exp(-2im*π*(fx*cx + fy*cy + fz*cz)) *
+    return rx * ry * rz * cispi(-2*(fx*cx + fy*cy + fz*cz)) *
         sphere_transform(sqrt((rx*kx)^2 + (ry*ky)^2 + (rz*kz)^2))
 end
 

@@ -111,8 +111,8 @@ radon(ob::Object2d{Gauss2}) = (r,ϕ) -> ob.value *
 function spectrum_gauss2(fx, fy, cx, cy, wx, wy, θ)
     (sx, sy) = fwhm2spread.((wx, wy))
     (kx, ky) = rotate2d(fx, fy, θ) # rotate first, then translate
-    return sx * exp(-2im*π*fx*cx) *
-           sy * exp(-2im*π*fy*cy) * exp(-π * (abs2(sx*kx) + abs2(sy*ky)))
+    return cispi(-2 * (fx*cx + fy*cy)) *
+           sx * sy * exp(-π * (abs2(sx*kx) + abs2(sy*ky)))
 end
 
 """
