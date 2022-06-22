@@ -78,13 +78,25 @@ end
     @test fun(ob.center...) == ob.value
     @test fun((ob.center .+ 2 .* ob.width)...) == 0
 
+    fun = @inferred phantom([ob])
+    @test fun isa Function
+    @test fun(ob.center...) == ob.value
+    @test fun((ob.center .+ 2 .* ob.width)...) == 0
+
     img = @inferred phantom(x, y, z, [ob])
+    @test img isa Array{<:Real, 3}
+    @test size(img) == length.((x, y, z))
+
+    over = 2
+    img = @NOTinferred phantom(x, y, z, [ob], over)
     @test img isa Array{<:Real, 3}
     @test size(img) == length.((x, y, z))
 
     fun = @inferred radon([ob])
     @test fun isa Function
     fun(0,0,0,0) # todo
+
+    @test radon([0], [0], [0], [0], [ob])[1] isa Real # todo
 
     fun = @inferred spectrum([ob])
     @test fun isa Function
