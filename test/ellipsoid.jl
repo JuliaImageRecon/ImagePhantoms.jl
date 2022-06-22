@@ -5,7 +5,7 @@ test/ellipsoid.jl
 const DEBUG = false
 
 using ImagePhantoms: Object3d, AbstractShape3, phantom, radon, spectrum
-using ImagePhantoms: Ellipsoid, Sphere
+using ImagePhantoms: Object, Ellipsoid, Sphere
 import ImagePhantoms as IP
 using Unitful: m, unit, °
 using FFTW: fftshift, fft
@@ -65,9 +65,9 @@ end
 
 
 @testset "method" begin
-    x = LinRange(-1,1,32)*5
-    y = LinRange(-1,1,31)*5
-    z = LinRange(-1,1,30)*5
+    x = LinRange(-1,1,13)*5
+    y = LinRange(-1,1,12)*5
+    z = LinRange(-1,1,11)*5
     ob = @inferred shape((1, 2., 3), (4//1, 5, 6), (π/6, 0), 5.0f0)
 
     show(devnull, ob)
@@ -82,11 +82,11 @@ end
     @test img isa Array{<:Real, 3}
     @test size(img) == length.((x, y, z))
 
-    fun = @inferred radon(ob)
+    fun = @inferred radon([ob])
     @test fun isa Function
     fun(0,0,0,0) # todo
 
-    fun = @inferred spectrum(ob)
+    fun = @inferred spectrum([ob])
     @test fun isa Function
     @test fun(0,0,0) ≈ 4/3 * π * prod(ob.width) * ob.value
 end
