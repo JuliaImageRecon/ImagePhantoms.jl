@@ -1,7 +1,7 @@
 # core.jl
 
 using ImagePhantoms
-using ImagePhantoms: rotate2d, coords # helpers
+using ImagePhantoms: rotate2d, rotate3d, coords # helpers
 using Unitful: m
 
 using Test: @test, @testset, @test_throws, @inferred
@@ -38,5 +38,7 @@ end
 @testset "helpers" begin
     @test collect(@inferred rotate2d(2, 1, π/2)) ≈ [1,-2]
     @test all((@inferred rotate2d((2, 1), π/2)) .≈ (1,-2))
+    @test ≈(collect(@inferred rotate3d(2, 1, 3, π/2, 0)), [1,-2,3]; atol= 1e-15)
+    @test all((@inferred rotate3d((2, 1, 3), π/2, 0)) .≈ (1,-2, 3))
     @test (@inferred coords(Square(3m), 9m, 6m)) == (3, 2)
 end
