@@ -6,7 +6,7 @@ Utilities for 3D objects, cf object.jl
 using LazyGrids: ndgrid
 
 
-# methods for phantoms: an array of objects
+# phantom images
 
 
 """
@@ -14,12 +14,14 @@ using LazyGrids: ndgrid
 Return function of `(x,y,z)` that user can sample at any `(x,y,z)` locations
 to make a 3D phantom image for a single 3D object.
 """
-phantom(ob::Object3d) = (x,y,z) ->
-   phantom1(ob, coords(ob, x, y, z)) * ob.value # coordinate transformation
+function phantom(ob::Object3d)
+#   apply coordinate transformation and value:
+    return (x,y,z) -> ob.value * phantom1(ob, coords(ob, x, y, z))
+end
 
 
 """
-    image = phantom(oa::Array{<:Object3d})::Function
+    phantom(oa::Array{<:Object3d})::Function
 Return function of `(x,y,z)` that user can sample at any `(x,y,z)` locations
 to make a 3D phantom image for an `Array` of 3D objects.
 """
@@ -29,8 +31,9 @@ end
 
 
 """
-    image = phantom(x, y, z, oa::Array{<:Object3d})
+    phantom(x::Vector, y::Vector, z::Vector, oa::Array{<:Object3d})
 Return a 3D digital image of the phantom sampled at grid of `(x,y,z)` locations.
+Returned 3D image size is `length(x) × length(y) × length(z)`.
 """
 function phantom(
     x::AbstractVector,
@@ -38,9 +41,6 @@ function phantom(
     z::AbstractVector,
     oa::Array{<:Object3d},
 )
-
-#   return sum(ob -> phantom(ob).(ndgrid(x,y,z)...), oa) # todo
-#   return phantom(ndgrid(x,y,z)..., oa) # todo cut
     return phantom(oa).(ndgrid(x,y,z)...)
 end
 
@@ -73,20 +73,7 @@ function phantom(
 end
 
 
-#=
-todo cut
-function phantom(
-    xx::AbstractArray,
-    yy::AbstractArray,
-    zz::AbstractArray,
-    oa::Array{<:Object3d},
-)
-    return sum(ob -> phantom(ob).(xx,yy,zz), oa)
-end
-=#
-
-
-# methods for Radon transform
+# Radon transform
 
 
 """
@@ -128,18 +115,49 @@ function radon(
 end
 
 
+# spectra
+
+
+# apply rotate, translate, and scale properties of 3D Fourier transform
+function _spectrum(ob::Object3d, fx, fy, fz, cx, cy, cz, rx, ry, rz, Φ, Θ)
+    (kx, ky, kz) = rotate3d(fx, fy, fz, Φ, Θ) # rotate then translate
+    return rx * ry * rz * cispi(-2*(fx*cx + fy*cy + fz*cz)) *
+        spectrum1(ob, (rx*kx, ry*ky, rz*kz))
+end
+
+
 """
-    kspace = spectrum(oa::Array{<:Object3d})::Function
-Return function `kspace(fx,fy,fz)` that user can sample at any `(fx,fy,fz)` locations
-to make phantom 3D k-space data.
+    spectrum(ob::Object3d)::Function
+Return function of `(fx,fy,fz)` that user can sample
+at any spatial frequency locations
+to evaluate the spectrum (3D Fourier transform)
+of a single 3D object.
+Units of spatial frequencies should be the reciprocal
+of the units defining the object.
+"""
+function spectrum(ob::Object3d)
+    return (fx,fy,fz) -> ob.value *
+        _spectrum(ob, fx, fy, fz, ob.center..., ob.width..., ob.angle...)
+end
+
+
+"""
+    spectrum(oa::Array{<:Object3d})::Function
+Return function `kspace(fx,fy,fz)` that user can sample
+at any spatial frequency locations
+to evaluate the spectrum (3D Fourier transform)
+for an `Array` of 3D objects.
 """
 function spectrum(oa::Array{<:Object3d})
     return (fx,fy,fz) -> sum(ob -> spectrum(ob)(fx,fy,fz), oa)
 end
 
+
 """
-    kspace = spectrum(fx, fy, oa::Array{<:Object3d})::Function
-Return k-space array `kspace` sampled at given `(fx,fy,fz)` locations.
+    spectrum(fx::Vector, fy::Vector, fz::Vector, oa::Array{<:Object3d})
+Return 3D k-space array
+sampled at grid of `(fx,fy,fz)` locations.
+Returned 3D array size is `length(fx) × length(fy) × length(fz)`.
 """
 function spectrum(
     fx::AbstractVector,
@@ -147,10 +165,10 @@ function spectrum(
     fz::AbstractVector,
     oa::Array{<:Object3d},
 )
-#   return sum(ob -> spectrum(ob).(fx,fy'), oa) # todo
-    return spectrum(ndgrid(fx,fy,fz)..., oa)
+    return spectrum(oa).(ndgrid(fx,fy,fz)...)
 end
 
+#=
 function spectrum(
     fx::AbstractArray,
     fy::AbstractArray,
@@ -159,6 +177,7 @@ function spectrum(
 )
     return sum(ob -> spectrum(ob).(fx,fy,fz), oa)
 end
+=#
 
 
 # helpers

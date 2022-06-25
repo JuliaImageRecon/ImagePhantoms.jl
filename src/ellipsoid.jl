@@ -80,33 +80,6 @@ function Sphere(v::AbstractVector{<:Number})
 end
 
 
-# helper
-
-"""
-   sphere_transform(f::Real)
-
-Fourier transform of unit-radius sphere.
-The argument `f` is the radial coordinate in k-space and is unitless.
-See p253 of Bracewell 1978, The Fourier transform and its applications,
-or http://doi.org/10.1002/mrm.21292.
-
-Formula: `4/3 π` for `f ≈ 0`, otherwise
-`(sin(2πf) - 2πf cos(2πf)) / (2 * π^2 * f^3)`.
-"""
-function sphere_transform(f::T) where {T <: AbstractFloat}
-    atol = eps(T)
-    if abs(f)^3 ≤ atol
-         return 4/3 * π
-    end
-    f2pi = 2π * f
-    (s, c) = sincos(f2pi)
-    # numerator: s - f2pi * c ≈ (2πf)^3/3 for small f
-    return (s - f2pi * c) / (2 * π^2 * f^3)
-end
-
-
-
-
 # methods
 
 
@@ -178,16 +151,36 @@ radon(ob::Object3d{Ellipsoid}) = (s,t,ϕ,θ) -> ob.value *
     xray_ellipsoid(s, t, ϕ, θ, ob.center..., ob.width..., ob.angle...)
 
 
-function spectrum_ellipsoid(fx, fy, fz, cx, cy, cz, rx, ry, rz, Φ, Θ)
-    (kx, ky, kz) = rotate3d(fx, fy, fz, Φ, Θ) # rotate then translate
-    return rx * ry * rz * cispi(-2*(fx*cx + fy*cy + fz*cz)) *
-        sphere_transform(sqrt((rx*kx)^2 + (ry*ky)^2 + (rz*kz)^2))
+# spectrum
+
+
+"""
+   sphere_transform(f::Real)
+
+Fourier transform of unit-radius sphere.
+The argument `f` is the radial coordinate in k-space and is unitless.
+See p253 of Bracewell 1978, The Fourier transform and its applications,
+or http://doi.org/10.1002/mrm.21292.
+
+Formula: `4/3 π` for `f ≈ 0`, otherwise
+`(sin(2πf) - 2πf cos(2πf)) / (2 * π^2 * f^3)`.
+"""
+function sphere_transform(f::T) where {T <: AbstractFloat}
+    atol = eps(T)
+    if abs(f)^3 ≤ atol
+         return 4/3 * π
+    end
+    f2pi = 2π * f
+    (s, c) = sincos(f2pi)
+    # numerator: s - f2pi * c ≈ (2πf)^3/3 for small f
+    return (s - f2pi * c) / (2 * π^2 * f^3)
 end
 
 
 """
-    spectrum(ob::Object3d{Ellipsoid})
-Returns function of ``(f_x,f_y,f_z)`` for the spectrum (3D Fourier transform).
+    spectrum1(ob::Object3d{Ellipsoid}, (kx,ky,kz))
+Spectrum of unit sphere at `(kx,ky,kz)`, for unitless spatial frequency coordinates.
 """
-spectrum(ob::Object3d{Ellipsoid}) = (fx,fy,fz) -> ob.value *
-    spectrum_ellipsoid(fx, fy, fz, ob.center..., ob.width..., ob.angle...)
+function spectrum1(ob::Object3d{Ellipsoid}, kxyz::NTuple{3,Real})
+    return sphere_transform(sqrt(sum(abs2, kxyz)))
+end
