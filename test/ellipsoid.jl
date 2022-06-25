@@ -73,6 +73,7 @@ end
     show(devnull, ob)
     @test (@inferred eltype(ob)) == Float32
 
+
     fun = @inferred phantom(ob)
     @test fun isa Function
     @test fun(ob.center...) == ob.value
@@ -92,11 +93,13 @@ end
     @test img isa Array{<:Real, 3}
     @test size(img) == length.((x, y, z))
 
+
     fun = @inferred radon([ob])
     @test fun isa Function
     fun(0,0,0,0) # todo
 
     @test radon([0], [0], [0], [0], [ob])[1] isa Real # todo
+
 
     fun = @inferred spectrum([ob])
     @test fun isa Function

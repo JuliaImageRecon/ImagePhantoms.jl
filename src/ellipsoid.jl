@@ -111,11 +111,10 @@ end
 
 
 """
-    phantom(ob::Object3d{Ellipsoid})
-Returns function of `(x,y)` for making image.
+    phantom1(ob::Object3d{Ellipsoid}, (x,y,z))
+Evaluate unit sphere at `(x,y,z)`, for unitless coordinates.
 """
-phantom(ob::Object3d{Ellipsoid}) =
-    (x,y,z) -> (sum(abs2, coords(ob, x, y, z)) ≤ 1) * ob.value
+phantom1(ob::Object3d{Ellipsoid}, xyz::NTuple{3,Real}) = sum(abs2, xyz) ≤ 1
 
 
 #=

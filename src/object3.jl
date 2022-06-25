@@ -5,21 +5,50 @@ Utilities for 3D objects, cf object.jl
 
 using LazyGrids: ndgrid
 
+
 # methods for phantoms: an array of objects
+
+
+"""
+    phantom(ob::Object3d)::Function
+Return function of `(x,y,z)` that user can sample at any `(x,y,z)` locations
+to make a 3D phantom image for a single 3D object.
+"""
+phantom(ob::Object3d) = (x,y,z) ->
+   phantom1(ob, coords(ob, x, y, z)) * ob.value # coordinate transformation
+
 
 """
     image = phantom(oa::Array{<:Object3d})::Function
-Return function `image(x,y,z)` that user can sample at any `(x,y,z)` locations
-to make a phantom image.
+Return function of `(x,y,z)` that user can sample at any `(x,y,z)` locations
+to make a 3D phantom image for an `Array` of 3D objects.
 """
 function phantom(oa::Array{<:Object3d})
     return (x,y,z) -> sum(ob -> phantom(ob)(x,y,z), oa)
 end
 
+
 """
-    image = phantom(x, y, oa::Array{<:Object3d}, oversample::Int; T)
-Return a digital image of the phantom sampled at `(x,y,z)` locations,
-with over-sampling factor `oversample` and element type `T`.
+    image = phantom(x, y, z, oa::Array{<:Object3d})
+Return a 3D digital image of the phantom sampled at grid of `(x,y,z)` locations.
+"""
+function phantom(
+    x::AbstractVector,
+    y::AbstractVector,
+    z::AbstractVector,
+    oa::Array{<:Object3d},
+)
+
+#   return sum(ob -> phantom(ob).(ndgrid(x,y,z)...), oa) # todo
+#   return phantom(ndgrid(x,y,z)..., oa) # todo cut
+    return phantom(oa).(ndgrid(x,y,z)...)
+end
+
+
+"""
+    image = phantom(x, y, z, oa::Array{<:Object3d}, oversample::Int; T)
+Return a 3D digital image of the phantom sampled at grid of `(x,y,z)` locations,
+with over-sampling factor `oversample` and returned element type `T`.
 """
 function phantom(
     x::AbstractVector,
@@ -29,6 +58,7 @@ function phantom(
     oversample::Int;
     T::DataType = promote_type(eltype.(oa)..., Float32),
 )
+
     oversample < 1 && throw(ArgumentError("oversample $oversample"))
     dx = x[2] - x[1]
     dy = y[2] - y[1]
@@ -42,21 +72,9 @@ function phantom(
     return sum(ob -> ophantom(ob).(ndgrid(x,y,z)...), oa)
 end
 
-"""
-    image = phantom(x, y, z, oa::Array{<:Object3d})
-Return a digital image of the phantom sampled at `(x,y,z)` locations.
-"""
-function phantom(
-    x::AbstractVector,
-    y::AbstractVector,
-    z::AbstractVector,
-    oa::Array{<:Object3d},
-)
 
-#   return sum(ob -> phantom(ob).(ndgrid(x,y,z)...), oa) # todo
-    return phantom(ndgrid(x,y,z)..., oa)
-end
-
+#=
+todo cut
 function phantom(
     xx::AbstractArray,
     yy::AbstractArray,
@@ -65,6 +83,10 @@ function phantom(
 )
     return sum(ob -> phantom(ob).(xx,yy,zz), oa)
 end
+=#
+
+
+# methods for Radon transform
 
 
 """
