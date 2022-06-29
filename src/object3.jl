@@ -73,25 +73,84 @@ function phantom(
 end
 
 
-# Radon transform
+# radon transform
+
+# shift property of the X-ray transform; ϕ=azimuth θ=polar
+function xray_shift(
+    u::RealU, v::RealU, ϕ::RealU, θ::RealU, # projection coordinates
+    cx::RealU, cy::RealU, cz::RealU, # object center
+)
+    (sϕ, cϕ) = sincos(ϕ)
+    (sθ, cθ) = sincos(θ)
+    ushift = cx * cϕ + cy * sϕ
+    vshift = (cx * sϕ - cy * cϕ) * sθ + cz * cθ
+    return (u - ushift, v - vshift, ϕ, θ)
+end
+
+# affine scaling property of the X-ray transform; ϕ=azimuth θ=polar
+# p,topo,prop,affine
+function xray_scale(
+    u::RealU, v::RealU, ϕ::RealU, θ::RealU, # projection coordinates
+    wx::RealU, wy::RealU, wz::RealU, # object width
+)
+    (sϕ, cϕ) = sincos(ϕ)
+    ϕp = atan(wy * sϕ, wx * cϕ) # ϕ'
+    (sθ, cθ) = sincos(θ)
+    denom = sqrt((wx * cϕ)^2 + (wy * sϕ)^2)
+    θp = atan(u * v * sθ, v * denom) # θ'
+    vp = (wy/wx - wx/wy) * sϕ * cϕ * u + cos(θp)/cos(θ) * v / c
+    return (u / denom, vp, ϕp, θp)
+end
 
 
+function _radon(
+    type::AbstractShape3,
+    u::Real, v::Real, ϕ::RealU, θ::RealU,
+    xang::RealU, zang::RealU,
+)
+throw("todo") # need a rotation property too
+    return xray1(type, u, v, ϕ, θ)
+end
+
+
+# todo: not finished
 """
-    sino = radon(oa::Array{<:Object3d})::Function
-Return function `sino(u,v,ϕ,θ)` that user can sample at any `(u,v,ϕ,θ)` locations
+    radon(ob::Object3d)::Function
+Return function of `(u,v,ϕ,θ)` that user can sample
+at any projection coordinates
 to make projection views of a 3D object.
 
 The coordinate system used here is such that `ϕ=0` corresponds to
 line integrals along the ``y`` axis for an object ``f(x,y,z)``.
 Then as `ϕ` increases, the line integrals rotate counter-clockwise.
 """
+function radon(ob::Object3d)
+    return (u,v,ϕ,θ) -> ob.value *
+        _radon(
+         xray_scale(
+          xray_shift(u, v, ϕ, θ, ob.center...)...,
+          ob.width...,
+         ),
+         ob.angles...,
+        )
+end
+
+
+"""
+    radon(oa::Array{<:Object3d})::Function
+Return function of `(u,v,ϕ,θ)` that user can sample
+at any projection coordinates
+to make projection views of an array of 3D objects.
+"""
 function radon(oa::Array{<:Object3d})
     return (u,v,ϕ,θ) -> sum(ob -> radon(ob)(u,v,ϕ,θ), oa)
 end
 
+
 """
-    sino = radon(u, v, ϕ, θ, oa::Array{<:Object3d})
-Return parallel-beam projections `sino` sampled at given `(u,v,ϕ,θ)` locations.
+    radon(u:Vector, v:Vector, ϕ:Vector, θ:Vector, oa::Array{<:Object3d})
+Return parallel-beam projections sampled at grid of `(u,v,ϕ,θ)` locations.
+Returned array size is `length(u) × length(v) × length(ϕ) × length(θ)`.
 """
 function radon(
     u::AbstractVector,
@@ -101,9 +160,10 @@ function radon(
     oa::Array{<:Object3d},
 )
 #   return sum(ob -> radon(ob).(ndgrid(u, v, ϕ, θ)...), oa) # todo
-    return radon(ndgrid(u, v, ϕ, θ)..., oa)
+    return radon(oa).(ndgrid(u, v, ϕ, θ)...)
 end
 
+#=
 function radon(
     u::AbstractArray,
     v::AbstractArray,
@@ -113,6 +173,7 @@ function radon(
 )
     return sum(ob -> radon(ob).(u,v,ϕ,θ), oa)
 end
+=#
 
 
 # spectra

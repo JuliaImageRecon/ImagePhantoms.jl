@@ -2,21 +2,12 @@
 test/ellipsoid.jl
 =#
 
-const DEBUG = false
-
 using ImagePhantoms: Object3d, AbstractShape3, phantom, radon, spectrum
 using ImagePhantoms: Object, Ellipsoid, Sphere
 import ImagePhantoms as IP
 using Unitful: m, unit, °
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
-if DEBUG
-    include("helper.jl")
-    using MIRTjim: jim, prompt
-    using UnitfulRecipes
-    using Plots: plot, plot!, scatter, scatter!, gui, default
-    default(markerstrokecolor=:auto, markersize=2)
-end
 
 (shape, shape3) = (Ellipsoid, Sphere)
 
@@ -107,6 +98,16 @@ end
 end
 
 
+@testset "radon-units" begin
+    width = (30m, 40m, 50m)
+    center = (8m, 7m, 6m)
+    ϕ = π/6
+    ob = shape(center, width, (ϕ, 0), 1.0f0)
+    @test radon([center[1]], [center[3]], [0], [0], [ob])[1] ≈
+        IP.radon_ellipse(0m, 0, 0 .* center[1:2]..., width[1:2]..., ϕ)
+end
+
+
 @testset "spectrum" begin
     dx = 1.0m
     dy = 1.1m
@@ -129,32 +130,23 @@ end
     @test maximum(abs, kspace) ≈ 1
     @test kspace[L÷2+1,M÷2+1,N÷2+1] ≈ 1
 
-#= todo: move to docs
-if DEBUG
-    clim = (-6, 0)
-    sp = z -> max(log10(abs(z)/oneunit(abs(z))), -6)
-    p1 = jim(x, y, img, "phantom")
-    p2 = jim(fx, fy, sp.(X), "log10|DFT|"; clim)
-    p3 = jim(fx, fy, sp.(kspace), "log10|Spectrum|"; clim)
-    p4 = jim(fx, fy, abs.(kspace - X), "Difference")
-    jim(p1, p4, p2, p3)
-end
-=#
-
     @test abs(maximum(abs, X) - 1) < 1e-2
     @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
 
-#=
-todo
     # test sinogram with projection-slice theorem
 
-    dr = 0.02m
-    nr = 2^10
-    r = (-nr÷2:nr÷2-1) * dr
-    fr = (-nr÷2:nr÷2-1) / nr / dr
-    ϕ = deg2rad.(0:180) # * Unitful.rad # todo round unitful Unitful.°
-    sino = @inferred radon(r, ϕ, [ob])
+    du,dv = 0.02m, 0.03m
+    nu,nv = 2^9, 2^8
+    u = (-nu÷2:nu÷2-1) * du
+    v = (-nv÷2:nv÷2-1) * dv
+    fu = (-nu÷2:nu÷2-1) / nu / du
+    fv = (-nv÷2:nv÷2-1) / nv / dv
+    ϕ = deg2rad.(0:6:180) # * Unitful.rad # todo round unitful Unitful.°
+    θ = [π/7]
+    sino = @inferred radon(u, v, ϕ, θ, [ob])
 
+#=
+todo projection slice
     ia = argmin(abs.(ϕ .- deg2rad(55)))
     slice = sino[:,ia]
     Slice = myfft(slice) * dr
@@ -162,21 +154,6 @@ todo
 
     kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
     ideal = spectrum(ob).(kx, ky)
-
-if DEBUG
-    p2 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram")
-    jim(p1, p2)
-    p3 = plot(r, slice, title="profile at ϕ = $angle", label="")
-    p4 = scatter(fr, abs.(Slice), label="abs fft", color=:blue)
-    scatter!(fr, real(Slice), label="real fft", color=:green)
-    scatter!(fr, imag(Slice), label="imag fft", color=:red,
-        xlims=(-1,1).*(1.2/m), title="1D spectra")
-
-    plot!(fr, abs.(ideal), label="abs", color=:blue)
-    plot!(fr, real(ideal), label="real", color=:green)
-    plot!(fr, imag(ideal), label="imag", color=:red)
-    plot(p1, p2, p3, p4); gui()
-end
 
     @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
 =#

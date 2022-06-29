@@ -105,6 +105,23 @@ end
 =#
 
 
+# x-ray transform (line integral) of unit sphere
+# `u,v` should be unitless
+function xray1(
+#   ob::Object3d{Ellipsoid},
+    ::Ellipsoid,
+    u::Real,
+    v::Real,
+    ϕ::RealU,
+    polar::RealU,
+)
+    T = promote_type(eltype(u), eltype(v), Float32)
+    r2 = u^2 + v^2
+# @show u, v, ϕ, r2, T
+    return r2 < 1 ? 2 * sqrt(one(T) - r2) : zero(T)
+end
+
+
 """
 Translated from ellipsoid_proj.m in MIRT
 Caution: note that `ϕ, θ` denote projection view angles
@@ -123,6 +140,7 @@ function xray_ellipsoid(u, v, ϕ, polar, cx, cy, cz, rx, ry, rz, xang, zang)
     vshift = (cx * sinaz - cy * cosaz) * spolar + cz * cpolar
     u -= ushift
     v -= vshift
+#@show u, v, ushift, vshift
 
     az = ϕ - xang
     sinaz, cosaz = sincos(az)
@@ -138,7 +156,19 @@ function xray_ellipsoid(u, v, ϕ, polar, cx, cy, cz, rx, ry, rz, xang, zang)
     B = p1 * e1 / rx^2 + p2 * e2 / ry^2 + p3 * e3 / rz^2
     C = (p1 / rx)^2 + (p2 / ry)^2 + (p3 / rz)^2 - 1
 
-    return 2 * real(sqrt(Complex(B^2 - A*C))) / A
+#@show A B C
+
+#   return 2 * real(sqrt(Complex(B^2 - A*C))) / A
+#@show (B/A)^2 - C/A
+#throw("todo")
+#   return 2 * real(sqrt(Complex((B/A)^2 - C/A)))
+#   real(sqrt(Complex(1 - (C/B)*(A/B))))
+#   #
+#   r = A*C/B^2
+    dis = B^2 - A*C
+#@show dis
+    return dis < zero(dis) ? zero(u) : 2 * sqrt(dis) / A
+#2 * B / A * xray1(Ellipsoid(), r, 0, 0, 0)
 end
 
 
