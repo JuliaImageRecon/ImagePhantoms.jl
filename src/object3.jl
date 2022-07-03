@@ -67,8 +67,9 @@ function phantom(
     all(≈(dy), diff(y)) || throw("oversample requires uniform y")
     all(≈(dz), diff(z)) || throw("oversample requires uniform z")
     tmp = ((1:oversample) .- (oversample+1)/2) / oversample
-    ophantom = ob ->
-       (x,y,z) -> T(sum(phantom(ob).(ndgrid(x .+ dx*tmp, y .+ dy*tmp, z .+ dz*tmp)...)) / abs2(oversample))
+    o3 = oversample^3
+    ophantom = ob -> (x,y,z) ->
+        T(sum(phantom(ob).(ndgrid(x .+ dx*tmp, y .+ dy*tmp, z .+ dz*tmp)...)) / o3)
     return sum(ob -> ophantom(ob).(ndgrid(x,y,z)...), oa)
 end
 
