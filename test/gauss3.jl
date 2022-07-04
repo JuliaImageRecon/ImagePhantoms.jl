@@ -25,6 +25,7 @@ end
     @isob3 @inferred Object(shape(), center=(1,2,3))
     @isob3 @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
     @isob3 @inferred shape(1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0)
+    @isob3 @inferred shape(1, 5.0f0)
     @isob3 @NOTinferred shape(Number[1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0])
 end
 
