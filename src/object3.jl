@@ -252,17 +252,6 @@ function spectrum(
     return spectrum(oa).(ndgrid(fx,fy,fz)...)
 end
 
-#=
-function spectrum(
-    fx::AbstractArray,
-    fy::AbstractArray,
-    fz::AbstractArray,
-    oa::Array{<:Object3d},
-)
-    return sum(ob -> spectrum(ob).(fx,fy,fz), oa)
-end
-=#
-
 
 # helpers
 
