@@ -90,67 +90,50 @@ Evaluate unit sphere at `(x,y,z)`, for unitless coordinates.
 phantom1(ob::Object3d{Ellipsoid}, xyz::NTuple{3,Real}) = sum(abs2, xyz) ≤ 1
 
 
-#=
-"""
-    xray_ellipsoid(s, t, ϕ, θ, cx, cy, cz, rx, ry, rz, Φ, Θ)
-X-ray transform at `(s, t, ϕ, θ)` of ellipsoid.
-"""
-function xray_ellipsoid(s, t, ϕ, θ, cx, cy, rx, ry, rz, Φ, Θ)
-    Θ == 0 || throw("polar rotation not done")
-    (sinϕ, cosϕ) = sincos(ϕ)
-    r -= cx * cosϕ + cy * sinϕ # Radon translation property
-    (sinϕ, cosϕ) = sincos(ϕ - θ) # Radon rotation property
-    return lmax * trapezoid(r, -dmax, -dbreak, dbreak, dmax)
-end
-=#
-
 
 # x-ray transform (line integral) of unit sphere
 # `u,v` should be unitless
 function xray1(
-#   ob::Object3d{Ellipsoid},
     ::Ellipsoid,
     u::Real,
     v::Real,
-    ϕ::RealU,
-    polar::RealU,
+    ϕ::RealU, # irrelevant
+    θ::RealU, # irrelevant
 )
     T = promote_type(eltype(u), eltype(v), Float32)
     r2 = u^2 + v^2
-# @show u, v, ϕ, r2, T
     return r2 < 1 ? 2 * sqrt(one(T) - r2) : zero(T)
 end
 
 
+#=
 """
 Translated from ellipsoid_proj.m in MIRT
 Caution: note that `ϕ, θ` denote projection view angles
-whereas `Φ, Θ` denote object rotation angles.
+whereas `xang, zang` or `Φ, Θ` denote object rotation angles.
 """
-function xray_ellipsoid(u, v, ϕ, polar, cx, cy, cz, rx, ry, rz, xang, zang)
+function xray_ellipsoid(u, v, ϕ, θ, cx, cy, cz, rx, ry, rz, xang, zang)
 #function xray_ellipsoid(u, v, β, θ, cx, cy, cz, rx, ry, rz, xang, zang)
 #function xray_ellipsoid(u, v, β, θ, cx, cy, cz, rx, ry, rz, Φ, Θ)
 #function ellipsoid_proj_do(ss, tt, beta, source_zs, dso, dod, dfs, oversample)
 
     zang == 0 || throw("Z angle not done")
-    (spolar, cpolar) = sincos(polar)
-
-    sinaz, cosaz = sincos(ϕ)
-    ushift = cx * cosaz + cy * sinaz
-    vshift = (cx * sinaz - cy * cosaz) * spolar + cz * cpolar
+    (sϕ, cϕ) = sincos(ϕ)
+    (sθ, cθ) = sincos(θ)
+    ushift = cx * cϕ + cy * sϕ
+    vshift = (cx * sϕ - cy * cϕ) * sθ + cz * cθ
     u -= ushift
     v -= vshift
-#@show u, v, ushift, vshift
 
     az = ϕ - xang
     sinaz, cosaz = sincos(az)
-    p1 = u * cosaz + v * sinaz * spolar
-    p2 = u * sinaz - v * cosaz * spolar
-    p3 = v * cpolar
+    p1 = u * cosaz + v * sinaz * sθ
+    p2 = u * sinaz - v * cosaz * sθ
+    p3 = v * cθ
 
-    e1 = -sinaz * cpolar
-    e2 = cosaz * cpolar
-    e3 = spolar
+    e1 = -sinaz * cθ
+    e2 = cosaz * cθ
+    e3 = sθ
 
     A = (e1 / rx)^2 + (e2 / ry)^2 + (e3 / rz)^2
     B = p1 * e1 / rx^2 + p2 * e2 / ry^2 + p3 * e3 / rz^2
@@ -177,8 +160,10 @@ end
 Returns function of `(s,t,ϕ,θ)` for evaluating a line integral of an Ellipsoid,
 where `ϕ` is the azimuthal angle and `θ` is the polar angle.
 """
-radon(ob::Object3d{Ellipsoid}) = (s,t,ϕ,θ) -> ob.value *
+radon(::Symbol, ob::Object3d{Ellipsoid}) = (s,t,ϕ,θ) -> ob.value *
     xray_ellipsoid(s, t, ϕ, θ, ob.center..., ob.width..., ob.angle...)
+todo
+=#
 
 
 # spectrum
