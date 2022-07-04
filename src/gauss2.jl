@@ -82,7 +82,7 @@ Returns function of `(x,y)` for making image.
 """
 function phantom(ob::Object2d{Gauss2})
     return (x,y) -> ob.value * # trick due to fwhm to spread scaling:
-        exp(-π * sum(abs2.(coords(ob, x, y))) / fwhm2spread(1)^2)
+        exp(-π * sum(abs2, coords(ob, x, y)) / fwhm2spread(1)^2)
 end
 
 

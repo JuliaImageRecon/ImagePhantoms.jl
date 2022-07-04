@@ -1,13 +1,13 @@
 #---------------------------------------------------------
-# # [Ellipsoid](@id 31-ellipsoid)
+# # [Gauss3](@id 34-gauss3)
 #---------------------------------------------------------
 
 #=
-This page illustrates the `Ellipsoid` shape in the Julia package
+This page illustrates the `Gauss3` shape in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
 
 This page was generated from a single Julia file:
-[31-ellipsoid.jl](@__REPO_ROOT_URL__/31-ellipsoid.jl).
+[34-gauss3.jl](@__REPO_ROOT_URL__/34-gauss3.jl).
 =#
 
 #md # In any such Julia documentation,
@@ -16,16 +16,17 @@ This page was generated from a single Julia file:
 
 #md # The corresponding notebook can be viewed in
 #md # [nbviewer](http://nbviewer.jupyter.org/) here:
-#md # [`31-ellipsoid.ipynb`](@__NBVIEWER_ROOT_URL__/31-ellipsoid.ipynb),
+#md # [`34-gauss3.ipynb`](@__NBVIEWER_ROOT_URL__/34-gauss3.ipynb),
 #md # and opened in [binder](https://mybinder.org/) here:
-#md # [`31-ellipsoid.ipynb`](@__BINDER_ROOT_URL__/31-ellipsoid.ipynb).
+#md # [`34-gauss3.ipynb`](@__BINDER_ROOT_URL__/34-gauss3.ipynb).
 
 
 # ### Setup
 
 # Packages needed here.
 
-using ImagePhantoms: Ellipsoid, phantom, radon, spectrum
+using ImagePhantoms: Gauss3, phantom, radon, spectrum
+import ImagePhantoms as IP
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt, mid3
 using FFTW: fft, fftshift
@@ -47,23 +48,23 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 #=
 A basic shape used in constructing 3D digital image phantoms
-is the ellipsoid,
-specified by its center, radii, angle(s) and value.
+is the 3D gaussian,
+specified by its center, fwhm, angle(s) and value.
 All of the methods in `ImagePhantoms` support physical units,
 so we use such units throughout this example.
 (Using units is recommended but not required.)
 
-Here are 3 ways to define an ellipsoid object,
+Here are 3 ways to define a 3D gaussian object,
 using physical units.
 =#
 
 center = (20mm, 10mm, 5mm)
-radii = (25mm, 35mm, 15mm)
+width = (25mm, 35mm, 15mm)
 ϕ0s = :(π/6) # symbol version for nice plot titles
 angles = (eval(ϕ0s), 0)
-Ellipsoid([20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
-Ellipsoid( 20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0 ) # 9 arguments
-ob = Ellipsoid(center, radii, angles, 1.0f0) # tuples (recommended use)
+Gauss3([40mm, 20mm, 2mm, 25mm, 35mm, 12mm, π/6, 0, 1.0f0]) # Vector{Number}
+Gauss3(20mm, 20mm, 2mm, 25mm, 35mm, 12mm, π/6, 0, 1.0f0) # 9 arguments
+ob = Gauss3(center, width, angles, 1.0f0) # tuples (recommended use)
 
 
 #=
@@ -73,18 +74,18 @@ Make a 3D digital image of it using `phantom` and display it.
 We use `ImageGeoms` to simplify the indexing.
 =#
 
-deltas = (1.0mm, 1.1mm, 0.9mm)
+deltas = (1.0mm, 1.1mm, 1.2mm)
 dims = (2^8, 2^8+2, 48)
 offsets = (0.5, 0.5, 0.5) # for FFT spectra later
 ig = ImageGeom( ; dims, deltas, offsets)
 oversample = 2
 img = phantom(axes(ig)..., [ob], oversample)
 p1 = jim(axes(ig), img;
-   title="Ellipsoid, rotation ϕ=$ϕ0s", xlabel="x", ylabel="y")
+   title="Gauss3, rotation ϕ=$ϕ0s", xlabel="x", ylabel="y")
 
 
 # The image integral should match the object volume:
-volume = 4/3*π*prod(ob.width)
+volume = IP.fwhm2spread(1)^3 * prod(width)
 (sum(img)*prod(ig.deltas), volume)
 
 
@@ -122,7 +123,7 @@ p3 = jim(axesf(ig), sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
 # Compare the DFT and analytical spectra to validate the code
 err = maximum(abs, spectrum_exact - spectrum_fft) / maximum(abs, spectrum_exact)
-@assert err < 3e-3
+@assert err < 1e-3
 p4 = jim(axesf(ig), 1e3*abs.(spectrum_fft - spectrum_exact);
    title="Difference × 10³", xlabel, ylabel)
 jim(p1, p4, p2, p3)
@@ -139,15 +140,16 @@ pg = ImageGeom((2^8,2^7), (0.6mm,1.0mm), (0.5,0.5)) # projection sampling
 ϕs, θs = (:(π/2), ϕ0s), (:(π/7), :(0))
 ϕ, θ = [eval.(ϕs)...], [eval.(θs)...]
 proj2 = [radon(axes(pg)..., ϕ[i], θ[i], [ob]) for i in 1:2] # 2 projections
+smax = ob.value * IP.fwhm2spread(maximum(ob.width))
 p5 = jim(axes(pg)..., proj2; xlabel="u", ylabel="v", title =
     "Projections at (ϕ,θ) = ($(ϕs[1]), $(θs[1])) and ($(ϕs[2]), $(θs[2]))")
 
 
 #=
-Because the ellipsoid has major axis of length 70mm
-and one of the two views above was along that axis,
+Because the object has maximum FWHM of 35mm,
+and one of the two views above was along the corresponding axis,
 the maximum projection value is about
-70mm.
+`fwhm2spread(35mm) = 35mm * sqrt(π / log(16))` ≈ 37.25mm.
 
 The integral of each projection should match the object volume:
 =#
@@ -166,10 +168,9 @@ if isinteractive()
 else
     anim = @animate for ip in 1:length(ϕd)
         jim(axes(pg), projs[:,:,ip,1]; xlabel="u", ylabel="v", prompt=false,
-            title="ϕ=$(ϕd[ip])° θ=$θs",
-            clim = (0,1) .* (2 * maximum(radii) * ob.value))
+            title="ϕ=$(ϕd[ip])° θ=$θs", clim = (0,1) .* smax)
     end
-    gif(anim, "ellipsoid.gif", fps = 6)
+    gif(anim, "gauss3.gif", fps = 6)
 end
 
 
@@ -209,9 +210,9 @@ p8 = jim(axesf(pg), sp.(proj_fft); prompt=false,
      title = "log10|FFT Spectrum|", clim, xlabel, ylabel)
 
 err = maximum(abs, spectrum_slice - proj_fft) / maximum(abs, spectrum_slice)
-@assert err < 1e-3
-p9 = jim(axesf(pg), 1e3*abs.(proj_fft - spectrum_slice);
-    title="Difference × 10³", xlabel, ylabel, prompt=false)
+@assert err < 1e-5
+p9 = jim(axesf(pg), 1e6*abs.(proj_fft - spectrum_slice);
+    title="Difference × 10⁶", xlabel, ylabel, prompt=false)
 jim(p6, p7, p8, p9)
 
 

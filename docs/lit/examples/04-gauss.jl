@@ -32,7 +32,8 @@ using MIRTjim: jim, prompt
 using FFTW: fft, fftshift
 using Unitful: mm, unit, °
 using UnitfulRecipes
-using Plots: plot, plot!, scatter!, default; default(markerstrokecolor=:auto)
+using Plots: plot, plot!, scatter!, default
+default(markerstrokecolor=:auto)
 
 # The following line is helpful when running this file as a script;
 # this way it will prompt user to hit a key after each figure is displayed.
