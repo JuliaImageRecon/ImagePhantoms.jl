@@ -65,7 +65,7 @@ struct Object{S, D, V, W, C, A, P} <: AbstractObject
         value::V,
         param::P,
     ) where {S <: AbstractShape, D, V <: Number, W, C <: RealU, Da, A <: RealU, P}
-        1 ≤ Da == D-1 || throw(ArgumentError("Dϕ=$Dϕ != D-1, where D=$D"))
+        1 ≤ Da == D-1 || throw(ArgumentError("Da=$Da != D-1, where D=$D"))
         all(width .> zero(eltype(width))) || throw(ArgumentError("widths must be positive"))
         new{S,D,V,W,C,A,P}(shape, center, width, angle, value, param)
     end
@@ -197,7 +197,7 @@ function Object(ob::Object{S,D} ;
     value::Number = ob.value,
     param = ob.param,
 ) where {S, D, Da}
-    Da == D-1 || throw(ArgumentError("Dϕ=$Dϕ != D-1, where D=$D"))
+    Da == D-1 || throw(ArgumentError("Da=$Da != D-1, where D=$D"))
     Object(ob.shape, center, width, angle, value, param)
 end
 
