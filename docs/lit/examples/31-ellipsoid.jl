@@ -32,7 +32,7 @@ using FFTW: fft, fftshift
 using LazyGrids: ndgrid
 using Unitful: mm, unit, °
 using UnitfulRecipes
-using Plots: plot, plot!, scatter!, gui, default
+using Plots: plot, plot!, scatter!, default
 using Plots # gif @animate
 default(markerstrokecolor=:auto)
 
@@ -42,25 +42,27 @@ default(markerstrokecolor=:auto)
 
 isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
+
 # ### Overview
 
 #=
 A basic shape used in constructing 3D digital image phantoms
-is the ellipsoid, specified by its center, radii, angle(s) and value.
+is the ellipsoid,
+specified by its center, radii, angle(s) and value.
 All of the methods in `ImagePhantoms` support physical units,
 so we use such units throughout this example.
 (Using units is recommended but not required.)
 
 Here are 3 ways to define an ellipsoid object,
-using parameters specified with physical units.
+using physical units.
 =#
 
 center = (20mm, 10mm, 5mm)
 radii = (25mm, 35mm, 15mm)
 ϕ0s = :(π/6) # symbol version for nice plot titles
 angles = (eval(ϕ0s), 0)
-Ellipsoid([40mm, 20mm, 10mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
-Ellipsoid(40mm, 20mm, 10mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0) # 9 arguments
+Ellipsoid([20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
+Ellipsoid( 20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0 ) # 9 arguments
 ob = Ellipsoid(center, radii, angles, 1.0f0) # tuples (recommended use)
 
 
@@ -81,7 +83,7 @@ p1 = jim(axes(ig), img;
    title="Ellipsoid, rotation ϕ=$ϕ0s", xlabel="x", ylabel="y")
 
 
-# The image integral should match the ellipsoid volume:
+# The image integral should match the object volume:
 volume = 4/3*π*prod(ob.width)
 (sum(img)*prod(ig.deltas), volume)
 
@@ -119,10 +121,10 @@ p3 = jim(axesf(ig), sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
 
 # Compare the DFT and analytical spectra to validate the code
-@assert maximum(abs, spectrum_exact - spectrum_fft) /
-        maximum(abs, spectrum_exact) < 3e-3
-p4 = jim(axesf(ig), 10^4*abs.(spectrum_fft - spectrum_exact);
-   title="Difference × 10⁴", xlabel, ylabel)
+err = maximum(abs, spectrum_exact - spectrum_fft) / maximum(abs, spectrum_exact)
+@assert err < 3e-3
+p4 = jim(axesf(ig), 1e3*abs.(spectrum_fft - spectrum_exact);
+   title="Difference × 10³", xlabel, ylabel)
 jim(p1, p4, p2, p3)
 
 
@@ -144,9 +146,10 @@ p5 = jim(axes(pg)..., proj2; xlabel="u", ylabel="v", title =
 #=
 Because the ellipsoid has major axis of length 70mm
 and one of the two views above was along that axis,
-the maximum projection value is about 70mm.
+the maximum projection value is about
+70mm.
 
-The integral of each projection should match the ellipsoid volume:
+The integral of each projection should match the object volume:
 =#
 ((p -> sum(p)*prod(pg.deltas)).(proj2)..., volume)
 
@@ -205,10 +208,10 @@ proj_fft = myfft(proj) * prod(pg.deltas) * vscale
 p8 = jim(axesf(pg), sp.(proj_fft); prompt=false,
      title = "log10|FFT Spectrum|", clim, xlabel, ylabel)
 
-@assert maximum(abs, spectrum_slice - proj_fft) /
-        maximum(abs, spectrum_slice) < 1e-3
-p9 = jim(axesf(pg), 10^4*abs.(proj_fft - spectrum_slice);
-    title="Difference × 10⁴", xlabel, ylabel, prompt=false)
+err = maximum(abs, spectrum_slice - proj_fft) / maximum(abs, spectrum_slice)
+@assert err < 1e-3
+p9 = jim(axesf(pg), 1e3*abs.(proj_fft - spectrum_slice);
+    title="Difference × 10³", xlabel, ylabel, prompt=false)
 jim(p6, p7, p8, p9)
 
 
@@ -217,5 +220,6 @@ The good agreement between
 the 2D slice through the 3D analytical spectrum
 and the FFT of the 2D projection view
 validates that `phantom`, `radon`, and `spectrum`
-are all self consistent for this object.
+are all self consistent
+for this object.
 =#
