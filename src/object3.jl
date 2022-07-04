@@ -88,6 +88,16 @@ function xray_shift(
     return (u - ushift, v - vshift, ϕ, θ)
 end
 
+# rotation property (only axial for now)
+function xray_rotate(
+    Δu::RealU, Δv::RealU, ϕ::RealU, θ::RealU, # projection coordinates
+    Φazim::RealU,
+    Θpolar::RealU,
+)
+    Θpolar == zero(Θpolar) || throw("nonzero polar object angle not done")
+    return (Δu, Δv, ϕ - Φazim, θ)
+end
+
 # affine scaling property of the X-ray transform; ϕ=azimuth θ=polar
 # p,topo,prop,affine
 function xray_scale(
@@ -95,26 +105,40 @@ function xray_scale(
     wx::RealU, wy::RealU, wz::RealU, # object width
 )
     (sϕ, cϕ) = sincos(ϕ)
-    ϕp = atan(wy * sϕ, wx * cϕ) # ϕ'
     (sθ, cθ) = sincos(θ)
-    denom = sqrt((wx * cϕ)^2 + (wy * sϕ)^2)
-    θp = atan(u * v * sθ, v * denom) # θ'
-    vp = (wy/wx - wx/wy) * sϕ * cϕ * u + cos(θp)/cos(θ) * v / c
-    return (u / denom, vp, ϕp, θp)
+    e1old = [cϕ, sϕ, 0]
+    e2old = [-sϕ*cθ, cϕ*cθ, sθ]
+    e3old = [sϕ*sθ, -cϕ*sθ, cθ]
+    width = [wx, wy, wz]
+    r = 1 / sqrt( sum(abs2, e2old ./ width) ) # would be radius for sphere
+    ϕp = atan(wy * sϕ, wx * cϕ) # ϕ'
+    θp = asin(sθ * r / wz) # θ'
+    tmp = (e1old * u + e3old * v) ./ width
+    (sϕp, cϕp) = sincos(ϕp)
+    (sθp, cθp) = sincos(θp)
+    e1new = [cϕp, sϕp, 0]
+    e3new = [sϕp*sθp, -cϕp*sθp, cθp]
+    up = e1new' * tmp
+    vp = e3new' * tmp
+    return (r, up, vp, ϕp, θp)
 end
 
 
-function _radon(
+# interface to xray1 after applying shift, rotate, scale properties
+function _xray(
     type::AbstractShape3,
-    u::Real, v::Real, ϕ::RealU, θ::RealU,
-    xang::RealU, zang::RealU,
+    center::Tuple,
+    width::Tuple,
+    angle::Tuple,
+    u::RealU, v::RealU, ϕ::RealU, θ::RealU,
 )
-throw("todo") # need a rotation property too
-    return xray1(type, u, v, ϕ, θ)
+    Δu, Δv, ϕ, θ = xray_shift(u, v, ϕ, θ, center...)
+    ur, vr, ϕr, θr, = xray_rotate(Δu, Δv, ϕ, θ, angle...)
+    scale, up, vp, ϕp, θp = xray_scale(ur, vr, ϕr, θr, width...)
+    return scale * xray1(type, up, vp, ϕp, θp)
 end
 
 
-# todo: not finished
 """
     radon(ob::Object3d)::Function
 Return function of `(u,v,ϕ,θ)` that user can sample
@@ -127,13 +151,7 @@ Then as `ϕ` increases, the line integrals rotate counter-clockwise.
 """
 function radon(ob::Object3d)
     return (u,v,ϕ,θ) -> ob.value *
-        _radon(
-         xray_scale(
-          xray_shift(u, v, ϕ, θ, ob.center...)...,
-          ob.width...,
-         ),
-         ob.angles...,
-        )
+        _xray(ob.shape, ob.center, ob.width, ob.angle, u, v, ϕ, θ)
 end
 
 
@@ -160,21 +178,25 @@ function radon(
     θ::AbstractVector,
     oa::Array{<:Object3d},
 )
-#   return sum(ob -> radon(ob).(ndgrid(u, v, ϕ, θ)...), oa) # todo
     return radon(oa).(ndgrid(u, v, ϕ, θ)...)
 end
 
-#=
+
+"""
+    radon(u:Vector, v:Vector, ϕ:RealU, θ:RealU, oa::Array{<:Object3d})
+Return parallel-beam projection view sampled at grid of `(u,v)` locations
+for a given `(ϕ,θ)` pair.
+Returned array size is `length(u) × length(v)`.
+"""
 function radon(
-    u::AbstractArray,
-    v::AbstractArray,
-    ϕ::AbstractArray,
-    θ::AbstractArray,
+    u::AbstractVector,
+    v::AbstractVector,
+    ϕ::RealU,
+    θ::RealU,
     oa::Array{<:Object3d},
 )
-    return sum(ob -> radon(ob).(u,v,ϕ,θ), oa)
+    return radon(oa).(ndgrid(u, v)..., ϕ, θ)
 end
-=#
 
 
 # spectra
