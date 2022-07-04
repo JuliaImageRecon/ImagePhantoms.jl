@@ -168,8 +168,7 @@ if isinteractive()
 else
     anim = @animate for ip in 1:length(ϕd)
         jim(axes(pg), projs[:,:,ip,1]; xlabel="u", ylabel="v", prompt=false,
-            title="ϕ=$(ϕd[ip])° θ=$θs",
-            clim = (0,1) .* (2 * maximum(radii) * ob.value))
+            title="ϕ=$(ϕd[ip])° θ=$θs", clim = (0,1) .* smax)
     end
     gif(anim, "gauss3.gif", fps = 6)
 end
