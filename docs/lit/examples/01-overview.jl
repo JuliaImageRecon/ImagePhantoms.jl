@@ -82,7 +82,7 @@ to use `ImageGeoms` to help with the sampling.
 
 ig = ImageGeom(dims=(200,256), deltas=(1mm,1mm))
 image = phantom(axes(ig)..., objects)
-jim(axes(ig)..., image, xlabel="x", ylabel="y", title="SheppLoganToft")
+jim(axes(ig), image, xlabel="x", ylabel="y", title="SheppLoganToft")
 
 
 # Here is the sinogram corresponding to this phantom,
@@ -91,14 +91,14 @@ jim(axes(ig)..., image, xlabel="x", ylabel="y", title="SheppLoganToft")
 r = LinRange(-100mm,100mm,401)
 ϕ = deg2rad.(0:180)
 sino = radon(r, ϕ, objects)
-jim(r, ϕ, sino, title="Sinogram", yflip=false, aspect_ratio=:none)
+jim(r, ϕ, sino, title="Sinogram")
 
 
 # Here is the 2D spectrum (Fourier transform) of this phantom,
 # computed analytically from the ellipse parameters using `spectrum`:
 
 kspace = spectrum(axesf(ig)..., objects)
-jim(axesf(ig)..., log10.(abs.(kspace/(1mm)^2)), xlabel="ν₁", ylabel="ν₂", title="log10|Spectrum|")
+jim(axesf(ig), log10.(abs.(kspace/(1mm)^2)), xlabel="ν₁", ylabel="ν₂", title="log10|Spectrum|")
 
 #=
 The 2D Fourier transform formula used here is:
