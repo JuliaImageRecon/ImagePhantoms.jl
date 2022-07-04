@@ -3,7 +3,7 @@
 #---------------------------------------------------------
 
 #=
-This page illustrates the `Ellipse` shape in the Julia package
+This page illustrates the `Ellipsoid` shape in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
 
 This page was generated from a single Julia file:
@@ -59,9 +59,9 @@ center = (20mm, 10mm, 5mm)
 radii = (25mm, 35mm, 15mm)
 ϕ0s = :(π/6) # symbol version for nice plot titles
 angles = (eval(ϕ0s), 0)
-ob = Ellipsoid([40mm, 20mm, 10mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0])
-ob = Ellipsoid(40mm, 20mm, 10mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0)
-ob = Ellipsoid(center, radii, angles, 1.0f0) # recommended use
+Ellipsoid([40mm, 20mm, 10mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
+Ellipsoid(40mm, 20mm, 10mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0) # 9 arguments
+ob = Ellipsoid(center, radii, angles, 1.0f0) # tuples (recommended use)
 
 
 #=
@@ -72,10 +72,11 @@ We use `ImageGeoms` to simplify the indexing.
 =#
 
 deltas = (1.0mm, 1.1mm, 0.9mm)
-dims = (2^8, 2^8+2, 2^6)
+dims = (2^8, 2^8+2, 48)
 offsets = (0.5, 0.5, 0.5) # for FFT spectra later
 ig = ImageGeom( ; dims, deltas, offsets)
-img = phantom(axes(ig)..., [ob])
+oversample = 2
+img = phantom(axes(ig)..., [ob], oversample)
 p1 = jim(axes(ig), img;
    title="Ellipsoid, rotation ϕ=$ϕ0s", xlabel="x", ylabel="y")
 
@@ -93,7 +94,7 @@ jim(mid3(img), "Middle 3 planes")
 ### Spectrum using `spectrum`
 
 There are two ways to examine the spectrum of this 3D image:
-* using the analytical Fourier transform of the ellipse via `spectrum`
+* using the analytical Fourier transform of the object via `spectrum`
 * applying the DFT via FFT to the digital image.
 Because the shape has units `mm`, the spectra axes have units cycles/mm.
 Appropriate frequency axes for DFT are provided by `axesf(ig)`.
@@ -119,7 +120,7 @@ p3 = jim(axesf(ig), sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
 # Compare the DFT and analytical spectra to validate the code
 @assert maximum(abs, spectrum_exact - spectrum_fft) /
-        maximum(abs, spectrum_exact) < 2e-3
+        maximum(abs, spectrum_exact) < 3e-3
 p4 = jim(axesf(ig), 10^4*abs.(spectrum_fft - spectrum_exact);
    title="Difference × 10⁴", xlabel, ylabel)
 jim(p1, p4, p2, p3)
@@ -132,10 +133,10 @@ Compute 2D projection views of the object using `radon`.
 Validate it using the projection-slice theorem aka Fourier-slice theorem.
 =#
 
-pg = ImageGeom((2^9,2^8), (0.3mm,0.5mm), (0.5,0.5)) # projection sampling
+pg = ImageGeom((2^8,2^7), (0.6mm,1.0mm), (0.5,0.5)) # projection sampling
 ϕs, θs = (:(π/2), ϕ0s), (:(π/7), :(0))
 ϕ, θ = [eval.(ϕs)...], [eval.(θs)...]
-proj2 = [radon(axes(pg)..., [ϕ[i]], [θ[i]], [ob]) for i in 1:2] # 2 projections
+proj2 = [radon(axes(pg)..., ϕ[i], θ[i], [ob]) for i in 1:2] # 2 projections
 p5 = jim(axes(pg)..., proj2; xlabel="u", ylabel="v", title =
     "Projections at (ϕ,θ) = ($(ϕs[1]), $(θs[1])) and ($(ϕs[2]), $(θs[2]))")
 
@@ -147,7 +148,7 @@ the maximum projection value is about 70mm.
 
 The integral of each projection should match the ellipsoid volume:
 =#
-((p -> sum(p)*prod(pg.deltas)).(proj2)..., 4/3*π*prod(ob.width))
+((p -> sum(p)*prod(pg.deltas)).(proj2)..., volume)
 
 
 # Look at a set of projections as the views orbit around the object.
@@ -156,13 +157,17 @@ The integral of each projection should match the ellipsoid volume:
 θs = :(π/7)
 θ = eval(θs)
 projs = radon(axes(pg)..., ϕs, [θ], [ob]) # many projection views
-#src p? = jim(axes(pg), projs; title="projection views")
 
-anim = @animate for ip in 1:length(ϕd)
-    jim(axes(pg), projs[:,:,ip,1]; xlabel="u", ylabel="v", prompt=false,
-        title="ϕ=$(ϕd[ip])° θ=$θs", clim = (0,1) .* (2 * maximum(radii) * ob.value))
+if isinteractive()
+    jim(axes(pg)..., projs; title="projection views $(ϕd)")
+else
+    anim = @animate for ip in 1:length(ϕd)
+        jim(axes(pg), projs[:,:,ip,1]; xlabel="u", ylabel="v", prompt=false,
+            title="ϕ=$(ϕd[ip])° θ=$θs",
+            clim = (0,1) .* (2 * maximum(radii) * ob.value))
+    end
+    gif(anim, "ellipsoid.gif", fps = 6)
 end
-gif(anim, "ellipsoid.gif", fps = 6)
 
 
 #=
@@ -182,7 +187,7 @@ to a slice through the 3D object spectrum.
 
 ϕs, θs = :(π/3), :(π/7)
 ϕ, θ = eval.((ϕs, θs))
-proj = radon(axes(pg)..., [ϕ], [θ], [ob])[:,:,1,1]
+proj = radon(axes(pg)..., ϕ, θ, [ob])
 p6 = jim(axes(pg), proj; xlabel="u", ylabel="v", prompt=false,
     title = "Projection at (ϕ,θ) = ($ϕs, $θs)")
 
@@ -201,7 +206,7 @@ p8 = jim(axesf(pg), sp.(proj_fft); prompt=false,
      title = "log10|FFT Spectrum|", clim, xlabel, ylabel)
 
 @assert maximum(abs, spectrum_slice - proj_fft) /
-        maximum(abs, spectrum_slice) < 3e-4
+        maximum(abs, spectrum_slice) < 1e-3
 p9 = jim(axesf(pg), 10^4*abs.(proj_fft - spectrum_slice);
     title="Difference × 10⁴", xlabel, ylabel, prompt=false)
 jim(p6, p7, p8, p9)
