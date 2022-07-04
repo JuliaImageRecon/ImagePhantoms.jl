@@ -78,14 +78,14 @@ The coordinate system used here is defined as follows.
 Start by defining a point on the "detector plane" as follows:
 ```math
 \vec{p} = \vec{p}(u, v, ϕ, θ)
-= u \vec{e}_1 + v \vec{e}_2
+= u \vec{e}_1 + v \vec{e}_3
 = (u \cos ϕ + v \sin ϕ \sin θ, u \sin ϕ - v \cos ϕ \sin θ, v \cos θ) ∈ ℝ^3,
 ```
 where
 ```math
 \vec{e}_1 = (\cos ϕ, \sin ϕ, 0)
 ,\qquad
-\vec{e}_2 = (\sin ϕ \sin θ, -\cos ϕ \sin θ, \cos θ).
+\vec{e}_3 = (\sin ϕ \sin θ, -\cos ϕ \sin θ, \cos θ).
 ```
 
 Now define the (X-ray) projection
@@ -111,7 +111,8 @@ p(u, v, ϕ, 0)
 = ∫_{-∞}^{∞} f(u \cos ϕ - ℓ \sin ϕ, u \sin ϕ + ℓ \cos ϕ, v) \, \mathrm{d} ℓ.
 ```
 
-todo: show cuboid?
+For example projection views,
+see the Ellipsoid examples.
 
 =#
 
