@@ -132,8 +132,9 @@ radon(ob::Object2d{Rect}) = (r,ϕ) -> ob.value *
 
 function spectrum_rect(fx, fy, cx, cy, wx, wy, θ)
     (kx, ky) = rotate2d(fx, fy, θ) # rect is rotated first, then translated
-    return wx * sinc(kx * wx) * exp(-2im*π*fx*cx) *
-           wy * sinc(ky * wy) * exp(-2im*π*fy*cy)
+    return cispi(-2 * (fx*cx + fy*cy)) *
+           wx * sinc(kx * wx) *
+           wy * sinc(ky * wy)
 end
 
 """

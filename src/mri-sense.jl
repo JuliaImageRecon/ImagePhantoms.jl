@@ -46,7 +46,7 @@ function mri_smap_basis(
     deltas::NTuple{D,<:Number} = ones(D),
     kfun::Function = (k,N) -> k / (2N), # DCT-II frequency
     nfun::Function = (N) -> -(N÷2):(N÷2)-1,
-    basis::Function = (k,N) -> exp.(2im * π * nfun(N) * kfun(k,N)), # 1D basis
+    basis::Function = (k,N) -> cispi.(2 * nfun(N) * kfun(k,N)), # 1D basis
     T::DataType = ComplexF32,
 ) where D
     B = zeros(T, count(mask), length(ki))
