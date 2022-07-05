@@ -14,6 +14,10 @@ include("shepplogan.jl")
 include("disk-phantom.jl")
 include("focus-chart.jl")
 
+# 3d:
+include("ellipsoid.jl")
+include("gauss3.jl")
+
 @testset "mri-sense" begin
     include("mri-sense.jl")
 end

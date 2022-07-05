@@ -110,8 +110,8 @@ radon(ob::Object2d{Ellipse}) = (r,ϕ) -> ob.value *
 
 function spectrum_ellipse(fx, fy, cx, cy, rx, ry, θ)
     (kx, ky) = rotate2d(fx, fy, θ) # rect is rotated first, then translated
-    return 2rx * exp(-2im*π*fx*cx) * # width=diameter=2*radius
-           2ry * exp(-2im*π*fy*cy) * jinc(2sqrt(abs2(kx * rx) + abs2(ky * ry)))
+    return cispi(-2 * (fx*cx + fy*cy)) * # width=diameter=2*radius
+           2rx * 2ry * jinc(2sqrt(abs2(kx * rx) + abs2(ky * ry)))
 end
 
 """

@@ -33,11 +33,11 @@ using FFTW: fft, fftshift
 using ImageGeoms: embed
 using LazyGrids: ndgrid
 using MIRT: ir_mri_sensemap_sim
-using MIRTjim: jim, prompt; jim(:prompt, true)
+using MIRTjim: jim, prompt
 using Random: seed!
 using Unitful: mm
 
-# The following line is helpful when running this example.jl file as a script;
+# The following line is helpful when running this file as a script;
 # this way it will prompt user to hit a key after each figure is displayed.
 
 isinteractive() ? jim(:prompt, true) : prompt(:draw);
@@ -93,7 +93,7 @@ oa = Ellipse(oa)
 oversample = 3
 image0 = phantom(x, y, oa, oversample)
 cfun = z -> cat(dims = ndims(z)+1, real(z), imag(z))
-jim(x, y, cfun(image0), "Digital phantom\n (real | imag)"; ncol=1)
+jim(x, y, cfun(image0), "Digital phantom\n (real | imag)")
 
 #=
 In practice, sensitivity maps are usually estimated
@@ -125,7 +125,7 @@ so that the square-root of the sum of squares (SSoS) is unity:
 
 ssos = sqrt.(sum(abs.(smap).^2, dims=ndims(smap))) # SSoS
 ssos = selectdim(ssos, ndims(smap), 1)
-jim(ssos, "SSoS for ncoil=$ncoil")
+jim(x, y, ssos, "SSoS for ncoil=$ncoil")
 
 for ic=1:ncoil # normalize
     selectdim(smap, ndims(smap), ic) ./= ssos
@@ -188,9 +188,9 @@ p3 = jim(fx, fy, cfun(kspace2 - kspace1), "Error")
 xlims = (-1,1) .* (0.06/mm)
 ylims = (-1,1) .* (0.06/mm)
 jim(
- jim(fx, fy, real(kspace1[1]), "Analytical"; xlims, ylims),
- jim(fx, fy, real(kspace2[1]), "FFT-based"; xlims, ylims),
- jim(fx, fy, real(kspace2[1] - kspace1[1]), "Error"; xlims, ylims),
+ jim(fx, fy, real(kspace1[1]), "Analytical"; xlims, ylims, prompt=false),
+ jim(fx, fy, real(kspace2[1]), "FFT-based"; xlims, ylims, prompt=false),
+ jim(fx, fy, real(kspace2[1] - kspace1[1]), "Error"; xlims, ylims, prompt=false),
 )
 
 

@@ -179,22 +179,20 @@ radon(ob::Object2d{Triangle}) = (r,ϕ) -> ob.value *
     radon_tri(r, ϕ, ob.center..., ob.width..., ob.angle[1], ob.param)
 
 
-expimp(x::Real) = exp(1im*π * x)
-
 function spectrum_tri(u, v)
     (u == 0 && v == 0) ? sqrt3 / 4 :
-    (u == 0) ? 1im / (2π * v) * (expimp(-v*sqrt3) - 1) + 1/(2*sqrt3*abs2(π*v)) *
-        (1 - expimp(-v * sqrt3) * (1im * π * v * sqrt3 + 1)) :
-    im*sqrt3/(4π*u) * expimp(-sqrt3/2*v) * (
-        expimp(-u/2) * sinc((v*sqrt3 - u)/2) -
-        expimp( u/2) * sinc((v*sqrt3 + u)/2) )
+    (u == 0) ? 1im / (2π * v) * (cispi(-v*sqrt3) - 1) + 1/(2*sqrt3*abs2(π*v)) *
+        (1 - cispi(-v * sqrt3) * (1im * π * v * sqrt3 + 1)) :
+    im*sqrt3/(4π*u) * cispi(-sqrt3/2*v) * (
+        cispi(-u/2) * sinc((v*sqrt3 - u)/2) -
+        cispi( u/2) * sinc((v*sqrt3 + u)/2) )
 end
 
 function spectrum_tri(fx, fy, cx, cy, wx, wy, θ, param)
     param == 1/2 || throw("todo")
     (kx, ky) = rotate2d(fx, fy, θ) # rotate first, then translate
-    return wx * exp(-2im*π*fx*cx) *
-           wy * exp(-2im*π*fy*cy) * spectrum_tri(kx*wx, ky*wy)
+    return cispi(-2 * (fx*cx + fy * cy)) *
+           wx * wy * spectrum_tri(kx*wx, ky*wy)
 end
 
 """
