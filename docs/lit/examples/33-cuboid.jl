@@ -61,7 +61,8 @@ using physical units.
 center = (10mm, 8mm, 6mm)
 width = (35mm, 25mm, 15mm)
 ϕ0s = :(π/6) # symbol version for nice plot titles
-angles = (eval(ϕ0s), 0)
+ϕ0 = eval(ϕ0s)
+angles = (ϕ0, 0)
 Cuboid([10mm, 8mm, 6mm, 35mm, 25mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
 Cuboid( 10mm, 8mm, 6mm, 35mm, 25mm, 15mm, π/6, 0, 1.0f0 ) # 9 arguments
 ob = Cuboid(center, width, angles, 1.0f0) # tuples (recommended use)
@@ -78,7 +79,7 @@ deltas = (1.0mm, 1.1mm, 1.2mm)
 dims = (2^8, 2^8+2, 48)
 offsets = (0.5, 0.5, 0.5) # for FFT spectra later
 ig = ImageGeom( ; dims, deltas, offsets)
-oversample = 2
+oversample = 3
 img = phantom(axes(ig)..., [ob], oversample)
 p1 = jim(axes(ig), img;
    title="Cuboid, rotation ϕ=$ϕ0s", xlabel="x", ylabel="y")
@@ -123,7 +124,7 @@ p3 = jim(axesf(ig), sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
 # Compare the DFT and analytical spectra to validate the code
 err = maximum(abs, spectrum_exact - spectrum_fft) / maximum(abs, spectrum_exact)
-@assert err < 6e-2 # todo
+@assert err < 4e-2
 p4 = jim(axesf(ig), 1e3*abs.(spectrum_fft - spectrum_exact);
    title="|Difference| × 10³", xlabel, ylabel)
 jim(p1, p4, p2, p3)
@@ -137,20 +138,22 @@ Validate it using the projection-slice theorem aka Fourier-slice theorem.
 =#
 
 pg = ImageGeom((2^8,2^7), (0.6mm,1.0mm), (0.5,0.5)) # projection sampling
-ϕs, θs = (:(π/2), ϕ0s), (:(π/7), :(0))
-ϕ, θ = [eval.(ϕs)...], [eval.(θs)...]
-proj2 = [radon(axes(pg)..., ϕ[i], θ[i], [ob]) for i in 1:2] # 2 projections
+ϕs, θs = (:(π/3), ϕ0s), (:(π/7), :(0))
+ϕ3 = ϕ0 + atan(ob.width[1], ob.width[2])
+θ3 = atan(ob.width[3], sqrt(sum(abs2, ob.width[1:2])))
+ϕ, θ = [eval.(ϕs)..., ϕ3], [eval.(θs)..., θ3]
+proj3 = [radon(axes(pg)..., ϕ[i], θ[i], [ob]) for i in 1:3] # 3 projections
 smax = ob.value * sqrt(sum(abs2, ob.width))
-p5 = jim(axes(pg)..., proj2; xlabel="u", ylabel="v", title =
-    "Projections at (ϕ,θ) = ($(ϕs[1]), $(θs[1])) and ($(ϕs[2]), $(θs[2]))")
+p5 = jim(axes(pg)..., proj3; xlabel="u", ylabel="v", nrow = 1, title =
+    "Projections at (ϕ,θ) = ($(ϕs[1]), $(θs[1])) and ($(ϕs[2]), $(θs[2]))\n
+    and along long axis")
 
 
 #=
-todo
-Because the object has maximum FWHM of 35mm,
-and one of the two views above was along the corresponding axis,
-the maximum projection value is about
-`fwhm2spread(35mm) = 35mm * sqrt(π / log(16))` ≈ 37.25mm.
+Because the object has maximum chord length of
+`smax = sqrt(35^2+25^2+15^2)` ≈ 45.6mm,
+and one of the views above was along the corresponding axis,
+the maximum projection value is about that value.
 
 The integral of each projection should match the object volume:
 =#
@@ -211,7 +214,7 @@ p8 = jim(axesf(pg), sp.(proj_fft); prompt=false,
      title = "log10|FFT Spectrum|", clim, xlabel, ylabel)
 
 err = maximum(abs, spectrum_slice - proj_fft) / maximum(abs, spectrum_slice)
-@assert err < 1e-5
+@assert err < 2e-3
 p9 = jim(axesf(pg), 1e6*abs.(proj_fft - spectrum_slice);
     title="Difference × 10⁶", xlabel, ylabel, prompt=false)
 jim(p6, p7, p8, p9)

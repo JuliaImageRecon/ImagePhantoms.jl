@@ -94,17 +94,20 @@ phantom1(ob::Object3d{Cuboid}, xyz::NTuple{3,Real}) = (maximum(abs, xyz) ≤ 0.5
 
 # radon
 
+
+_sort(a, b) = a < b ? (a, b) : (b, a)
+
 """
-    (ℓmin, ℓmax) = cuboid_proj_line1(p1, e1)
+    (ℓmin, ℓmax) = cube_bounds(p, e)
+Bounds of ℓ corresponding to rect(x) for direction `e` from point `p`.
 """
-function cuboid_proj_line1(p1, e1)
-    if e1 == 0
-        return (-Inf,Inf)
-    end
-    # bounds of ℓ corresponding to rect(x)
-    ℓmin = (-1/2 - p1) ./ e1
-    ℓmax = ( 1/2 - p1) ./ e1
-    return min(ℓmin, ℓmax), max(ℓmin, ℓmax)
+function cube_bounds(p::T, e::T) where T <: AbstractFloat
+    return abs(e) < eps(T) ? (-T(Inf), T(Inf)) :
+        _sort((-T(0.5) - p) / e, ( T(0.5) - p) / e)
+end
+function cube_bounds(p::Real, e::Real)
+   T = promote_type(eltype(p), eltype(e), Float32)
+   return cube_bounds(T(p), T(e))
 end
 
 
@@ -126,25 +129,26 @@ function xray1(
     p2 = u * sϕ - v * cϕ * sθ
     p3 = v * cθ
 
-    e1 = -sϕ * cθ # x = p1 + l*e1
-    e2 = cϕ * cθ  # y = p2 + l*e2
-    e3 = sθ       # z = p3 + l*e3
+    e1 = -sϕ * cθ # x = p1 + ℓ * e1
+    e2 = cϕ * cθ  # y = p2 + ℓ * e2
+    e3 = sθ       # z = p3 + ℓ * e3
 
-    ℓxmin, ℓxmax = cuboid_proj_line1(p1, e1)
-    ℓymin, ℓymax = cuboid_proj_line1(p2, e2)
-    ℓzmin, ℓzmax = cuboid_proj_line1(p3, e3)
+    ℓxmin, ℓxmax = cube_bounds(p1, e1)
+    ℓymin, ℓymax = cube_bounds(p2, e2)
+    ℓzmin, ℓzmax = cube_bounds(p3, e3)
 
-    ℓmin = max(ℓxmin, ℓymin, ℓzmin)
-    ℓmax = min(ℓxmax, ℓymax, ℓzmax)
-    ℓ = max(ℓmax - ℓxmin, zero(T))
-    if e1 == 0 && !(-1/2 ≤ u ≤ 1/2)
-        return zero(T)
+    minℓ = max(ℓxmin, ℓymin, ℓzmin)
+    maxℓ = min(ℓxmax, ℓymax, ℓzmax)
+    ℓ = max(maxℓ - minℓ, zero(T))
+
+    if abs(e1) < eps(T)
+        ℓ *= (-1/2 ≤ u < 1/2)
     end
-    if e2 == 0 && !(-1/2 ≤ u ≤ 1/2)
-        return zero(T)
+    if abs(e2) < eps(T)
+        ℓ *= (-1/2 ≤ u < 1/2)
     end
-    if e3 == 0 && !(-1/2 ≤ v ≤ 1/2)
-        return zero(T)
+    if abs(e3) < eps(T)
+        ℓ *= (-1/2 ≤ v < 1/2)
     end
     return ℓ
 end
@@ -154,7 +158,8 @@ end
 
 """
     spectrum(ob::Object3d{Cuboid}, (kx,ky,kz))
-Spectrum of unit cube at `(kx,ky,kz)`, for unitless spatial frequency coordinates.
+Spectrum of unit cube at `(kx,ky,kz)`,
+for unitless spatial frequency coordinates.
 """
 function spectrum1(ob::Object3d{Cuboid}, kxyz::NTuple{3,Real})
     return prod(sinc, kxyz)

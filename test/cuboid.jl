@@ -16,6 +16,17 @@ macro isob3(ex) # @isob macro to streamline tests
 end
 
 
+@testset "xray1" begin
+    @inferred IP.xray1(Cuboid(), 0.5f0, 0.4, π/6, π/7)
+    fun = (u, v, ϕ, θ) -> IP.xray1(Cuboid(), u, v, ϕ, θ)
+    @test fun(0, 0, 0, 0) ≈ 1
+    @test fun(0.51, 0, 0, 0) == 0
+    @test fun(0, 0, π/4, 0) ≈ √2 # diagonal of square
+    @test fun(0.72, 0, π/4, 0) == 0
+    @test fun(0, 0, π/4, atan(1, √2)) ≈ sqrt(3) # long diagonal of cube
+end
+
+
 @testset "construct" begin
     @test shape <: AbstractShape3
 
@@ -147,16 +158,5 @@ end
     θ = [π/7]
     sino = @inferred radon(u, v, ϕ, θ, [ob])
 
-#=
-todo projection slice
-    ia = argmin(abs.(ϕ .- deg2rad(55)))
-    slice = sino[:,ia]
-    Slice = myfft(slice) * dr
-    angle = round(rad2deg(ϕ[ia]), digits=1)
-
-    kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
-    ideal = spectrum(ob).(kx, ky)
-
-    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
-=#
+# todo projection slice
 end
