@@ -1,21 +1,17 @@
 #=
-cuboid.jl
+test/cuboid.jl
 =#
 
-include("helper.jl") # todo
-using ImagePhantoms #: Object3d, AbstractShape3
-using ImagePhantoms #: Cuboid, Cube
+using ImagePhantoms: Object3d, AbstractShape3, phantom, radon, spectrum
+using ImagePhantoms: Object, Cuboid, Cube
 import ImagePhantoms as IP
-using Unitful: m, unit
-#using MIRTjim: jim, prompt
-#using UnitfulRecipes
-#using Plots; default(markerstrokecolor=:auto)
+using Unitful: m, unit, °
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
 
 (shape, shape3) = (Cuboid, Cube)
 
-macro isob3(ex) # macro to streamline tests
+macro isob3(ex) # @isob macro to streamline tests
     :(@test $(esc(ex)) isa Object3d{shape})
 end
 
@@ -31,6 +27,7 @@ end
     @isob3 @inferred shape(1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0)
     @isob3 @NOTinferred shape(Number[1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0])
 
+    # cubes
     @isob3 @inferred shape(1, 5.0f0)
     @isob3 @inferred shape3(1, 5.0f0)
     @isob3 @inferred shape3(1, 2, 3, 4., 5.0f0)
@@ -44,89 +41,114 @@ end
 
     ob = @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
 
-    @isob @NOTinferred IP.rotate(ob, π)
+    @isob3 @NOTinferred IP.rotate(ob, π)
 
     @test IP.rotate(ob, -ob.angle[1]).angle[1] == 0
 
-    @isob @inferred ob * 2//1
-    @isob @inferred 2 * ob
-    @isob @inferred ob / 2.0f0
-    @isob @inferred IP.scale(ob, (2,3,4))
-    @isob @inferred IP.scale(ob, 2)
-    @isob @inferred IP.translate(ob, (2, 3, 4))
-    @isob @inferred IP.translate(ob, 2, 3, 4)
+    @isob3 @inferred ob * 2//1
+    @isob3 @inferred 2 * ob
+    @isob3 @inferred ob / 2.0f0
+    @isob3 @inferred IP.scale(ob, (2,3,4))
+    @isob3 @inferred IP.scale(ob, 2)
+    @isob3 @inferred IP.translate(ob, (2, 3, 4))
+    @isob3 @inferred IP.translate(ob, 2, 3, 4)
 end
 
 
 @testset "method" begin
-    x = LinRange(-1,1,32)*5
-    y = LinRange(-1,1,31)*5
-    z = LinRange(-1,1,30)*5
+    x = LinRange(-1,1,13)*5
+    y = LinRange(-1,1,12)*5
+    z = LinRange(-1,1,11)*5
     ob = @inferred shape((1, 2., 3), (4//1, 5, 6), (π/6, 0), 5.0f0)
 
     show(devnull, ob)
     @test (@inferred eltype(ob)) == Float32
+
 
     fun = @inferred phantom(ob)
     @test fun isa Function
     @test fun(ob.center...) == ob.value
     @test fun((ob.center .+ 2 .* ob.width)...) == 0
 
+    fun = @inferred phantom([ob])
+    @test fun isa Function
+    @test fun(ob.center...) == ob.value
+    @test fun((ob.center .+ 2 .* ob.width)...) == 0
+
     img = @inferred phantom(x, y, z, [ob])
+    @test img isa Array{<:Real, 3}
+    @test size(img) == length.((x, y, z))
 
-#=
-    fun = @inferred radon(ob)
-    @test fun isa Function
-    fun(0,0,0,0)
-=#
+    over = 2
+    img = @NOTinferred phantom(x, y, z, [ob], over)
+    @test img isa Array{<:Real, 3}
+    @test size(img) == length.((x, y, z))
 
-    fun = @inferred spectrum(ob)
+
+    fun = @inferred radon([ob])
     @test fun isa Function
+    fun(0,0,0,0) # todo
+
+    @test radon([0], [0], [0], [0], [ob])[1] isa Real # todo
+
+
+    fun = @inferred spectrum([ob])
+    @test fun isa Function
+    @test fun(0,0,0) ≈ prod(ob.width) * ob.value
+end
+
+
+@testset "radon-units" begin
+    width = (30m, 40m, 50m)
+    center = (8m, 7m, 6m)
+    ϕ = π/6
+    ob = shape(center, width, (ϕ, 0), 1.0f0)
+    x1 = radon([center[1]], [center[3]], [0], [0], [ob])[1]
+    x2 = radon([center[1]], [center[3]], 0, 0, [ob])[1]
+    @test x2 ≈ x1
 end
 
 
 @testset "spectrum" begin
-    dx = 0.020m
-    dy = 0.022m
-    dz = 0.025m
-    (L,M,N) = (2^8,2^8+2,2^8+4)
+    dx = 1.0m
+    dy = 1.1m
+    dz = 1.2m
+    (L,M,N) = (2^7,2^7+2,2^7+4)
     x = (-L÷2:L÷2-1) * dx
     y = (-M÷2:M÷2-1) * dy
     z = (-N÷2:N÷2-1) * dz
-    width = (2m, 8m, 3m)
-    ob = shape((4m, 3m, 2m), width, (π/6, 0), 1.0f0)
-    img = phantom(x, y, z, [ob])
+    width = (30m, 40m, 50m)
+    ob = shape((8m, 7m, 6m), width, (π/6, 0), 1.0f0)
+    oversample = 2
+    img = phantom(x, y, z, [ob], oversample)
 
-    zscale = 1 / prod(width) # normalize spectra
+    zscale = 1 / (prod(width) * ob.value) # normalize spectra
     fx = (-L÷2:L÷2-1) / L / dx
     fy = (-M÷2:M÷2-1) / M / dy
     fz = (-N÷2:N÷2-1) / N / dz
     X = myfft(img) * (dx * dy * dz * zscale)
     kspace = spectrum(fx, fy, fz, [ob]) * zscale
+    @test spectrum(ob)(0/m, 0/m, 0/m) * zscale ≈ 1
+    @test maximum(abs, kspace) ≈ 1
+    @test kspace[L÷2+1,M÷2+1,N÷2+1] ≈ 1
 
-#=
-    clim = (-6, 0)
-    sp = z -> max(log10(abs(z)/oneunit(abs(z))), -6)
-    p1 = jim(x, y, img, "phantom")
-    p2 = jim(fx, fy, sp.(X), "log10|DFT|"; clim)
-    p3 = jim(fx, fy, sp.(kspace), "log10|Spectrum|"; clim)
-    p4 = jim(fx, fy, abs.(kspace - X), "Difference")
-    jim(p1, p4, p2, p3)
-=#
+    @test abs(maximum(abs, X) - 1) < 1e-2
     @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
 
-
-#=
-todo
     # test sinogram with projection-slice theorem
 
-    dr = 0.02m
-    nr = 2^10
-    r = (-nr÷2:nr÷2-1) * dr
-    fr = (-nr÷2:nr÷2-1) / nr / dr
-    ϕ = deg2rad.(0:180) # * Unitful.rad # todo round unitful Unitful.°
-    sino = radon(r, ϕ, [ob])
+    du,dv = 0.02m, 0.03m
+    nu,nv = 2^9, 2^8
+    u = (-nu÷2:nu÷2-1) * du
+    v = (-nv÷2:nv÷2-1) * dv
+    fu = (-nu÷2:nu÷2-1) / nu / du
+    fv = (-nv÷2:nv÷2-1) / nv / dv
+    ϕ = deg2rad.(0:6:180) # * Unitful.rad # todo round unitful Unitful.°
+    θ = [π/7]
+    sino = @inferred radon(u, v, ϕ, θ, [ob])
 
+#=
+todo projection slice
     ia = argmin(abs.(ϕ .- deg2rad(55)))
     slice = sino[:,ia]
     Slice = myfft(slice) * dr
@@ -134,22 +156,7 @@ todo
 
     kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
     ideal = spectrum(ob).(kx, ky)
+
     @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
 =#
-
-#=
-    p2 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram")
-    jim(p1, p2)
-    p3 = plot(r, slice, title="profile at ϕ = $angle", label="")
-    p4 = scatter(fr, abs.(Slice), label="abs fft", color=:blue)
-    scatter!(fr, real(Slice), label="real fft", color=:green)
-    scatter!(fr, imag(Slice), label="imag fft", color=:red,
-        xlims=(-1,1).*(1.2/m), title="1D spectra")
-
-    plot!(fr, abs.(ideal), label="abs", color=:blue)
-    plot!(fr, real(ideal), label="real", color=:green)
-    plot!(fr, imag(ideal), label="imag", color=:red)
-    plot(p1, p2, p3, p4)
-=#
-
 end

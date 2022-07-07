@@ -6,6 +6,8 @@ using ImagePhantoms
 include("helper.jl")
 
 include("core.jl")
+
+# 2d:
 include("ellipse.jl")
 include("gauss2.jl")
 include("rect.jl")
@@ -17,6 +19,7 @@ include("focus-chart.jl")
 # 3d:
 include("ellipsoid.jl")
 include("gauss3.jl")
+include("cuboid.jl")
 
 @testset "mri-sense" begin
     include("mri-sense.jl")
