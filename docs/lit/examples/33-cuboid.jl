@@ -157,7 +157,7 @@ the maximum projection value is about that value.
 
 The integral of each projection should match the object volume:
 =#
-((p -> sum(p)*prod(pg.deltas)).(proj2)..., volume)
+((p -> sum(p)*prod(pg.deltas)).(proj3)..., volume)
 
 
 # Look at a set of projections as the views orbit around the object.
