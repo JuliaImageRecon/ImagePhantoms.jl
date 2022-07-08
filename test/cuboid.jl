@@ -24,6 +24,9 @@ end
     @test fun(0, 0, π/4, 0) ≈ √2 # diagonal of square
     @test fun(0.72, 0, π/4, 0) == 0
     @test fun(0, 0, π/4, atan(1, √2)) ≈ sqrt(3) # long diagonal of cube
+    @inferred IP.cube_bounds(0.2, 0.5f0)
+    @inferred IP.cube_bounds(0.2, 0.5)
+    @test IP.cube_bounds(0.2, 0.5f0) == IP.cube_bounds(0.2, 0.5)
 end
 
 
