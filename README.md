@@ -1,6 +1,6 @@
 # ImagePhantoms.jl
 
-https://github.com/JuliaImageRecon/ImagePhantoms.jl (_WIP!_)
+https://github.com/JuliaImageRecon/ImagePhantoms.jl
 
 [![action status][action-img]][action-url]
 [![pkgeval status][pkgeval-img]][pkgeval-url]
@@ -14,7 +14,17 @@ This Julia language repo
 provides tools for working with software-defined image phantoms
 like the Shepp-Logan phantom.
 
-For explanations see the documentation
+For each phantom shape,
+methods are available for computing samples of
+its image
+(using `phantom`),
+its Radon transform (2D) or X-ray line integrals (3D),
+(using `radon`),
+and its 2D or 3D Fourier transform
+(using `spectrum`).
+
+For explanations and examples
+see the documentation
 using the blue "docs" links above.
 
 
@@ -86,7 +96,9 @@ see the
 
 Currently the package supports
 the following 2D shapes:
-ellipses/circles, rectangles/squares, gaussians, triangles.
+ellipses/circles, rectangles/squares, gaussians, triangles,
+and the following 3D shapes:
+ellipsoids/spheres, cuboids/cubes, gaussians.
 
 
 ### Dependents
