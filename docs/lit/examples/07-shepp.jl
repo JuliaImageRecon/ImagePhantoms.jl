@@ -43,7 +43,7 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 
 #=
-### CT version
+## CT version
 
 Original version from:
 Larry A Shepp, Benjamin F Logan,
@@ -61,7 +61,7 @@ jim(image1, "SheppLogan (original CT version)", clim=(0.95, 1.05))
 
 
 #=
-### Over-sampling
+## Over-sampling
 
 When generating ellipse phantoms,
 it is generally preferable
@@ -84,7 +84,7 @@ Most of the remaining examples use the recommended default over-sampling.
 
 
 #=
-### Units
+## Units
 
 The original Shepp-Logan phantom
 in the paper as cited above
@@ -102,7 +102,7 @@ jim(image1u, "SheppLogan with density units", clim=(0.95,1.05))
 
 
 #=
-### Toft version
+## Toft version
 
 This version is from:
 Toft, Peter Aundal & Sørensen, John Aasted
@@ -115,9 +115,9 @@ image2 = shepp_logan(256, SheppLoganToft())
 jim(image2, "SheppLoganToft")
 
 
-# ### Emission tomography version
-
 #=
+## Emission tomography version
+
 This version has low intensity for the skull
 because typical PET/SPECT radiotracers
 do not accumulate in bone regions.
@@ -130,9 +130,9 @@ image3 = shepp_logan(256, SheppLoganEmis())
 jim(image3, "SheppLoganEmis")
 
 
-# ### BrainWeb version
-
 #=
+## BrainWeb version
+
 This version was inspired by the
 [BrainWeb](https://brainweb.bic.mni.mcgill.ca)
 phantoms that have integer indices
@@ -150,10 +150,12 @@ jim(image4, "SheppLoganBrainWeb")
 # to preserve the integer indices.
 
 
-# ### Disjoint middle ellipses
+#=
+## Disjoint middle ellipses
 
-# Sometimes it can be more convenient
-# to have the middle ellipses be non-overlapping:
+Sometimes it can be more convenient
+to have the middle ellipses be non-overlapping:
+=#
 
 ob = ellipse_parameters(SheppLoganBrainWeb(), disjoint=true)
 ob[:,end] = 1:10
@@ -165,7 +167,7 @@ image5 = phantom(x, y, ob, oversample)
 jim(x, y, image5, "Disjoint"; aspect_ratio = 1)
 
 
-# ### Comedy version
+# ## Comedy version
 
 image6 = shepp_logan(256, SouthPark(); fovs=(1,1))
 jim(image6, "SouthPark")
