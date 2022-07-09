@@ -1,5 +1,5 @@
 #---------------------------------------------------------
-# # [Ellipsoid](@id 31-ellipsoid)
+# # [Ellipsoid](@id 32-ellipsoid)
 #---------------------------------------------------------
 
 #=
@@ -7,7 +7,7 @@ This page illustrates the `Ellipsoid` shape in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
 
 This page was generated from a single Julia file:
-[31-ellipsoid.jl](@__REPO_ROOT_URL__/31-ellipsoid.jl).
+[32-ellipsoid.jl](@__REPO_ROOT_URL__/32-ellipsoid.jl).
 =#
 
 #md # In any such Julia documentation,
@@ -16,9 +16,9 @@ This page was generated from a single Julia file:
 
 #md # The corresponding notebook can be viewed in
 #md # [nbviewer](http://nbviewer.jupyter.org/) here:
-#md # [`31-ellipsoid.ipynb`](@__NBVIEWER_ROOT_URL__/31-ellipsoid.ipynb),
+#md # [`32-ellipsoid.ipynb`](@__NBVIEWER_ROOT_URL__/32-ellipsoid.ipynb),
 #md # and opened in [binder](https://mybinder.org/) here:
-#md # [`31-ellipsoid.ipynb`](@__BINDER_ROOT_URL__/31-ellipsoid.ipynb).
+#md # [`32-ellipsoid.ipynb`](@__BINDER_ROOT_URL__/32-ellipsoid.ipynb).
 
 
 # ### Setup
