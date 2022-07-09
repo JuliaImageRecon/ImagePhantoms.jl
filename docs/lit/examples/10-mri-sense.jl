@@ -32,7 +32,6 @@ using ImagePhantoms: phantom, mri_smap_fit, mri_spectra
 using FFTW: fft, fftshift
 using ImageGeoms: embed
 using LazyGrids: ndgrid
-using MIRT: ir_mri_sensemap_sim
 using MIRTjim: jim, prompt
 using Random: seed!
 using Unitful: mm
@@ -83,7 +82,8 @@ dx, dy = fovs ./ (nx,ny)
 x = (-(nx÷2):(nx÷2-1)) * dx
 y = (-(ny÷2):(ny÷2-1)) * dy
 
-# Define Shepp-Logan phantom object, with random complex phases
+# Define Shepp-Logan phantom object,
+# with random complex phases
 # to make it a bit more realistic.
 
 oa = ellipse_parameters(SheppLoganBrainWeb() ; disjoint=true, fovs)
@@ -109,13 +109,39 @@ mask[[1:8;end-8:end],:] .= false
 jim(x, y, mask, "mask")
 
 
-# ### Sensitivity maps
+#=
+### Sensitivity maps
 
-# Here we use simulated sensitivity maps from MIRT:
+Here we use highly idealized sensitivity maps,
+roughly corresponding to the
+[Biot-Savart law](https://en.wikipedia.org/wiki/Biot-Savart_law)
+for an infinite thin wire,
+as a crude approximation of a
+[birdcage coil](https://en.wikipedia.org/wiki/Radiofrequency_coil).
+One wire is outside the upper right corner,
+the other is outside the left border.
+=#
+
+# response at (x,y) to wire at (wx,wy)
+function biot_savart_wire(x, y, wx, wy)
+    phase = cis(atan(y-wy, x-wx))
+    return oneunit(x) / sqrt(sum(abs2, (x-wx, y-wy))) * phase # 1/r falloff
+end
 
 ncoil = 2
-smap = ir_mri_sensemap_sim(dims=(nx,ny), ncoil=ncoil, orbit_start=[0])
-jim(x, y, cfun(smap), "Sensitivity maps raw")
+wire1 = (a,b) -> biot_savart_wire(a, b, maximum(x) + 8dx, maximum(y) + 8dy)
+wire2 = (a,b) -> biot_savart_wire(a, b, minimum(x) - 20dx, zero(dy))
+smap = [wire1.(x, y'), wire2.(x, y')]
+smap[1] *= cis(3π/4) # match coil phases at image center, ala "quadrature phase"
+smap = cat(dims=3, smap...)
+smap /= maximum(abs, smap)
+mag = abs.(smap)
+phase = angle.(smap)
+
+jim(
+ jim(x, y, mag, "|Sensitivity maps raw|"; color=:cividis, ncol=1, prompt=false),
+ jim(x, y, phase, "∠(Sensitivity maps raw)"; color=:hsv, ncol=1, prompt=false),
+)
 
 #=
 Typical sensitivity map estimation methods
@@ -125,7 +151,7 @@ so that the square-root of the sum of squares (SSoS) is unity:
 
 ssos = sqrt.(sum(abs.(smap).^2, dims=ndims(smap))) # SSoS
 ssos = selectdim(ssos, ndims(smap), 1)
-jim(x, y, ssos, "SSoS for ncoil=$ncoil")
+jim(x, y, ssos, "SSoS for ncoil=$ncoil"; color=:cividis, clim=(0,1))
 
 for ic=1:ncoil # normalize
     selectdim(smap, ndims(smap), ic) ./= ssos
@@ -136,17 +162,17 @@ smaps = stacker(smap) # code hereafter expects vector of maps
 jim(x, y, cfun(smaps), "Sensitivity maps (masked and normalized)")
 
 
-# ### Sensitivity map fitting using complex exponentials
-
 #=
+### Sensitivity map fitting using complex exponentials
+
 The `mri_smap_fit` function fits each `smap`
 with a linear combination of complex exponential signals.
 (These signals are not orthogonal due to the `mask`.)
-With frequencies `-7:7/N`, the maximum error is ≤ 0.2%.
+With frequencies `-9:9/N`, the maximum error is ≤ 0.4%.
 =#
 
 deltas = (dx, dy)
-kmax = 7
+kmax = 9
 fit = mri_smap_fit(smaps, embed; mask, kmax, deltas)
 jim(
  jim(x, y, cfun(smaps), "Original maps"; prompt=false, clim=(-1,1)),
@@ -154,11 +180,11 @@ jim(
  jim(x, y, cfun(100 * (fit.smaps - smaps)), "error * 100"; prompt=false),
 )
 
-# The fit coefficients are smaller near `kmax`
+# The fit coefficients are smaller near `±kmax`
 # so probably `kmax` is large enough.
 
-coefs = map(x -> reshape(x,15,15), fit.coefs)
-jim(-kmax:kmax, -kmax:kmax, cfun(coefs), "coefs", prompt=false)
+coefs = map(x -> reshape(x, 2kmax+1, 2kmax+1), fit.coefs)
+jim(-kmax:kmax, -kmax:kmax, cfun(coefs), "Coefficients")
 
 
 # ### Compare FFT with analytical spectra

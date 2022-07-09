@@ -90,7 +90,6 @@ Evaluate unit sphere at `(x,y,z)`, for unitless coordinates.
 phantom1(ob::Object3d{Ellipsoid}, xyz::NTuple{3,Real}) = sum(abs2, xyz) ≤ 1
 
 
-
 # x-ray transform (line integral) of unit sphere
 # `u,v` should be unitless
 function xray1(
@@ -106,68 +105,7 @@ function xray1(
 end
 
 
-#=
-"""
-Translated from ellipsoid_proj.m in MIRT
-Caution: note that `ϕ, θ` denote projection view angles
-whereas `xang, zang` or `Φ, Θ` denote object rotation angles.
-"""
-function xray_ellipsoid(u, v, ϕ, θ, cx, cy, cz, rx, ry, rz, xang, zang)
-#function xray_ellipsoid(u, v, β, θ, cx, cy, cz, rx, ry, rz, xang, zang)
-#function xray_ellipsoid(u, v, β, θ, cx, cy, cz, rx, ry, rz, Φ, Θ)
-#function ellipsoid_proj_do(ss, tt, beta, source_zs, dso, dod, dfs, oversample)
-
-    zang == 0 || throw("Z angle not done")
-    (sϕ, cϕ) = sincos(ϕ)
-    (sθ, cθ) = sincos(θ)
-    ushift = cx * cϕ + cy * sϕ
-    vshift = (cx * sϕ - cy * cϕ) * sθ + cz * cθ
-    u -= ushift
-    v -= vshift
-
-    az = ϕ - xang
-    sinaz, cosaz = sincos(az)
-    p1 = u * cosaz + v * sinaz * sθ
-    p2 = u * sinaz - v * cosaz * sθ
-    p3 = v * cθ
-
-    e1 = -sinaz * cθ
-    e2 = cosaz * cθ
-    e3 = sθ
-
-    A = (e1 / rx)^2 + (e2 / ry)^2 + (e3 / rz)^2
-    B = p1 * e1 / rx^2 + p2 * e2 / ry^2 + p3 * e3 / rz^2
-    C = (p1 / rx)^2 + (p2 / ry)^2 + (p3 / rz)^2 - 1
-
-#@show A B C
-
-#   return 2 * real(sqrt(Complex(B^2 - A*C))) / A
-#@show (B/A)^2 - C/A
-#throw("todo")
-#   return 2 * real(sqrt(Complex((B/A)^2 - C/A)))
-#   real(sqrt(Complex(1 - (C/B)*(A/B))))
-#   #
-#   r = A*C/B^2
-    dis = B^2 - A*C
-#@show dis
-    return dis < zero(dis) ? zero(u) : 2 * sqrt(dis) / A
-#2 * B / A * xray1(Ellipsoid(), r, 0, 0, 0)
-end
-
-
-"""
-    radon(ob::Object3d{Ellipsoid})
-Returns function of `(s,t,ϕ,θ)` for evaluating a line integral of an Ellipsoid,
-where `ϕ` is the azimuthal angle and `θ` is the polar angle.
-"""
-radon(::Symbol, ob::Object3d{Ellipsoid}) = (s,t,ϕ,θ) -> ob.value *
-    xray_ellipsoid(s, t, ϕ, θ, ob.center..., ob.width..., ob.angle...)
-todo
-=#
-
-
 # spectrum
-
 
 """
    sphere_transform(f::Real)
