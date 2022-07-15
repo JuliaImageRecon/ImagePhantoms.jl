@@ -149,6 +149,12 @@ function _xray(
 end
 
 
+# this gateway seems to help type inference
+function _radon(ob::Object2d, r::RealU, ϕ::RealU)
+    return ob.value * _xray(ob.shape, ob.center, ob.width, ob.angle, r, ϕ)
+end
+
+
 """
     radon(ob::Object2d)::Function
 Return function of `(r,ϕ)` that user can sample
@@ -161,8 +167,7 @@ for an object ``f(x,y)``.
 Then as `ϕ` increases, the line integrals rotate counter-clockwise.
 """
 function radon(ob::Object2d)
-    return (r,ϕ) -> ob.value *
-        _xray(ob.shape, ob.center, ob.width, ob.angle, r, ϕ)
+    return (r::RealU, ϕ::RealU) -> _radon(ob, r, ϕ)
 end
 
 
