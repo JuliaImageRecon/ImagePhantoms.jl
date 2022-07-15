@@ -116,9 +116,9 @@ if DEBUG
     jim(p1, p4, p2, p3); prompt()
 end
 
-    @test abs(maximum(abs, X) - 1) < 1e-2
-    @test abs(maximum(abs, kspace) - 1) < 1e-5
-    @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
+    @test abs(maximum(abs, X) - 1) < 3e-5
+    @test abs(maximum(abs, kspace) - 1) < 1e-6
+    @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-3
 
 
     # test sinogram with projection-slice theorem
@@ -154,5 +154,5 @@ if DEBUG
     plot(p1, p2, p3, p4); gui()
 end
 
-    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
+    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 4e-6
 end
