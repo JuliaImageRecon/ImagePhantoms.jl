@@ -261,7 +261,7 @@ function spectrum(
 end
 
 
-# helpers
+# helper
 
 
 function rotate2d(x::RealU, y::RealU, θ::RealU)

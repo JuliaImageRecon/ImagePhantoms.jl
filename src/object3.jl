@@ -285,7 +285,7 @@ function spectrum(
 end
 
 
-# helpers
+# helper
 
 
 function rotate3d(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU)
