@@ -120,8 +120,8 @@ end
 
 
 """
-    spectrum1(ob::Object2d{Cuboid}, (kx,ky))
-Spectrum of unit square at `(kx,kyz)`,
+    spectrum1(ob::Object2d{Rect}, (kx,ky))
+Spectrum of unit square at `(kx,ky)`,
 for unitless spatial frequency coordinates.
 """
 function spectrum1(ob::Object2d{Rect}, kxy::NTuple{2,Real})
