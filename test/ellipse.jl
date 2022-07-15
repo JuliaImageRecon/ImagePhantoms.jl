@@ -83,10 +83,14 @@ end
     @test fun isa Function
     fun(0,0)
 
+    r = LinRange(-1,1,51)*2
+    s1 = @inferred radon(r, [0], [ob])
+    s2 = @inferred radon(r, 0, [ob])
+    @test s1[:] == s2
+
     fun = @inferred spectrum(ob)
     @test fun isa Function
 end
-
 
 @testset "spectrum" begin
     dx = 0.02m
@@ -127,7 +131,7 @@ end
     fr = (-nr÷2:nr÷2-1) / nr / dr
     ϕ = deg2rad.(0:360) # * Unitful.rad # todo round unitful Unitful.°
 #   ϕ = deg2rad.((0:360)°) # not yet due to Unitful issue
-    sino = @NOTinferred radon(r, ϕ, [ob]) # todo
+    sino = @inferred radon(r, ϕ, [ob])
 
     ia = argmin(abs.(ϕ .- deg2rad(55)))
     slice = sino[:,ia]
