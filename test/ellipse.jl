@@ -92,6 +92,22 @@ end
     @test fun isa Function
 end
 
+
+@testset "infer" begin
+    obs = [shape((4m, 3m), (2m, 5m), π/6, 1.0f0),
+           shape((4f0m, 3f0m), (2f0m, 5f0m), π/6, 1.0)]
+    for ob in obs
+        nr, dr = 2^4, 0.02m
+        r = (-nr÷2:nr÷2-1) * dr .+ ob.center[1]
+        ϕ = deg2rad.(0:20:360)
+        @inferred IP._radon(ob, r[1], ϕ[1])
+        sino1 = @inferred radon([r[1]], [ϕ[1]], [ob])
+        sino = @inferred radon(r, ϕ, [ob])
+        @test sino1[1] == sino[1]
+    end
+end
+
+
 @testset "spectrum" begin
     dx = 0.02m
     dy = 0.025m
