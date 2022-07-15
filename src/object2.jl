@@ -151,7 +151,9 @@ end
 
 # this gateway seems to help type inference
 function _radon(ob::Object2d, r::RealU, ϕ::RealU)
-    return ob.value * _xray(ob.shape, ob.center, ob.width, ob.angle, r, ϕ)
+    Tc = eltype(ob.center[1] / oneunit(ob.center[1]))
+    T = promote_type(Tc, eltype(ob.value))
+    return T(ob.value) * _xray(ob.shape, ob.center, ob.width, ob.angle, r, ϕ)
 end
 
 
