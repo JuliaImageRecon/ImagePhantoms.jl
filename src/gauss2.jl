@@ -61,6 +61,7 @@ Gauss2(w::RealU, v::Number = 1) = Gauss2((zero(w),zero(w)), (w,w), 0, v)
 
 # helper
 
+
 """
     s = fwhm2spread(w)
 Convert FWHM `w` to equivalent Gaussian spread `s` for ``\\exp(-π (x/s)^2)``.
@@ -77,47 +78,28 @@ Convert FWHM `w` to equivalent Gaussian spread `s` for ``\\exp(-π (x/s)^2)``.
 
 
 """
-    phantom(ob::Object2d{Gauss2})
-Returns function of `(x,y)` for making image.
+    phantom1(ob::Object2d{Gauss2}, (x,y))
+Evaluate unit gauss2 at `(x,y)`,
+for unitless coordinates.
 """
-function phantom(ob::Object2d{Gauss2})
-    return (x,y) -> ob.value * # trick due to fwhm to spread scaling:
-        exp(-π * sum(abs2, coords(ob, x, y)) / fwhm2spread(1)^2)
+phantom1(ob::Object2d{Gauss2}, xy::NTuple{2,Real}) =
+        exp(-π * sum(abs2, xy) / fwhm2spread(1)^2)
+
+
+# x-ray transform (line integral) of unit gauss2
+# `r` should be unitless
+function xray1(::Gauss2, r::Real, ϕ::RealU)
+    s = fwhm2spread(1)
+    return s * exp(-π * abs2(r / s))
 end
 
 
 """
-    radon_gauss2(r, ϕ, cx, cy, wx, wy, θ)
-Radon transform at `(r,ϕ)` of 2D Gaussian.
+    spectrum1(ob::Object2d{Gauss2}, (kx,ky))
+Spectrum of unit gauss2 at `(kx,ky)`,
+for unitless spatial frequency coordinates.
 """
-function radon_gauss2(r, ϕ, cx, cy, wx, wy, θ)
-    (sx, sy) = fwhm2spread.((wx, wy))
-    (sinϕ, cosϕ) = sincos(ϕ)
-    r -= cx * cosϕ + cy * sinϕ # Radon translation property
-    (sinϕ, cosϕ) = sincos(ϕ - θ) # Radon rotation property
-    s = sqrt(abs2(sx * cosϕ) + abs2(sy * sinϕ)) # by Fourier-slice Thm.
-    return sx * sy / s * exp(-π * abs2(r / s))
+function spectrum1(ob::Object2d{Gauss2}, kxy::NTuple{2,Real})
+    s = fwhm2spread(1)
+    return s^2 * exp(-π * sum(abs2, kxy) * s^2)
 end
-
-
-"""
-    radon(ob::Object2d{Gauss2})
-Returns function of `(r,ϕ)` for making a sinogram.
-"""
-radon(ob::Object2d{Gauss2}) = (r,ϕ) -> ob.value *
-    radon_gauss2(r, ϕ, ob.center..., ob.width..., ob.angle[1])
-
-
-function spectrum_gauss2(fx, fy, cx, cy, wx, wy, θ)
-    (sx, sy) = fwhm2spread.((wx, wy))
-    (kx, ky) = rotate2d(fx, fy, θ) # rotate first, then translate
-    return cispi(-2 * (fx*cx + fy*cy)) *
-           sx * sy * exp(-π * (abs2(sx*kx) + abs2(sy*ky)))
-end
-
-"""
-    spectrum(ob::Object2d{Gauss2})
-Returns function of ``(f_x,f_y)`` for the spectrum (2D Fourier transform).
-"""
-spectrum(ob::Object2d{Gauss2}) = (fx,fy) -> ob.value *
-    spectrum_gauss2(fx, fy, ob.center..., ob.width..., ob.angle[1])
