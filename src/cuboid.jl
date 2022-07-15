@@ -87,7 +87,8 @@ end
 
 """
     phantom1(ob::Object3d{Cuboid}, (x,y,z))
-Evaluate unit cube at `(x,y,z)`, for unitless coordinates.
+Evaluate unit cube at `(x,y,z)`,
+for unitless coordinates.
 """
 phantom1(ob::Object3d{Cuboid}, xyz::NTuple{3,Real}) = (maximum(abs, xyz) ≤ 0.5)
 
