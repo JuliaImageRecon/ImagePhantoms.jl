@@ -1,10 +1,12 @@
 # core.jl
 
-using ImagePhantoms
-using ImagePhantoms: rotate2d, rotate3d, coords # helpers
-using Unitful: m
+using ImagePhantoms: Object, Circle, Ellipse, Square
+using ImagePhantoms: phantom, radon, spectrum
+import ImagePhantoms as IP
+using Unitful: m, °
 
 using Test: @test, @testset, @test_throws, @inferred
+
 
 @testset "methods" begin
     ob = Circle(1)
@@ -32,10 +34,20 @@ using Test: @test, @testset, @test_throws, @inferred
 
 end
 
+
 @testset "helpers" begin
-    @test collect(@inferred rotate2d(2, 1, π/2)) ≈ [1,-2]
-    @test all((@inferred rotate2d((2, 1), π/2)) .≈ (1,-2))
-    @test ≈(collect(@inferred rotate3d(2, 1, 3, π/2, 0)), [1,-2,3]; atol= 1e-15)
-    @test all((@inferred rotate3d((2, 1, 3), π/2, 0)) .≈ (1,-2, 3))
-    @test (@inferred coords(Square(3m), 9m, 6m)) == (3, 2)
+    @test collect(@inferred IP.rotate2d(2, 1, π/2)) ≈ [1,-2]
+    @test all((@inferred IP.rotate2d((2, 1), π/2)) .≈ (1,-2))
+    @test ≈(collect(@inferred IP.rotate3d(2, 1, 3, π/2, 0)), [1,-2,3]; atol= 1e-15)
+    @test all((@inferred IP.rotate3d((2, 1, 3), π/2, 0)) .≈ (1,-2, 3))
+    @test (@inferred IP.coords(Square(3m), 9m, 6m)) == (3, 2)
+
+    @inferred IP.xray_shift(1.0f0, π/3, 3, 4//5)
+    @inferred IP.xray_shift(1.0f0m, π/3, 3m, (4//5)m)
+    @inferred IP.xray_rotate(1.0f0, π/3, (1//5))
+    @inferred IP.xray_rotate(1.0f0m, π/3, (1//5)°)
+    @inferred IP.xray_scale(1.0f0, π/3, 3, 4//5)
+    @inferred IP.xray_scale(1.0f0m, π/3, 3m, (4//5)m)
+    @inferred IP._xray(Ellipse(), (1.0f0, 2), (1//5, 3.), (π/3,), 2.1, π/7)
+    @inferred IP._xray(Ellipse(), (1.0f0m, 2m), ((1//5)m, 3.0m), (π/3,), 2.1m, 5°)
 end
