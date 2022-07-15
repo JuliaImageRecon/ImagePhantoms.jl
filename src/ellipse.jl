@@ -80,43 +80,27 @@ end
 
 
 """
-    phantom(ob::Object2d{Ellipse})
-Returns function of `(x,y)` for making image.
+    phantom1(ob::Object2d{Ellipse}, (x,y))
+Evaluate unit circle at `(x,y)`,
+for unitless coordinates.
 """
-phantom(ob::Object2d{Ellipse}) =
-    (x,y) -> (sum(abs2, coords(ob, x, y)) ≤ 1) * ob.value
+phantom1(ob::Object2d{Ellipse}, xy::NTuple{2,Real}) = (sum(abs2, xy) ≤ 1)
 
 
-"""
-    radon_ellipse(r, ϕ, cx, cy, rx, ry, θ)
-Radon transform of ellipse at point `(r,ϕ)`.
-"""
-function radon_ellipse(r, ϕ, cx, cy, rx, ry, θ)
-    (sinϕ, cosϕ) = sincos(ϕ)
-    r -= cx * cosϕ + cy * sinϕ # Radon translation property
-    (sinϕ, cosϕ) = sincos(ϕ - θ) # Radon rotation property
-    rp2 = abs2(rx * cosϕ) + abs2(ry * sinϕ) # square of projected radius
-    return 2rx*ry / rp2 * sqrt(max(rp2 - abs2(r), 0*oneunit(r)^2))
+# x-ray transform (line integral) of unit circle
+# `r` should be unitless
+function xray1(::Ellipse, r::Real, ϕ::RealU)
+    T = promote_type(eltype(r), Float32)
+    r2 = r^2
+    return r2 < 1 ? 2 * sqrt(one(T) - r2) : zero(T)
 end
 
 
 """
-    radon(ob::Object2d{Ellipse})
-Returns function of `(r,ϕ)` for making a sinogram.
+    spectrum1(ob::Object2d{Ellipse}, (kx,ky))
+Spectrum of unit circle at `(kx,ky)`,
+for unitless spatial frequency coordinates.
 """
-radon(ob::Object2d{Ellipse}) = (r,ϕ) -> ob.value *
-    radon_ellipse(r, ϕ, ob.center..., ob.width..., ob.angle[1])
-
-
-function spectrum_ellipse(fx, fy, cx, cy, rx, ry, θ)
-    (kx, ky) = rotate2d(fx, fy, θ) # rect is rotated first, then translated
-    return cispi(-2 * (fx*cx + fy*cy)) * # width=diameter=2*radius
-           2rx * 2ry * jinc(2sqrt(abs2(kx * rx) + abs2(ky * ry)))
+function spectrum1(ob::Object2d{Ellipse}, kxy::NTuple{2,Real})
+    return 4 * jinc(2 * sqrt(sum(abs2, kxy)))
 end
-
-"""
-    spectrum(ob::Object2d{Ellipse})
-Returns function of ``(f_x,f_y)`` for the spectrum (2D Fourier transform).
-"""
-spectrum(ob::Object2d{Ellipse}) = (fx,fy) -> ob.value *
-    spectrum_ellipse(fx, fy, ob.center..., ob.width..., ob.angle[1])
