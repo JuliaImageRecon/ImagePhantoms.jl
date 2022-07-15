@@ -124,13 +124,13 @@ function xray_scale(
     e1old = [cϕ, sϕ]
     e2old = [-sϕ, cϕ]
     width = [wx, wy]
-    r = 1 / sqrt( sum(abs2, e2old ./ width) ) # would be radius for circle
+    w = 1 / sqrt( sum(abs2, e2old ./ width) ) # would be radius for circle
     ϕp = atan(wy * sϕ, wx * cϕ) # ϕ'
     tmp = (e1old * r) ./ width
     (sϕp, cϕp) = sincos(ϕp)
     e1new = [cϕp, sϕp]
-    up = e1new' * tmp
-    return (r, up, ϕp)
+    rp = e1new' * tmp
+    return (w, rp, ϕp)
 end
 
 
@@ -139,11 +139,11 @@ function _xray(
     type::AbstractShape2,
     center::Tuple,
     width::Tuple,
-    angle::RealU,
+    angle::Tuple,
     r::RealU, ϕ::RealU,
 )
-    Δr, ϕ = xray_shift(r, ϕ, center...)
-    rr, ϕr = xray_rotate(Δr, ϕ, angle)
+    Δr = xray_shift(r, ϕ, center...)
+    rr, ϕr = xray_rotate(Δr, ϕ, angle[1])
     scale, rp, ϕp, = xray_scale(rr, ϕr, width...)
     return scale * xray1(type, rp, ϕp)
 end
@@ -213,7 +213,7 @@ end
 
 # apply rotate, translate, and scale properties of 2D Fourier transform
 function _spectrum(ob::Object2d, fx, fy, cx, cy, rx, ry, Φ)
-    (kx, ky) = rotateld(fx, fy, Φ) # rotate then translate
+    (kx, ky) = rotate2d(fx, fy, Φ) # rotate then translate
     return rx * ry * cispi(-2*(fx*cx + fy*cy)) *
         spectrum1(ob, (rx*kx, ry*ky))
 end
@@ -230,7 +230,7 @@ of the units defining the object.
 """
 function spectrum(ob::Object2d)
     return (fx,fy) -> ob.value *
-        _spectrum(ob, fx, fy, ob.center..., ob.width..., ob.angle)
+        _spectrum(ob, fx, fy, ob.center..., ob.width..., ob.angle[1])
 end
 
 
