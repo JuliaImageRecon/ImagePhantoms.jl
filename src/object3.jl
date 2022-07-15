@@ -1,9 +1,33 @@
 #=
 object3.jl
-Utilities for 3D objects, cf object.jl
+Utilities for 3D objects
 =#
 
 using LazyGrids: ndgrid
+export phantom, radon, spectrum
+
+
+# rotate
+
+"""
+    rotate(ob::Object3d, (α,β))
+    rotate(ob::Object3d, α, β=0)
+Rotate a 3D object.
+"""
+rotate(ob::Object3d, θ::NTuple{2,RealU}) =
+    Object(ob.shape, ob.center, ob.width, ob.angle .+ θ, ob.value, ob.param)
+rotate(ob::Object3d, α::RealU, β::RealU=0) = rotate(ob, (α,β))
+
+
+"""
+    coords(object::Object3d, x::RealU, y::RealU, y::RealU)
+Put coordinates `(x,y,z)` in canonical axes associated with `object`.
+"""
+function coords(ob::Object3d, x::RealU, y::RealU, z::RealU)
+    xyz = rotate3d(x - ob.center[1], y - ob.center[2], z - ob.center[3],
+        ob.angle[1], ob.angle[2])
+    return xyz ./ ob.width # unitless
+end
 
 
 # phantom images
@@ -11,19 +35,23 @@ using LazyGrids: ndgrid
 
 """
     phantom(ob::Object3d)::Function
-Return function of `(x,y,z)` that user can sample at any `(x,y,z)` locations
-to make a 3D phantom image for a single 3D object.
+Return function of `(x,y,z)`
+that user can sample at any locations
+to make a 3D phantom image
+for a single 3D object.
 """
 function phantom(ob::Object3d)
-#   apply coordinate transformation and value:
+    # apply coordinate transformation and value:
     return (x,y,z) -> ob.value * phantom1(ob, coords(ob, x, y, z))
 end
 
 
 """
     phantom(oa::Array{<:Object3d})::Function
-Return function of `(x,y,z)` that user can sample at any `(x,y,z)` locations
-to make a 3D phantom image for an `Array` of 3D objects.
+Return function of `(x,y,z)`
+that user can sample at any locations
+to make a 3D phantom image
+for an `Array` of 3D objects.
 """
 function phantom(oa::Array{<:Object3d})
     return (x,y,z) -> sum(ob -> phantom(ob)(x,y,z), oa)
@@ -47,8 +75,9 @@ end
 
 """
     image = phantom(x, y, z, oa::Array{<:Object3d}, oversample::Int; T)
-Return a 3D digital image of the phantom sampled at grid of `(x,y,z)` locations,
-with over-sampling factor `oversample` and returned element type `T`.
+Return a 3D digital image of the phantom sampled
+at grid of `(x,y,z)` locations,
+with over-sampling factor `oversample` and element type `T`.
 """
 function phantom(
     x::AbstractVector,
@@ -98,7 +127,7 @@ function xray_rotate(
     return (Δu, Δv, ϕ - Φazim, θ)
 end
 
-# affine scaling property of the X-ray transform; ϕ=azimuth θ=polar
+# affine scaling property of the X-ray transform
 # p,topo,prop,affine
 function xray_scale(
     u::RealU, v::RealU, ϕ::RealU, θ::RealU, # projection coordinates
@@ -146,7 +175,8 @@ at any projection coordinates
 to make projection views of a 3D object.
 
 The coordinate system used here is such that `ϕ=0` corresponds to
-line integrals along the ``y`` axis for an object ``f(x,y,z)``.
+line integrals along the ``y`` axis
+for an object ``f(x,y,z)``.
 Then as `ϕ` increases, the line integrals rotate counter-clockwise.
 """
 function radon(ob::Object3d)
@@ -159,7 +189,8 @@ end
     radon(oa::Array{<:Object3d})::Function
 Return function of `(u,v,ϕ,θ)` that user can sample
 at any projection coordinates
-to make projection views of an array of 3D objects.
+to make projection views
+for an array of 3D objects.
 """
 function radon(oa::Array{<:Object3d})
     return (u,v,ϕ,θ) -> sum(ob -> radon(ob)(u,v,ϕ,θ), oa)
@@ -168,7 +199,8 @@ end
 
 """
     radon(u:Vector, v:Vector, ϕ:Vector, θ:Vector, oa::Array{<:Object3d})
-Return parallel-beam projections sampled at grid of `(u,v,ϕ,θ)` locations.
+Return parallel-beam projections
+sampled at grid of `(u,v,ϕ,θ)` locations.
 Returned array size is `length(u) × length(v) × length(ϕ) × length(θ)`.
 """
 function radon(
@@ -253,7 +285,7 @@ function spectrum(
 end
 
 
-# helpers
+# helper
 
 
 function rotate3d(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU)

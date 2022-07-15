@@ -39,6 +39,11 @@ for simulating data:
    that one can evaluate on a grid
    to make a sampled 2D parallel-beam sinogram,
    or evaluate appropriately to make a sampled fan-beam sinogram.
+   For 3D objects,
+  `radon` returns a function of `(u,v,ϕ,θ)`
+   that one can evaluate to compute projection views.
+   See the "3D geometry" example
+   for description of the coordinate system.
 * `spectrum` returns a function of spatial frequencies
   that one can sample to simulate k-space data (e.g., in MRI).
 

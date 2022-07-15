@@ -83,7 +83,7 @@ Triangle(param::T=0.5) where {T <: Real} = Triangle{T}(param)
 =#
 
 
-# helpers
+# helper
 
 function _trifun(x, y, param)
     param == 1/2 || throw("todo")
@@ -140,64 +140,43 @@ function radon_tri(r, sinϕ, cosϕ)
 end
 
 
-# methods
-
-
-"""
-    phantom(ob::Object2d{Triangle})
-Returns function of `(x,y)` for making image.
-"""
-phantom(ob::Object2d{Triangle}) = (x,y) ->
-    ob.value * _trifun(coords(ob, x, y)..., ob.param)
-
-
-"""
-    radon_tri(r, ϕ, cx, cy, wx, wy, θ, p)
-Radon transform at `(r,ϕ)` of triangle.
-"""
-function radon_tri(r, ϕ, cx::C, cy::C, wx::C, wy::C, θ, p) where {C <: RealU}
-    T = promote_type(eltype(r), C)
-    p == 1/2 || throw("todo")
-    (sinϕ, cosϕ) = sincos(ϕ)
-    r -= cx * cosϕ + cy * sinϕ # Radon translation property
-    ϕ -= θ # Radon rotation property
-    (sinϕ, cosϕ) = sincos(ϕ)
-    # Radon affine scaling property
-    denom = sqrt(abs2(cosϕ/wy) + abs2(sinϕ/wx))
-    (sinϕ, cosϕ) = sincos(ϕ)
-    r /= wx * wy * denom # unitless
-    ϕ = atan(sinϕ/wx, cosϕ/wy)
-    return abs(r) ≥ sqrt(3)/2 ? zero(T) : T(radon_tri(r, sincos(ϕ)...) / denom)
-end
-
-
-"""
-    radon(ob::Object2d{Triangle})
-Returns function of `(r,ϕ)` for making a sinogram.
-"""
-radon(ob::Object2d{Triangle}) = (r,ϕ) -> ob.value *
-    radon_tri(r, ϕ, ob.center..., ob.width..., ob.angle[1], ob.param)
-
-
+# spectrum of a unit-base equilateral triangle
 function spectrum_tri(u, v)
     (u == 0 && v == 0) ? sqrt3 / 4 :
     (u == 0) ? 1im / (2π * v) * (cispi(-v*sqrt3) - 1) + 1/(2*sqrt3*abs2(π*v)) *
         (1 - cispi(-v * sqrt3) * (1im * π * v * sqrt3 + 1)) :
-    im*sqrt3/(4π*u) * cispi(-sqrt3/2*v) * (
+    1im * sqrt3/(4π*u) * cispi(-sqrt3/2*v) * (
         cispi(-u/2) * sinc((v*sqrt3 - u)/2) -
         cispi( u/2) * sinc((v*sqrt3 + u)/2) )
 end
 
-function spectrum_tri(fx, fy, cx, cy, wx, wy, θ, param)
-    param == 1/2 || throw("todo")
-    (kx, ky) = rotate2d(fx, fy, θ) # rotate first, then translate
-    return cispi(-2 * (fx*cx + fy * cy)) *
-           wx * wy * spectrum_tri(kx*wx, ky*wy)
-end
+
+# methods
+
 
 """
-    spectrum(ob::Object2d{Triangle})
-Returns function of ``(f_x,f_y)`` for the spectrum (2D Fourier transform).
+    phantom1(ob::Object2d{Triangle}, (x,y))
+Evaluate unit triangle at `(x,y)`,
+for unitless coordinates.
 """
-spectrum(ob::Object2d{Triangle}) = (fx,fy) -> ob.value *
-    spectrum_tri(fx, fy, ob.center..., ob.width..., ob.angle[1], ob.param)
+phantom1(ob::Object2d{Triangle}, xy::NTuple{2,Real}) = _trifun(xy..., ob.param)
+
+
+# x-ray transform (line integral) of unit triangle
+# `r` should be unitless
+function xray1(::Triangle, r::Real, ϕ::RealU)
+    # todo: check ob.param == 1/2
+    T = promote_type(eltype(r), Float32)
+    return abs(r) ≥ sqrt(3)/2 ? zero(T) : T(radon_tri(r, sincos(ϕ)...))
+end
+
+
+"""
+    spectrum1(ob::Object2d{Triangle}, (kx,ky))
+Spectrum of unit triangle at `(kx,ky)`,
+for unitless spatial frequency coordinates.
+"""
+function spectrum1(ob::Object2d{Triangle}, kxy::NTuple{2,Real})
+    ob.param == 1/2 || throw("todo")
+    return spectrum_tri(kxy...)
+end

@@ -20,7 +20,7 @@ end
 
 (shape, shape2) = (Rect, Square)
 
-macro isob(ex) # macro to streamline tests
+macro isob(ex) # @isob macro to streamline tests
     :(@test $(esc(ex)) isa Object2d{shape})
 end
 
@@ -36,6 +36,7 @@ end
     @isob @inferred shape(1, 2., 3, 4//1, π, 5.0f0)
     @isob @NOTinferred shape(Number[1, 2., 3, 4//1, π, 5.0f0])
 
+    # squares
     @isob @inferred shape(1, 5.0f0)
     @isob @inferred shape2(1, 5.0f0)
     @isob @inferred shape2(1, 2, 3., 5.0f0)
@@ -113,9 +114,9 @@ if DEBUG
     jim(p1, p4, p2, p3); prompt()
 end
 
-    @test abs(maximum(abs, X) - 1) < 1e-2
+    @test abs(maximum(abs, X) - 1) < 2e-4
     @test abs(maximum(abs, kspace) - 1) < 1e-5
-    @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
+    @test maximum(abs, kspace - X) / maximum(abs, kspace) < 6e-3
 
 
     # test sinogram with projection-slice theorem
@@ -151,5 +152,5 @@ if DEBUG
     plot(p1, p2, p3, p4); gui()
 end
 
-    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
+    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 3e-5
 end
