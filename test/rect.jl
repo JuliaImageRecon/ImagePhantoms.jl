@@ -20,7 +20,7 @@ end
 
 (shape, shape2) = (Rect, Square)
 
-macro isob(ex) # macro to streamline tests
+macro isob(ex) # @isob macro to streamline tests
     :(@test $(esc(ex)) isa Object2d{shape})
 end
 
@@ -36,6 +36,7 @@ end
     @isob @inferred shape(1, 2., 3, 4//1, π, 5.0f0)
     @isob @NOTinferred shape(Number[1, 2., 3, 4//1, π, 5.0f0])
 
+    # squares
     @isob @inferred shape(1, 5.0f0)
     @isob @inferred shape2(1, 5.0f0)
     @isob @inferred shape2(1, 2, 3., 5.0f0)
