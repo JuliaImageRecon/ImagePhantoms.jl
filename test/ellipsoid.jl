@@ -103,11 +103,9 @@ end
     center = (8m, 7m, 6m)
     ϕ = π/6
     ob = shape(center, width, (ϕ, 0), 1.0f0)
-    x0 = IP.radon_ellipse(0m, 0, 0 .* center[1:2]..., width[1:2]..., ϕ)
     x1 = radon([center[1]], [center[3]], [0], [0], [ob])[1]
-    @test x1 ≈ x0
     x2 = radon([center[1]], [center[3]], 0, 0, [ob])[1]
-    @test x2 ≈ x0
+    @test x2 ≈ x1
 end
 
 

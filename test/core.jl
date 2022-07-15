@@ -21,17 +21,14 @@ using Test: @test, @testset, @test_throws, @inferred
     @test phantom([ob]) isa Function
     @test phantom([ob])(0,0) == 1
     @test phantom(zeros(2), zeros(3), [ob]) == ones(2,3)
-    @test phantom(zeros(2,3), zeros(2,3), [ob]) == ones(2,3)
 
     @test radon([ob]) isa Function
     @test radon([ob])(0,0) == 2
     @test radon(zeros(2), zeros(3), [ob]) == 2*ones(2,3)
-    @test radon(zeros(2,3), zeros(2,3), [ob]) == 2*ones(2,3)
 
     @test spectrum([ob]) isa Function
     @test spectrum([ob])(0,0) ≈ π
     @test spectrum(zeros(2), zeros(3), [ob]) ≈ π*ones(2,3)
-    @test spectrum(zeros(2,3), zeros(2,3), [ob]) ≈ π*ones(2,3)
 
 end
 
