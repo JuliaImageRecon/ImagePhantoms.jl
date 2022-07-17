@@ -31,7 +31,7 @@ General container for 2D and 3D objects for defining image phantoms.
 
 ```jldoctest
 julia> Object(Ellipse(), (0,0), (1,2), 0.0, 1//2, nothing)
-Object2d{Ellipse, Rational{Int64}, 2, Int64, Float64, Nothing} (S, D, V, ...)
+Object2d{Ellipse, Rational{Int64}, Int64, Float64, Nothing} (S, D, V, ...)
  shape::Ellipse Ellipse()
  center::NTuple{2,Int64} (0, 0)
  width::NTuple{2,Int64} (1, 2)
