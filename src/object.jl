@@ -108,7 +108,7 @@ end
 2D object constructor using tuples.
 """
 function Object(
-    shape::AbstractShape2,
+    shape::AbstractShape{2},
     center::NTuple{2,C},
     width::NTuple{2,C},
     angle::RealU = 0,
@@ -123,7 +123,7 @@ end
 2D object constructor using keywords.
 """
 function Object(
-    shape::AbstractShape2 ;
+    shape::AbstractShape{2} ;
     center::NTuple{2,C} = (0,0),
     width::NTuple{2,C} = _tuple(one(eltype(center)), 2),
     angle::RealU = 0,
@@ -140,7 +140,7 @@ end
 3D object constructor using tuples.
 """
 function Object(
-    shape::Shape3d,
+    shape::Shape{3},
     center::NTuple{3,C},
     width::NTuple{3,C},
     angle::NTuple{2,RealU} = (0,0),
@@ -156,7 +156,7 @@ end
 3D object constructor using keywords.
 """
 function Object(
-    shape::AbstractShape3 ;
+    shape::AbstractShape{3} ;
     center::NTuple{3,C} = (0,0,0),
     width::NTuple{3,C} = _tuple(one(eltype(center)), 3),
     angle::NTuple{2,RealU} = (0,0),

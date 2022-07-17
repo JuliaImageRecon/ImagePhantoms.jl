@@ -13,7 +13,7 @@ const sqrt3 = sqrt(3)
 
 
 """
-    Triangle{T} <: AbstractShape2
+    Triangle{T} <: AbstractShape{2}
 By default an equilateral triangle pointing upward with the "center"
 in the middle of the base, for the default parameter = `0.5`.
 
@@ -22,12 +22,12 @@ going from (-p,0) to (1-p,0)` and with height=sqrt(3)/2.
 
 Most methods currently support only the case `p=0.5`.
 """
-struct Triangle <: AbstractShape2 end
+struct Triangle <: AbstractShape{2} end
 
 #=
-    Triangle{T} <: AbstractShape2
+    Triangle{T} <: AbstractShape{2}
 The (width and height can be scaled when constructing an object).
-struct Triangle{T} <: AbstractShape2
+struct Triangle{T} <: AbstractShape{2}
     param::T # fraction in interval (0,1) 
     function Triangle{T}(param::T = 0.5) where {T <: Real}
         0 < param < 1 || throw(ArgumentError("param=$param"))

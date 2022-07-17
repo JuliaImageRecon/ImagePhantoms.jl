@@ -11,9 +11,9 @@ export phantom, radon, spectrum
 
 
 """
-    Rect <: AbstractShape2
+    Rect <: AbstractShape{2}
 """
-struct Rect <: AbstractShape2 end
+struct Rect <: AbstractShape{2} end
 
 
 # constructors

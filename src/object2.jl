@@ -136,7 +136,7 @@ end
 
 # interface to xray1 after applying shift, rotate, scale properties
 function _xray(
-    type::AbstractShape2,
+    type::AbstractShape{2},
     center::Tuple,
     width::Tuple,
     angle::Tuple,
