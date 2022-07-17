@@ -12,9 +12,9 @@ export phantom, radon, spectrum
 
 
 """
-    Cuboid <: AbstractShape3
+    Cuboid <: AbstractShape{3}
 """
-struct Cuboid <: AbstractShape3 end
+struct Cuboid <: AbstractShape{3} end
 
 
 # constructors

@@ -2,7 +2,7 @@
 test/gauss3.jl
 =#
 
-using ImagePhantoms: Object3d, AbstractShape3, phantom, radon, spectrum
+using ImagePhantoms: Object3d, AbstractShape, phantom, radon, spectrum
 using ImagePhantoms: Object, Gauss3
 import ImagePhantoms as IP
 using Unitful: m, unit, °
@@ -17,7 +17,7 @@ end
 
 
 @testset "construct" begin
-    @test shape <: AbstractShape3
+    @test shape <: AbstractShape{3}
 
     # constructors
     @isob3 @inferred Object(shape(), (1,2,3), (4,5,6), (π, π/4), 5.0f0)

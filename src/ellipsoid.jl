@@ -11,9 +11,9 @@ export phantom, radon, spectrum
 
 
 """
-    Ellipsoid <: AbstractShape3
+    Ellipsoid <: AbstractShape{3}
 """
-struct Ellipsoid <: AbstractShape3 end
+struct Ellipsoid <: AbstractShape{3} end
 
 
 # constructors
