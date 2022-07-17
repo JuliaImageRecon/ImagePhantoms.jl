@@ -10,9 +10,9 @@ export phantom, radon, spectrum
 
 
 """
-    Gauss3 <: AbstractShape3
+    Gauss3 <: AbstractShape{3}
 """
-struct Gauss3 <: AbstractShape3 end
+struct Gauss3 <: AbstractShape{3} end
 
 
 # constructors

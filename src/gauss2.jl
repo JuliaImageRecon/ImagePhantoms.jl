@@ -10,9 +10,9 @@ export phantom, radon, spectrum, fwhm2spread
 
 
 """
-    Gauss2 <: AbstractShape2
+    Gauss2 <: AbstractShape{2}
 """
-struct Gauss2 <: AbstractShape2 end
+struct Gauss2 <: AbstractShape{2} end
 
 
 # constructors
