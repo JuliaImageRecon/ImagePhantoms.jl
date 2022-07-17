@@ -20,8 +20,8 @@ abstract type AbstractObject end
 General container for 2D and 3D objects for defining image phantoms.
 
 * `center::NTuple{D,C}` coordinates of "center" of this object
-* `width::NTuple{W,C}` "width" along axis; usually `W=D` or `W=1`
-  (e.g., FWHM for Gauss, radii for Ellipse, radius of Circle)
+* `width::NTuple{D,C}` "width" along each axis
+  (e.g., FWHM for Gauss, radii for Ellipse)
 * `angle::NTuple{D-1,A}` angle of x' axis relative to x axis,
   in radians (or with units)
 * `value::V` "intensity" value for this object
@@ -40,12 +40,12 @@ Object2d{Ellipse, Rational{Int64}, 2, Int64, Float64, Nothing} (S, D, V, ...)
  param::Nothing nothing
 ```
 """
-struct Object{S, D, V, W, C, A, P} <: AbstractObject
+struct Object{S, D, V, C, A, P} <: AbstractObject
     shape::S
     "x,y center coordinates"
     center::NTuple{D,C}
     "'width' along x',y' axes (FWHM for Gauss, radii for Ellipse)"
-    width::NTuple{W,C}
+    width::NTuple{D,C}
     "angle of x' axis relative to x axis, in radians (or with units)"
     angle::NTuple{Da,A} where Da
     "'intensity' value for this shape"
@@ -60,14 +60,14 @@ struct Object{S, D, V, W, C, A, P} <: AbstractObject
     function Object{S}(
         shape::S,
         center::NTuple{D,C},
-        width::NTuple{W,C},
+        width::NTuple{D,C},
         angle::NTuple{Da,A},
         value::V,
         param::P,
-    ) where {S <: AbstractShape, D, V <: Number, W, C <: RealU, Da, A <: RealU, P}
+    ) where {S <: AbstractShape, D, V <: Number, C <: RealU, Da, A <: RealU, P}
         1 ≤ Da == D-1 || throw(ArgumentError("Da=$Da != D-1, where D=$D"))
         all(width .> zero(eltype(width))) || throw(ArgumentError("widths must be positive"))
-        new{S,D,V,W,C,A,P}(shape, center, width, angle, value, param)
+        new{S,D,V,C,A,P}(shape, center, width, angle, value, param)
     end
 end
 
@@ -94,7 +94,7 @@ General outer object constructor where `angle` is a tuple, including 3D case.
 function Object(
     shape::S,
     center::NTuple{D,C},
-    width::NTuple{W,C} where W = _tuple(zero(eltype(center)), length(center)),
+    width::NTuple{D,C} = _tuple(zero(eltype(center)), length(center)),
     angle::NTuple{Da,RealU} where Da = _tuple(0, length(center)-1),
     value::Number = 1,
     param::Any = nothing,
@@ -110,7 +110,7 @@ end
 function Object(
     shape::AbstractShape2,
     center::NTuple{2,C},
-    width::NTuple{W,C} where W,
+    width::NTuple{2,C},
     angle::RealU = 0,
     value::Number = 1,
     param::Any = nothing,
@@ -125,7 +125,7 @@ end
 function Object(
     shape::AbstractShape2 ;
     center::NTuple{2,C} = (0,0),
-    width::NTuple{W,C} where W = _tuple(one(eltype(center)), 2),
+    width::NTuple{2,C} = _tuple(one(eltype(center)), 2),
     angle::RealU = 0,
     value::Number = 1,
     param = nothing,
@@ -142,7 +142,7 @@ end
 function Object(
     shape::Shape3d,
     center::NTuple{3,C},
-    width::NTuple{W,C} where W,
+    width::NTuple{3,C},
     angle::NTuple{2,RealU} = (0,0),
     value::Number = 1,
     param::Any = nothing,
@@ -158,11 +158,11 @@ end
 function Object(
     shape::AbstractShape3 ;
     center::NTuple{3,C} = (0,0,0),
-    width::NTuple{W,C} = _tuple(one(eltype(center)), 3),
+    width::NTuple{3,C} = _tuple(one(eltype(center)), 3),
     angle::NTuple{2,RealU} = (0,0),
     value::Number = 1,
     param = nothing,
-) where {W, C <: RealU}
+) where {C <: RealU}
     Object(shape, center, width, angle, value, param)
 end
 
@@ -225,13 +225,13 @@ end
 # scale width (tricky because length(width) < D is possible
 """
     scale(ob::Object, factor::RealU)
-    scale(ob::Object, factor::NTuple{W,RealU})
+    scale(ob::Object, factor::NTuple{D,RealU})
 Scale the width(s) by `factor`.
 """
-scale(ob::Object{S,D,V,W}, factor::NTuple{W,RealU}) where {S,D,V,W} =
+scale(ob::Object{S,D}, factor::NTuple{D,RealU}) where {S,D} =
     Object(ob.shape, ob.center, ob.width .* factor, ob.angle, ob.value, ob.param)
-scale(ob::Object{S,D,V,W}, factor::RealU) where {S,D,V,W} =
-    scale(ob, _tuple(factor,W))
+scale(ob::Object{S,D}, factor::RealU) where {S,D} =
+    scale(ob, _tuple(factor,D))
 
 
 # scale value
