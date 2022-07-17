@@ -4,7 +4,7 @@ ellipse.jl
 
 const DEBUG = false
 
-using ImagePhantoms: Object, Object2d, AbstractShape2, phantom, radon, spectrum
+using ImagePhantoms: Object, Object2d, AbstractShape, phantom, radon, spectrum
 using ImagePhantoms: Ellipse, Circle
 import ImagePhantoms as IP
 using Unitful: m, unit, °
@@ -26,7 +26,7 @@ end
 
 
 @testset "construct" begin
-    @test shape <: AbstractShape2
+    @test shape <: AbstractShape{2}
 
     # constructors
     @isob @inferred Object(shape(), (1,2), (3,4), π, 5.0f0)
