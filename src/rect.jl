@@ -5,8 +5,7 @@ rect.jl
 
 #using ImagePhantoms #: Object, Object2d
 
-export Rect
-export Square
+export Rect, rect, square
 export phantom, radon, spectrum
 
 
@@ -16,61 +15,37 @@ export phantom, radon, spectrum
 struct Rect <: AbstractShape{2} end
 
 
-# constructors
+# constructor
 
 
 """
-    Rect(cx, cy, wx=1, wy=wx, ϕ=0, value::Number=1)
-    Rect(center::NTuple{2,RealU}, width::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1)
-    Rect([6-vector])
-Construct `Rect` object from parameters;
+    rect(cx, cy, wx=1, wy=wx, ϕ=0, value::Number=1)
+    rect(center::NTuple{2,RealU}, width::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1)
+    rect([6-vector])
+Construct `Object{Rect}` from parameters;
 here `width` is the full-width.
 """
-function Rect(
-    cx::RealU,
-    cy::RealU,
-    wx::RealU = oneunit(cx),
-    wy::RealU = wx,
-    ϕ::RealU = 0,
-    value::Number = 1,
-)
-    (cx, cy, wx, wy) = promote(cx, cy, wx, wy)
-    Object(Rect(), (cx,cy), (wx,wy), ϕ, value)
-end
-
-function Rect(
-    center::NTuple{2,RealU},
-    width::NTuple{2,RealU} = (1,1) .* oneunit(center[1]),
-    ϕ::RealU = 0,
-    value::Number = 1,
-)
-    Rect(center..., width..., ϕ, value)
-end
-
-function Rect(v::AbstractVector{<:Number})
-    length(v) == 6 || throw(ArgumentError("$v wrong length"))
-    Rect(v...)
-end
+rect(args... ; kwargs...) = Object(Rect(), args...; kwargs...)
 
 
-# squares as a special case
+# special case: squares
 
 """
-    Square(x,y,w,v=1) (square of width `w` centered at `(x,y)`)
-    Square((x,y), w=1, v=1) ditto
-    Square([4-vector]) ditto
-    Square(w, v=1) centered at origin
-Construct `Square` objects as special cases of `Rect` objects.
+    square(x, y, w,v=1) (square of width `w` centered at `(x,y)`)
+    square((x,y), w=1, v=1) ditto
+    square([4-vector]) ditto
+    square(w, v=1) centered at origin
+Construct squares as special cases of `Rect`.
 """
-Square(cx::RealU, cy::RealU, w::RealU, v::Number = 1) =
-    Rect(cx, cy, w, w, 0, v)
-Square(center::NTuple{2,RealU}, w::RealU = oneunit(center[1]), v::Number = 1) =
-    Square(center..., w, v)
-Square(w::RealU, v::Number = 1) = Square((zero(w),zero(w)), w, v)
+square(cx::RealU, cy::RealU, w::RealU, v::Number = 1) =
+    rect(cx, cy, w, w, 0, v)
+square(center::NTuple{2,RealU}, w::RealU = oneunit(center[1]), v::Number = 1) =
+    square(center..., w, v)
+square(w::RealU, v::Number = 1) = square((zero(w), zero(w)), w, v)
 
-function Square(v::AbstractVector{<:Number})
+function square(v::AbstractVector{<:Number})
     length(v) == 4 || throw(ArgumentError("$v wrong length"))
-    Square(v...)
+    square(v...)
 end
 
 

@@ -6,7 +6,7 @@ triangle.jl
 
 #using ImagePhantoms #: Object, Object2d
 
-export Triangle
+export Triangle, triangle
 export phantom, radon, spectrum
 
 const sqrt3 = sqrt(3)
@@ -17,10 +17,10 @@ const sqrt3 = sqrt(3)
 By default an equilateral triangle pointing upward with the "center"
 in the middle of the base, for the default parameter = `0.5`.
 
-For parameter `p` the object is a triangle whose base is along the x-axis
+For parameter `p ∈ (0,1)` the object is a triangle whose base is along the x-axis
 going from (-p,0) to (1-p,0)` and with height=sqrt(3)/2.
 
-Most methods currently support only the case `p=0.5`.
+The methods currently support only the default case `p=0.5`.
 """
 struct Triangle <: AbstractShape{2} end
 
@@ -36,51 +36,23 @@ struct Triangle{T} <: AbstractShape{2}
 end
 =#
 
+
 # constructors
 
 
 """
-    Triangle(cx, cy, wx=1, wy=wx, ϕ=0, value::Number=1, param::Real=0.5)
-    Triangle(center::NTuple{2,RealU}, width::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1, param=0.5)
-    Triangle([6-vector] or [7-vector])
-Construct `Triangle` object from parameters.
+    triangle(cx, cy, wx=1, wy=wx, ϕ=0, value::Number=1, param::Real=0.5)
+    triangle(center::NTuple{2,RealU}, width::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1, param=0.5)
+    triangle([6-vector])
+Construct `Object{Triangle}` from parameters.
 In the typical case where `param=0.5` and `width[1] == width[2]`,
 this is an equilateral triangle with base `width[1]` centered along the x axis.
 """
-function Triangle(
-    cx::RealU,
-    cy::RealU,
-    wx::RealU = oneunit(cx),
-    wy::RealU = wx,
-    ϕ::RealU = 0,
-    value::Number = 1,
-    param::Real = 0.5,
-)
-    (cx, cy, wx, wy) = promote(cx, cy, wx, wy)
-    Object(Triangle(), (cx,cy), (wx,wy), ϕ, value, param)
+function triangle(args... ; param::Real = 0.5, kwargs...)
+    0 < param < 1 || throw("Need param ∈ (0,1)")
+#   param == 0.5 || throw("Need param = 0.5")
+    return Object(Triangle(), args...; param, kwargs...)
 end
-
-function Triangle(
-    center::NTuple{2,RealU},
-    width::NTuple{2,RealU} = (1,1) .* oneunit(center[1]),
-    ϕ::RealU = 0,
-    value::Number = 1,
-    param::Real = 0.5,
-)
-    Triangle(center..., width..., ϕ, value, param)
-end
-
-function Triangle(v::AbstractVector{<:Number})
-    length(v) ∈ (6,7) || throw(ArgumentError("$v wrong length"))
-    Triangle(v...)
-end
-
-#=
-"""
-    shape = Triangle(param=0.5)
-"""
-Triangle(param::T=0.5) where {T <: Real} = Triangle{T}(param)
-=#
 
 
 # helper

@@ -5,8 +5,7 @@ ellipse.jl
 
 #using ImagePhantoms #: Object, Object2d
 
-export Ellipse
-export Circle
+export Ellipse, ellipse, circle
 export phantom, radon, spectrum
 
 
@@ -16,64 +15,37 @@ export phantom, radon, spectrum
 struct Ellipse <: AbstractShape{2} end
 
 
-# constructors
+# constructor
 
 
 """
-    Ellipse(cx, cy, rx=1, ry=rx, ϕ=0, value::Number=1)
-    Ellipse(center::NTuple{2,RealU}, radii::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1)
-    Ellipse([6-vector])
-Construct `Ellipse` object from parameters.
+    ellipse(cx, cy, rx=1, ry=rx, ϕ=0, value::Number=1)
+    ellipse(center::NTuple{2,RealU}, radii::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1)
+    ellipse([6-vector])
+Construct `Object{Ellipse}` from parameters.
 """
-function Ellipse(
-    cx::RealU,
-    cy::RealU,
-    rx::RealU = oneunit(cx),
-    ry::RealU = rx,
-    ϕ::RealU = 0,
-    value::Number = 1,
-)
-    (cx, cy, rx, ry) = promote(cx, cy, rx, ry)
-    Object(Ellipse(), (cx,cy), (rx,ry), ϕ, value)
-end
-
-function Ellipse(
-    center::NTuple{2,RealU},
-    radii::NTuple{2,RealU} = (1,1) .* oneunit(center[1]),
-    ϕ::RealU = 0,
-    value::Number = 1,
-)
-    Ellipse(center..., radii..., ϕ, value)
-end
-
-function Ellipse(v::AbstractVector{<:Number})
-    length(v) == 6 || throw(ArgumentError("$v wrong length"))
-    Ellipse(v...)
-end
+ellipse(args... ; kwargs...) = Object(Ellipse(), args...; kwargs...)
 
 
-# circles as a special case
+# special case: circles
 
 """
-    Circle(x,y,r,v=1) (circle of radius `r` centered at `(x,y)`)
-    Circle((x,y), r=1, v=1) ditto
-    Circle([4-vector]) ditto
-    Circle(r, v=1) centered at origin
-Construct circle objects as special cases of `Ellipse` objects.
+    circle(x, y, r, v=1) (circle of radius `r` centered at `(x,y)`)
+    circle((x,y), r=1, v=1) ditto
+    circle([4-vector]) ditto
+    circle(r, v=1) centered at origin
+Construct circles as special cases of `Ellipse`.
 """
-Circle(cx::RealU, cy::RealU, r::RealU, v::Number = 1) =
-    Ellipse(cx, cy,  r, r, 0, v)
-Circle(center::NTuple{2,RealU}, r::RealU = oneunit(center[1]), v::Number = 1) =
-    Circle(center..., r, v)
-Circle(r::RealU, v::Number = 1) = Circle((zero(r), zero(r)), r, v)
+circle(cx::RealU, cy::RealU, r::RealU, v::Number = 1) =
+    ellipse(cx, cy, r, r, 0, v)
+circle(center::NTuple{2,RealU}, r::RealU = oneunit(center[1]), v::Number = 1) =
+    circle(center..., r, v)
+circle(r::RealU, v::Number = 1) = circle((zero(r), zero(r)), r, v)
 
-function Circle(v::AbstractVector{<:Number})
+function circle(v::AbstractVector{<:Number})
     length(v) == 4 || throw(ArgumentError("$v wrong length"))
-    Circle(v...)
+    circle(v...)
 end
-
-
-# helper
 
 
 # methods
