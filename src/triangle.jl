@@ -25,8 +25,6 @@ The methods currently support only the default case `p=0.5`.
 struct Triangle <: AbstractShape{2} end
 
 #=
-    Triangle{T} <: AbstractShape{2}
-The (width and height can be scaled when constructing an object).
 struct Triangle{T} <: AbstractShape{2}
     param::T # fraction in interval (0,1) 
     function Triangle{T}(param::T = 0.5) where {T <: Real}
@@ -34,6 +32,7 @@ struct Triangle{T} <: AbstractShape{2}
         new{T}(param)
     end
 end
+Triangle(param::T = 0.5) where {T <: Real} = Triangle{T}(param)
 =#
 
 
