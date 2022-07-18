@@ -25,7 +25,7 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms: Ellipse, phantom, radon, spectrum
+using ImagePhantoms: ellipse, phantom, radon, spectrum
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
 using FFTW: fft, fftshift
@@ -54,7 +54,7 @@ using physical units.
 =#
 
 radii = (20mm, 80mm)
-ob = Ellipse((40mm, 30mm), radii, π/6, 1.0f0)
+ob = ellipse((40mm, 30mm), radii, π/6, 1.0f0)
 
 
 # ### Phantom image using `phantom`
@@ -176,5 +176,5 @@ The good agreement between the analytical spectra (solid lines)
 and the DFT samples (disks)
 validates that `phantom`, `radon`, and `spectrum`
 are all self consistent
-for this `Ellipse` object.
+for this `Ellipse` shape.
 =#

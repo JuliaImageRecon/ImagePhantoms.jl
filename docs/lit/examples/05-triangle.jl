@@ -25,7 +25,7 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms: Triangle, phantom, radon, spectrum
+using ImagePhantoms: triangle, phantom, radon, spectrum
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
 using FFTW: fft, fftshift
@@ -48,7 +48,7 @@ for constructing 2D digital image phantoms.
 The basic shape here is an equilateral triangle
 whose base is [-1/2,1/2] along the x axis,
 pointing upwards along the y axis.
-When defining such a `Triangle` object one can specify
+When defining such a `Triangle` shape one can specify
 its center, widths, angle and value.
 All of the methods in `ImagePhantoms` support physical units,
 so we use such units throughout this example.
@@ -59,7 +59,7 @@ using physical units.
 =#
 
 width = (20mm, 80mm)
-ob = Triangle((40mm, 30mm), width, π/6, 1.0f0)
+ob = triangle((40mm, 30mm), width, π/6, 1.0f0)
 
 
 # ### Phantom image using `phantom`
@@ -180,7 +180,7 @@ The good agreement between the analytical spectra (solid lines)
 and the DFT samples (disks)
 validates that `phantom`, `radon`, and `spectrum`
 are all self consistent
-for this `Triangle` object.
+for this `Triangle` shape.
 =#
 
 

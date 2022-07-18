@@ -25,7 +25,7 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms: Rect, phantom, radon, spectrum
+using ImagePhantoms: rect, phantom, radon, spectrum
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
 using FFTW: fft, fftshift
@@ -54,7 +54,7 @@ using physical units.
 =#
 
 width = (20mm, 80mm)
-ob = Rect((40mm, 30mm), width, π/6, 1.0f0)
+ob = rect((40mm, 30mm), width, π/6, 1.0f0)
 
 
 # ### Phantom image using `phantom`
@@ -174,5 +174,5 @@ The good agreement between the analytical spectra (solid lines)
 and the DFT samples (disks)
 validates that `phantom`, `radon`, and `spectrum`
 are all self consistent
-for this `Rect` object.
+for this `Rect` shape.
 =#

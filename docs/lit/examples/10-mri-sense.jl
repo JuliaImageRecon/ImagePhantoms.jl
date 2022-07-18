@@ -27,7 +27,7 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms: ellipse_parameters, SheppLoganBrainWeb, Ellipse
+using ImagePhantoms: ellipse_parameters, SheppLoganBrainWeb, ellipse
 using ImagePhantoms: phantom, mri_smap_fit, mri_spectra
 using FFTW: fft, fftshift
 using ImageGeoms: embed
@@ -42,9 +42,9 @@ using Unitful: mm
 isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 
-# ### Overview
-
 #=
+### Overview
+
 Modern MRI scanners use multiple receive coils
 each of which has its own "sensitivity map" (or "coil profile").
 Realistic MRI simulations should account for the effects of those
@@ -82,14 +82,16 @@ dx, dy = fovs ./ (nx,ny)
 x = (-(nx÷2):(nx÷2-1)) * dx
 y = (-(ny÷2):(ny÷2-1)) * dy
 
-# Define Shepp-Logan phantom object,
-# with random complex phases
-# to make it a bit more realistic.
+#=
+Define Shepp-Logan phantom object,
+with random complex phases
+to make it a bit more realistic.
+=#
 
 oa = ellipse_parameters(SheppLoganBrainWeb() ; disjoint=true, fovs)
 seed!(0)
 oa[:,end] = [1; randn(ComplexF32, 9)] # random phases
-oa = Ellipse(oa)
+oa = ellipse(oa)
 oversample = 3
 image0 = phantom(x, y, oa, oversample)
 cfun = z -> cat(dims = ndims(z)+1, real(z), imag(z))

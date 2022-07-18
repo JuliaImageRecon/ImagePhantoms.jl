@@ -25,7 +25,7 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms: Ellipse, phantom, disk_phantom_params
+using ImagePhantoms: ellipse, phantom, disk_phantom_params
 using ImageGeoms: ImageGeom
 using MIRTjim: jim, prompt
 using Plots # @animate, gif
@@ -57,7 +57,7 @@ function disk_phantom(title::String)
     x = (-M÷2:M÷2-1) * dx
     y = (-N÷2:N÷2-1) * dy
     params = disk_phantom_params( ; rhead = () -> rand(100:105))
-    objects = Ellipse(params) # vector of Ellipse objects
+    objects = ellipse(params) # vector of Object{Ellipse}
     oversample = 3
     img = phantom(x, y, objects, oversample)
     jim(x, y, img; title, clim=(0,1300))

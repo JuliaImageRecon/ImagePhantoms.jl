@@ -25,7 +25,9 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms
+using ImagePhantoms: shepp_logan, SouthPark
+using ImagePhantoms: SheppLoganToft, SheppLoganEmis, SheppLoganBrainWeb
+using ImagePhantoms: ellipse_parameters, ellipse, phantom
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
 using Unitful: g, cm
@@ -159,7 +161,7 @@ to have the middle ellipses be non-overlapping:
 
 ob = ellipse_parameters(SheppLoganBrainWeb(), disjoint=true)
 ob[:,end] = 1:10
-ob = Ellipse(ob)
+ob = ellipse(ob)
 x = LinRange(-0.4, 0.4, 206)
 y = LinRange(-0.5, 0.5, 256)
 oversample = 3
