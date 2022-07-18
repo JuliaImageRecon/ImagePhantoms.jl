@@ -26,17 +26,17 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms
-using ImageGeoms: ImageGeom, axesf
-using MIRTjim: jim, prompt
-using UnitfulRecipes
-using Unitful: mm
-using InteractiveUtils: versioninfo
+#src using ImagePhantoms
+#src using ImageGeoms: ImageGeom, axesf
+#src using MIRTjim: jim, prompt
+#src using UnitfulRecipes
+#src using Unitful: mm
 
-# The following line is helpful when running this file as a script;
-# this way it will prompt user to hit a key after each figure is displayed.
 
-isinteractive() ? jim(:prompt, true) : prompt(:draw);
+#src # The following line is helpful when running this file as a script;
+#src # this way it will prompt user to hit a key after each figure is displayed.
+
+#src isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 
 #=
@@ -115,15 +115,3 @@ For example projection views,
 see the Ellipsoid examples.
 
 =#
-
-
-# ## Reproducibility
-
-# This page was generated with the following version of Julia:
-
-io = IOBuffer(); versioninfo(io); split(String(take!(io)), '\n')
-
-
-# And with the following package versions
-
-import Pkg; Pkg.status()

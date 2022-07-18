@@ -25,7 +25,7 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms: Cuboid, phantom, radon, spectrum
+using ImagePhantoms: cuboid, phantom, radon, spectrum
 import ImagePhantoms as IP
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt, mid3
@@ -54,7 +54,7 @@ All of the methods in `ImagePhantoms` support physical units,
 so we use such units throughout this example.
 (Using units is recommended but not required.)
 
-Here are 3 ways to define a 3D cuboid object,
+Here are 3 ways to define a 3D `Object{Cuboid}`,
 using physical units.
 =#
 
@@ -63,9 +63,9 @@ width = (35mm, 25mm, 15mm)
 ϕ0s = :(π/6) # symbol version for nice plot titles
 ϕ0 = eval(ϕ0s)
 angles = (ϕ0, 0)
-Cuboid([10mm, 8mm, 6mm, 35mm, 25mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
-Cuboid( 10mm, 8mm, 6mm, 35mm, 25mm, 15mm, π/6, 0, 1.0f0 ) # 9 arguments
-ob = Cuboid(center, width, angles, 1.0f0) # tuples (recommended use)
+cuboid([10mm, 8mm, 6mm, 35mm, 25mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
+cuboid( 10mm, 8mm, 6mm, 35mm, 25mm, 15mm, π/6, 0, 1.0f0 ) # 9 arguments
+ob = cuboid(center, width, angles, 1.0f0) # tuples (recommended use)
 
 
 #=

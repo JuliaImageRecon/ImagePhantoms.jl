@@ -25,7 +25,7 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms: Gauss3, phantom, radon, spectrum
+using ImagePhantoms: gauss3, phantom, radon, spectrum
 import ImagePhantoms as IP
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt, mid3
@@ -54,7 +54,7 @@ All of the methods in `ImagePhantoms` support physical units,
 so we use such units throughout this example.
 (Using units is recommended but not required.)
 
-Here are 3 ways to define a 3D gaussian object,
+Here are 3 ways to define a 3D `Object{Gauss3}`,
 using physical units.
 =#
 
@@ -62,9 +62,9 @@ center = (20mm, 10mm, 5mm)
 width = (25mm, 35mm, 15mm)
 ϕ0s = :(π/6) # symbol version for nice plot titles
 angles = (eval(ϕ0s), 0)
-Gauss3([40mm, 20mm, 2mm, 25mm, 35mm, 12mm, π/6, 0, 1.0f0]) # Vector{Number}
-Gauss3(20mm, 20mm, 2mm, 25mm, 35mm, 12mm, π/6, 0, 1.0f0) # 9 arguments
-ob = Gauss3(center, width, angles, 1.0f0) # tuples (recommended use)
+gauss3([40mm, 20mm, 2mm, 25mm, 35mm, 12mm, π/6, 0, 1.0f0]) # Vector{Number}
+gauss3(20mm, 20mm, 2mm, 25mm, 35mm, 12mm, π/6, 0, 1.0f0) # 9 arguments
+ob = gauss3(center, width, angles, 1.0f0) # tuples (recommended use)
 
 
 #=
