@@ -129,7 +129,7 @@ end
     fr = (-nr÷2:nr÷2-1) / nr / dr
     ϕ = deg2rad.(0:360) # * Unitful.rad # todo round unitful Unitful.°
 #   ϕ = deg2rad.((0:360)°) # not yet due to Unitful issue
-    sino = @inferred radon(r, ϕ, [ob])
+    sino = @NOTinferred radon(r, ϕ, [ob])
 
     ia = argmin(abs.(ϕ .- deg2rad(35)))
     slice = sino[:,ia]
