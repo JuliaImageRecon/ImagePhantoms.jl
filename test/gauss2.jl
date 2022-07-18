@@ -5,7 +5,7 @@ gauss2.jl
 const DEBUG = false
 
 using ImagePhantoms: Object, Object2d, AbstractShape, phantom, radon, spectrum
-using ImagePhantoms: Gauss2
+using ImagePhantoms: Gauss2, gauss2
 import ImagePhantoms as IP
 using Unitful: m, unit, °
 using FFTW: fftshift, fft
@@ -18,20 +18,20 @@ if DEBUG
     default(markerstrokecolor=:auto, markersize=2)
 end
 
-shape = Gauss2
+(Shape, shape) = (Gauss2, gauss2)
 
 macro isob(ex) # @isob macro to streamline tests
-    :(@test $(esc(ex)) isa Object2d{shape})
+    :(@test $(esc(ex)) isa Object2d{Shape})
 end
 
 
 @testset "construct" begin
-    @test shape <: AbstractShape{2}
+    @test Shape <: AbstractShape{2}
 
     # constructors
-    @isob @inferred Object(shape(), (1,2), (3,4), π, 5.0f0)
-    @isob @inferred Object(shape(), (1,2), (3,4), (π,), 5.0f0)
-    @isob @inferred Object(shape(), center=(1,2))
+    @isob @inferred Object(Shape(), (1,2), (3,4), π, 5.0f0)
+    @isob @inferred Object(Shape(), (1,2), (3,4), (π,), 5.0f0)
+    @isob @inferred Object(Shape(), center=(1,2))
     @isob @inferred shape((1,2.), (3,4//1), π, 5.0f0)
     @isob @inferred shape(1, 2., 3, 4//1, π, 5.0f0)
     @isob @NOTinferred shape(Number[1, 2., 3, 4//1, π, 5.0f0])
@@ -44,7 +44,7 @@ end
 
     ob = @inferred shape((1,2.), (3,4//1), π, 5.0f0)
 
-    @isob @NOTinferred IP.rotate(ob, π)
+    @isob @inferred IP.rotate(ob, π)
 
     @test IP.rotate(ob, -ob.angle[1]).angle[1] == 0
 
@@ -137,7 +137,7 @@ end
     fr = (-nr÷2:nr÷2-1) / nr / dr
     ϕ = deg2rad.(0:360) # * Unitful.rad # todo round unitful Unitful.°
 #   ϕ = deg2rad.((0:180)°) # not yet due to Unitful issue
-    sino = @inferred radon(r, ϕ, [ob])
+    sino = @NOTinferred radon(r, ϕ, [ob])
 
     ia = argmin(abs.(ϕ .- deg2rad(55)))
     slice = sino[:,ia]

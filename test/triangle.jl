@@ -5,7 +5,7 @@ triangle.jl
 const DEBUG = false
 
 using ImagePhantoms: Object, Object2d, AbstractShape, phantom, radon, spectrum
-using ImagePhantoms: Triangle
+using ImagePhantoms: Triangle, triangle
 import ImagePhantoms as IP
 using Unitful: m, unit, °
 using FFTW: fftshift, fft
@@ -18,20 +18,20 @@ if DEBUG
     default(markerstrokecolor=:auto, markersize=2)
 end
 
-shape = Triangle
+(Shape, shape) = (Triangle, triangle)
 
 macro isob(ex) # @isob macro to streamline tests
-    :(@test $(esc(ex)) isa Object2d{shape})
+    :(@test $(esc(ex)) isa Object2d{Shape})
 end
 
 
 @testset "construct" begin
-    @test shape <: AbstractShape{2}
+    @test Shape <: AbstractShape{2}
 
     # constructors
-    @isob @inferred Object(shape(), (1,2), (3,4), π, 5.0f0)
-    @isob @inferred Object(shape(), (1,2), (3,4), (π,), 5.0f0)
-    @isob @inferred Object(shape(), center=(1,2))
+    @isob @inferred Object(Shape(), (1,2), (3,4), π, 5.0f0)
+    @isob @inferred Object(Shape(), (1,2), (3,4), (π,), 5.0f0)
+    @isob @inferred Object(Shape(), center=(1,2))
     @isob @inferred shape((1,2.), (3,4//1), π, 5.0f0)
     @isob @inferred shape(1, 2., 3, 4//1, π, 5.0f0)
     @isob @NOTinferred shape(Number[1, 2., 3, 4//1, π, 5.0f0])
@@ -44,7 +44,7 @@ end
 
     ob = @inferred shape((1,2.), (3,4//1), π, 5.0f0)
 
-    @isob @NOTinferred IP.rotate(ob, π)
+    @isob @inferred IP.rotate(ob, π)
 
     @test IP.rotate(ob, -ob.angle[1]).angle[1] == 0
 
@@ -140,6 +140,7 @@ end
     ideal = spectrum(ob).(kx, ky)
 
 if DEBUG
+    @show maximum(abs, ideal - Slice) / maximum(abs, ideal)
     p2 = jim(r, rad2deg.(ϕ), sino; aspect_ratio=:none, title="sinogram")
     jim(p1, p2)
     p3 = plot(r, slice, title="profile at ϕ = $angle", label="")

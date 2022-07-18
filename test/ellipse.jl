@@ -5,7 +5,7 @@ ellipse.jl
 const DEBUG = false
 
 using ImagePhantoms: Object, Object2d, AbstractShape, phantom, radon, spectrum
-using ImagePhantoms: Ellipse, Circle
+using ImagePhantoms: Ellipse, ellipse, circle
 import ImagePhantoms as IP
 using Unitful: m, unit, °
 using FFTW: fftshift, fft
@@ -18,20 +18,20 @@ if DEBUG
     default(markerstrokecolor=:auto, markersize=2)
 end
 
-(shape, shape2) = (Ellipse, Circle)
+(Shape, shape, shape2) = (Ellipse, ellipse, circle)
 
 macro isob(ex) # @isob macro to streamline tests
-    :(@test $(esc(ex)) isa Object2d{shape})
+    :(@test $(esc(ex)) isa Object2d{Shape})
 end
 
 
 @testset "construct" begin
-    @test shape <: AbstractShape{2}
+    @test Shape <: AbstractShape{2}
 
     # constructors
-    @isob @inferred Object(shape(), (1,2), (3,4), π, 5.0f0)
-    @isob @inferred Object(shape(), (1,2), (3,4), (π,), 5.0f0)
-    @isob @inferred Object(shape(), center=(1,2))
+    @isob @inferred Object(Shape(), (1,2), (3,4), π, 5.0f0)
+    @isob @inferred Object(Shape(), (1,2), (3,4), (π,), 5.0f0)
+    @isob @inferred Object(Shape(), center=(1,2))
     @isob @inferred shape((1,2.), (3,4//1), π, 5.0f0)
     @isob @inferred shape(1, 2., 3, 4//1, π, 5.0f0)
     @isob @NOTinferred shape(Number[1, 2., 3, 4//1, π, 5.0f0])
@@ -50,7 +50,7 @@ end
 
     ob = @inferred shape((1,2.), (3,4//1), π, 5.0f0)
 
-    @isob @NOTinferred IP.rotate(ob, π)
+    @isob @inferred IP.rotate(ob, π)
 
     @test IP.rotate(ob, -ob.angle[1]).angle[1] == 0
 

@@ -2,7 +2,7 @@
 
 const DEBUG = false
 
-using ImagePhantoms: ellipse_parameters, SheppLoganBrainWeb, Ellipse
+using ImagePhantoms: ellipse_parameters, SheppLoganBrainWeb, ellipse
 using ImagePhantoms: phantom, spectrum
 using ImagePhantoms: mri_smap_fit, mri_spectra
 using FFTW: fft, fftshift
@@ -32,7 +32,7 @@ y = (-(ny÷2):(ny÷2-1)) * dy
 oa = ellipse_parameters(SheppLoganBrainWeb() ; disjoint=true, fovs)
 seed!(0)
 oa[:,end] = [1; rand(ComplexF32,9)] # random phases
-oa = Ellipse(oa)
+oa = ellipse(oa)
 oversample = 3
 image0 = phantom(x, y, oa, oversample)
 cfun = z -> cat(dims = ndims(z)+1, real(z), imag(z))
