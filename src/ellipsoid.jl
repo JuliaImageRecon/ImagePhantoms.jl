@@ -5,8 +5,7 @@ ellipsoid.jl
 
 #using ImagePhantoms #: Object, Object3d
 
-export Ellipsoid
-export Sphere
+export Ellipsoid, ellipsoid, sphere
 export phantom, radon, spectrum
 
 
@@ -16,67 +15,36 @@ export phantom, radon, spectrum
 struct Ellipsoid <: AbstractShape{3} end
 
 
-# constructors
+# constructor
 
 
 """
-    Ellipsoid(cx, cy, cz, rx, ry, rz, Φ, Θ, value::Number = 1)
-    Ellipsoid(center::NTuple{3,RealU}, radii::NTuple{3,RealU}, angle::NTuple{2,RealU}, v)
-    Ellipsoid([9-vector])
-    Ellipsoid(r, v=1) (sphere of radius `r`)
-Construct `Ellipsoid` object from parameters.
+    ellipsoid(cx, cy, cz, rx=1, ry=1, rz=1, Φ=0, Θ=0, value::Number = 1)
+    ellipsoid(center::NTuple{3,RealU}, radii::NTuple{3,RealU}, angle::NTuple{2,RealU}, v)
+    ellipsoid([9-vector])
+Construct `Object{Ellipsoid}` from parameters.
 """
-function Ellipsoid(
-    cx::RealU,
-    cy::RealU,
-    cz::RealU,
-    rx::RealU,
-    ry::RealU,
-    rz::RealU,
-    Φ::RealU = 0,
-    Θ::RealU = 0,
-    value::Number = 1,
-)
-    (cx, cy, cz, rx, ry, rz) = promote(cx, cy, cz, rx, ry, rz)
-    Object(Ellipsoid(), (cx,cy,cz), (rx,ry,rz), (Φ, Θ), value)
-end
-
-function Ellipsoid(
-    center::NTuple{3,RealU},
-    radii::NTuple{3,RealU},
-    angle::NTuple{2,RealU},
-    value::Number = 1,
-)
-    Ellipsoid(center..., radii..., angle..., value)
-end
-
-function Ellipsoid(v::AbstractVector{<:Number})
-    length(v) == 9 || throw(ArgumentError("$v wrong length"))
-    Ellipsoid(v...)
-end
-
-Ellipsoid(r::RealU, v::Number = 1) =
-    Ellipsoid((zero(r),zero(r),zero(r)), (r,r,r), (0,0), v)
+ellipsoid(args... ; kwargs...) = Object(Ellipsoid(), args...; kwargs...)
 
 
-# spheres as a special case
+# special case: spheres
 
 """
-    Sphere(x,y,z,r,v=1) (sphere of radius `r` centered at `(x,y,z)`)
-    Sphere((x,y,z), r, v=1) ditto
-    Sphere([5-vector]) ditto
-    Sphere(r, v=1) centered at origin
-Construct `Sphere` objects as special cases of `Ellipsoid` objects.
+    sphere(x, y, z, r,v=1) (sphere of radius `r` centered at `(x,y,z)`)
+    sphere((x,y,z), r, v=1) ditto
+    sphere([5-vector]) ditto
+    sphere(r, v=1) centered at origin
+Construct spheres as special cases of `Ellipsoid`.
 """
-Sphere(r::RealU, v::Number = 1) = Ellipsoid(r, v)
-Sphere(cx::RealU, cy::RealU, cz::RealU, r::RealU, v::Number = 1) =
-    Ellipsoid(cx, cy, cz, r, r, r, 0, 0, v)
-Sphere(center::NTuple{3,RealU}, r::RealU, v::Number = 1) =
-    Ellipsoid(center, (r, r, r), (0, 0), v)
+sphere(cx::RealU, cy::RealU, cz::RealU, r::RealU, v::Number = 1) =
+    ellipsoid(cx, cy, cz, r, r, r, 0, 0, v)
+sphere(center::NTuple{3,RealU}, r::RealU, v::Number = 1) =
+    sphere(center..., r, v)
+sphere(r::RealU, v::Number = 1) = sphere((zero(r), zero(r), zero(r)), v)
 
-function Sphere(v::AbstractVector{<:Number})
+function sphere(v::AbstractVector{<:Number})
     length(v) == 5 || throw(ArgumentError("$v wrong length"))
-    Sphere(v...)
+    sphere(v...)
 end
 
 
@@ -85,9 +53,10 @@ end
 
 """
     phantom1(ob::Object3d{Ellipsoid}, (x,y,z))
-Evaluate unit sphere at `(x,y,z)`, for unitless coordinates.
+Evaluate unit sphere at `(x,y,z)`,
+for unitless coordinates.
 """
-phantom1(ob::Object3d{Ellipsoid}, xyz::NTuple{3,Real}) = sum(abs2, xyz) ≤ 1
+phantom1(ob::Object3d{Ellipsoid}, xyz::NTuple{3,Real}) = (sum(abs2, xyz) ≤ 1)
 
 
 # x-ray transform (line integral) of unit sphere
@@ -132,7 +101,8 @@ end
 
 """
     spectrum1(ob::Object3d{Ellipsoid}, (kx,ky,kz))
-Spectrum of unit sphere at `(kx,ky,kz)`, for unitless spatial frequency coordinates.
+Spectrum of unit sphere at `(kx,ky,kz)`,
+for unitless spatial frequency coordinates.
 """
 function spectrum1(ob::Object3d{Ellipsoid}, kxyz::NTuple{3,Real})
     return sphere_transform(sqrt(sum(abs2, kxyz)))

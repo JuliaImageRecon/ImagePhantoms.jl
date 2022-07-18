@@ -6,8 +6,7 @@ actually a rectangular cuboid https://en.wikipedia.org/wiki/Cuboid
 
 #using ImagePhantoms #: Object, Object3d
 
-export Cuboid
-export Cube
+export Cuboid, cuboid, cube
 export phantom, radon, spectrum
 
 
@@ -17,68 +16,37 @@ export phantom, radon, spectrum
 struct Cuboid <: AbstractShape{3} end
 
 
-# constructors
+# constructor
 
 
 """
-    Cuboid(cx, cy, cz, wx, wy, wz, Φ, Θ, value::Number)
-    Cuboid(center::NTuple{3,RealU}, width::NTuple{3,RealU}, angle::NTuple{2,RealU}, v)
-    Cuboid([9-vector])
-    Cuboid(r, v=1) (cube of width `r`)
-Construct `Cuboid` object from parameters;
+    cuboid(cx, cy, cz, wx, wy, wz, Φ, Θ, value::Number)
+    cuboid(center::NTuple{3,RealU}, width::NTuple{3,RealU}, angle::NTuple{2,RealU}, v)
+    cuboid([9-vector])
+Construct `Object{Cuboid}` from parameters;
 here `width` is the full-width.
 """
-function Cuboid(
-    cx::RealU,
-    cy::RealU,
-    cz::RealU,
-    wx::RealU,
-    wy::RealU,
-    wz::RealU,
-    Φ::RealU = 0,
-    Θ::RealU = 0,
-    value::Number = 1,
-)
-    (cx, cy, cz, wx, wy, wz) = promote(cx, cy, cz, wx, wy, wz)
-    Object(Cuboid(), (cx,cy,cz), (wx,wy,wz), (Φ, Θ), value)
-end
-
-function Cuboid(
-    center::NTuple{3,RealU},
-    width::NTuple{3,RealU},
-    angle::NTuple{2,RealU},
-    value::Number = 1,
-)
-    Cuboid(center..., width..., angle..., value)
-end
-
-function Cuboid(v::AbstractVector{<:Number})
-    length(v) == 9 || throw(ArgumentError("$v wrong length"))
-    Cuboid(v...)
-end
-
-Cuboid(r::RealU, v::Number = 1) =
-    Cuboid((zero(r),zero(r),zero(r)), (r,r,r), (0,0), v)
+cuboid(args... ; kwargs...) = Object(Cuboid(), args...; kwargs...)
 
 
-# cubes as a special case
+# special case: cubes
 
 """
-    Cube(x,y,z,w,v=1) (cube of width `w` centered at `(x,y,z)`)
-    Cube((x,y,z), w, v=1) ditto
-    Cube([5-vector]) ditto
-    Cube(w, v=1) centered at origin
-Construct `Cube` objects as special cases of `Cuboid` objects.
+    cube(x, y, z, w, v=1) (cube of width `w` centered at `(x,y,z)`)
+    cube((x,y,z), w, v=1) ditto
+    cube([5-vector]) ditto
+    cube(w, v=1) centered at origin
+Construct cubes as special cases of `Cuboid`.
 """
-Cube(w::RealU, v::Number = 1) = Cuboid(w, v)
-Cube(cx::RealU, cy::RealU, cz::RealU, w::RealU, v::Number = 1) =
-    Cuboid(cx, cy, cz, w, w, w, 0, 0, v)
-Cube(center::NTuple{3,RealU}, w::RealU, v::Number = 1) =
-    Cuboid(center, (w, w, w), (0, 0), v)
+cube(cx::RealU, cy::RealU, cz::RealU, w::RealU, v::Number = 1) =
+    cuboid(cx, cy, cz, w, w, w, 0, 0, v)
+cube(center::NTuple{3,RealU}, w::RealU, v::Number = 1) =
+    cube(center..., w, v)
+cube(w::RealU, v::Number = 1) = cube((zero(w), zero(w), zero(w)), v)
 
-function Cube(v::AbstractVector{<:Number})
+function cube(v::AbstractVector{<:Number})
     length(v) == 5 || throw(ArgumentError("$v wrong length"))
-    Cube(v...)
+    cube(v...)
 end
 
 
