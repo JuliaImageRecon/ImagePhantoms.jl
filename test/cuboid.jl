@@ -3,16 +3,16 @@ test/cuboid.jl
 =#
 
 using ImagePhantoms: Object3d, AbstractShape, phantom, radon, spectrum
-using ImagePhantoms: Object, Cuboid, Cube
+using ImagePhantoms: Object, Cuboid, cuboid, cube
 import ImagePhantoms as IP
 using Unitful: m, unit, °
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
 
-(shape, shape3) = (Cuboid, Cube)
+(Shape, shape, shape3) = (Cuboid, cuboid, cube)
 
 macro isob3(ex) # @isob macro to streamline tests
-    :(@test $(esc(ex)) isa Object3d{shape})
+    :(@test $(esc(ex)) isa Object3d{Shape})
 end
 
 
@@ -31,18 +31,17 @@ end
 
 
 @testset "construct" begin
-    @test shape <: AbstractShape{3}
+    @test Shape <: AbstractShape{3}
 
     # constructors
-    @isob3 @inferred Object(shape(), (1,2,3), (4,5,6), (π, π/4), 5.0f0)
-    @isob3 @inferred Object(shape(), (1,2,3), (4,5,6), (0, 0), 5.0f0)
-    @isob3 @inferred Object(shape(), center=(1,2,3))
+    @isob3 @inferred Object(Shape(), (1,2,3), (4,5,6), (π, π/4), 5.0f0)
+    @isob3 @inferred Object(Shape(), (1,2,3), (4,5,6), (0, 0), 5.0f0)
+    @isob3 @inferred Object(Shape(), center=(1,2,3))
     @isob3 @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
     @isob3 @inferred shape(1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0)
     @isob3 @NOTinferred shape(Number[1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0])
 
     # cubes
-    @isob3 @inferred shape(1, 5.0f0)
     @isob3 @inferred shape3(1, 5.0f0)
     @isob3 @inferred shape3(1, 2, 3, 4., 5.0f0)
     @isob3 @inferred shape3((1, 2, 3), 4., 5.0f0)
@@ -55,7 +54,7 @@ end
 
     ob = @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
 
-    @isob3 @NOTinferred IP.rotate(ob, π)
+    @isob3 @inferred IP.rotate(ob, π)
 
     @test IP.rotate(ob, -ob.angle[1]).angle[1] == 0
 
@@ -132,7 +131,7 @@ end
     y = (-M÷2:M÷2-1) * dy
     z = (-N÷2:N÷2-1) * dz
     width = (30m, 40m, 50m)
-    ob = shape((8m, 7m, 6m), width, (π/6, 0), 1.0f0)
+    ob = shape((8m, 7m, 6m), width, (π/6, 0), 5.0f0)
     oversample = 2
     img = phantom(x, y, z, [ob], oversample)
 

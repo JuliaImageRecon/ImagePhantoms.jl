@@ -3,29 +3,29 @@ test/gauss3.jl
 =#
 
 using ImagePhantoms: Object3d, AbstractShape, phantom, radon, spectrum
-using ImagePhantoms: Object, Gauss3
+using ImagePhantoms: Object, Gauss3, gauss3
 import ImagePhantoms as IP
 using Unitful: m, unit, °
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
 
-shape = Gauss3
+(Shape, shape) = (Gauss3, gauss3)
 
 macro isob3(ex) # @isob macro to streamline tests
-    :(@test $(esc(ex)) isa Object3d{shape})
+    :(@test $(esc(ex)) isa Object3d{Shape})
 end
 
 
 @testset "construct" begin
-    @test shape <: AbstractShape{3}
+    @test Shape <: AbstractShape{3}
 
     # constructors
-    @isob3 @inferred Object(shape(), (1,2,3), (4,5,6), (π, π/4), 5.0f0)
-    @isob3 @inferred Object(shape(), (1,2,3), (4,5,6), (0, 0), 5.0f0)
-    @isob3 @inferred Object(shape(), center=(1,2,3))
+    @isob3 @inferred Object(Shape(), (1,2,3), (4,5,6), (π, π/4), 5.0f0)
+    @isob3 @inferred Object(Shape(), (1,2,3), (4,5,6), (0, 0), 5.0f0)
+    @isob3 @inferred Object(Shape(), center=(1,2,3))
     @isob3 @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
     @isob3 @inferred shape(1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0)
-    @isob3 @inferred shape(1, 5.0f0)
+#   @isob3 @inferred shape(1, 5.0f0)
     @isob3 @NOTinferred shape(Number[1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0])
 end
 
@@ -35,7 +35,7 @@ end
 
     ob = @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
 
-    @isob3 @NOTinferred IP.rotate(ob, π)
+    @isob3 @inferred IP.rotate(ob, π)
 
     @test IP.rotate(ob, -ob.angle[1]).angle[1] == 0
 
@@ -146,4 +146,3 @@ end
 #=
 todo projection slice
 =#
-
