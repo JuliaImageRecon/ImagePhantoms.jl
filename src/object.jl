@@ -29,8 +29,8 @@ General container for 2D and 3D objects for defining image phantoms.
 # Example
 
 ```jldoctest
-julia> Object(Ellipse(), (0,0), (1,2), 0.0, 1//2, nothing)
-Object2d{Ellipse, Rational{Int64}, Int64, Float64, Nothing, 1} (S, D, V, ...)
+julia> Object(Ellipse(), (0,0), (1,2), 0.0, 1//2)
+Object2d{Ellipse, Rational{Int64}, Int64, Float64, 1} (S, D, V, ...)
  center::NTuple{2,Int64} (0, 0)
  width::NTuple{2,Int64} (1, 2)
  angle::Tuple{Float64} (0.0,)
@@ -56,23 +56,29 @@ struct Object{S, D, V, C, A, Da} <: AbstractObject
     function Object{S}(
         center::NTuple{D,RealU},
         width::NTuple{D,RealU},
-        angle::Union{RealU, NTuple{Da,RealU} where Da},
+        angle::NTuple{Da,RealU},
         value::V,
-    ) where {S <: AbstractShape, D, V <: Number}
+    ) where {S <: AbstractShape, D, Da, V <: Number}
         D == ndims(S()) || throw(ArgumentError("D=$D vs ndims(S)=$(ndims(S)) for S=$S"))
-        if D == 2 && angle isa RealU
-            angle = (angle,)
-        end
-        angle = promote(angle...)
-        Da = length(angle)
         1 ≤ Da == D-1 || throw(ArgumentError("Da=$Da != D-1, where D=$D"))
 
         all(width .> zero(eltype(width))) || throw(ArgumentError("widths must be positive"))
 
         C = promote_type(eltype.(center)..., eltype.(width)...)
+        angle = promote(angle...)
         A = eltype(angle)
         new{S,D,V,C,A,Da}(C.(center), C.(width), angle, value)
     end
+end
+
+# handle scalar `angle`
+function Object{S}(
+    center::NTuple{D,RealU},
+    width::NTuple{D,RealU},
+    angle::RealU,
+    value::V,
+) where {S <: AbstractShape, D, V <: Number}
+    return Object{S}(center, width, (angle,), value)
 end
 
 
@@ -130,9 +136,9 @@ function Object(
     Object(shape, (cx, cy), (wx, wy), (ϕ,), value)
 end
 
-function Object(shape::AbstractShape{2}, p::AbstractVector ; kwargs...)
-    length(p) == 6 || throw(ArgumentError("2D object needs 6 parameters"))
-    return Object(shape, p...; kwargs...)
+function Object(shape::AbstractShape{2}, v::AbstractVector ; kwargs...)
+    length(v) == 6 || throw(ArgumentError("2D object needs 6 parameters"))
+    return Object(shape, v...; kwargs...)
 end
 
 
