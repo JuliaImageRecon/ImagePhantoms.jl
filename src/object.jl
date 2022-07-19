@@ -16,7 +16,7 @@ abstract type AbstractObject end
 
 
 """
-    Object{S, D, V, ...}(center, width, angle, value, param) <: AbstractObject
+    Object{S, D, V, ...}(center, width, angle, value) <: AbstractObject
 General container for 2D and 3D objects for defining image phantoms.
 
 * `center::NTuple{D,C}` coordinates of "center" of this object
@@ -25,21 +25,19 @@ General container for 2D and 3D objects for defining image phantoms.
 * `angle::NTuple{D-1,A}` angle of x' axis relative to x axis,
   in radians (or with units)
 * `value::V` "intensity" value for this object
-* `param` optional additional shape parameters (often `nothing`)
 
 # Example
 
 ```jldoctest
-julia> Object(Ellipse(), (0,0), (1,2), 0.0, 1//2, nothing)
-Object2d{Ellipse, Rational{Int64}, Int64, Float64, Nothing, 1} (S, D, V, ...)
+julia> Object(Ellipse(), (0,0), (1,2), 0.0, 1//2)
+Object2d{Ellipse, Rational{Int64}, Int64, Float64, 1} (S, D, V, ...)
  center::NTuple{2,Int64} (0, 0)
  width::NTuple{2,Int64} (1, 2)
  angle::Tuple{Float64} (0.0,)
  value::Rational{Int64} 1//2
- param::Nothing nothing
 ```
 """
-struct Object{S, D, V, C, A, P, Da} <: AbstractObject
+struct Object{S, D, V, C, A, Da} <: AbstractObject
     "x,y center coordinates"
     center::NTuple{D,C}
     "'width' along x',y' axes (FWHM for Gauss, radii for Ellipse)"
@@ -48,11 +46,9 @@ struct Object{S, D, V, C, A, P, Da} <: AbstractObject
     angle::NTuple{Da,A}
     "'intensity' value for this shape"
     value::V
-    "optional additional shape parameters"
-    param::P # often `nothing`
 
     """
-        Object{S}(center, width, angle, value, param)
+        Object{S}(center, width, angle, value)
     Inner constructor for `S <: AbstractShape`.
     The `center` and `width` tuples should have the same units
     (or should both be unitless).
@@ -60,24 +56,29 @@ struct Object{S, D, V, C, A, P, Da} <: AbstractObject
     function Object{S}(
         center::NTuple{D,RealU},
         width::NTuple{D,RealU},
-        angle::Union{RealU, NTuple{Da,RealU} where Da},
+        angle::NTuple{Da,RealU},
         value::V,
-        param::P,
-    ) where {S <: AbstractShape, D, V <: Number, P}
+    ) where {S <: AbstractShape, D, Da, V <: Number}
         D == ndims(S()) || throw(ArgumentError("D=$D vs ndims(S)=$(ndims(S)) for S=$S"))
-        if D == 2 && angle isa RealU
-            angle = (angle,)
-        end
-        angle = promote(angle...)
-        Da = length(angle)
         1 ≤ Da == D-1 || throw(ArgumentError("Da=$Da != D-1, where D=$D"))
 
         all(width .> zero(eltype(width))) || throw(ArgumentError("widths must be positive"))
 
         C = promote_type(eltype.(center)..., eltype.(width)...)
+        angle = promote(angle...)
         A = eltype(angle)
-        new{S,D,V,C,A,P,Da}(C.(center), C.(width), angle, value, param)
+        new{S,D,V,C,A,Da}(C.(center), C.(width), angle, value)
     end
+end
+
+# handle scalar `angle`
+function Object{S}(
+    center::NTuple{D,RealU},
+    width::NTuple{D,RealU},
+    angle::RealU,
+    value::V,
+) where {S <: AbstractShape, D, V <: Number}
+    return Object{S}(center, width, (angle,), value)
 end
 
 
@@ -98,8 +99,8 @@ const Object3d = Object{S,3} where S
 
 
 """
-    Object(shape, center=(0,…), width=(1,…), angle=(0,…), value=1, param=nothing)
-    Object(shape ; center, width=(1,…), angle=(0,…), value=1, param=nothing)
+    Object(shape, center=(0,…), width=(1,…), angle=(0,…), value=1)
+    Object(shape ; center, width=(1,…), angle=(0,…), value=1)
 General outer `Object` constructor from tuples,
 as either positional arguments or named keyword arguments.
 """
@@ -108,21 +109,19 @@ function Object(
     _center::NTuple{D,RealU} = _tuple(0, D),
     _width::NTuple{D,RealU} = _tuple(1, D),
     _angle::Union{RealU, NTuple{Da,RealU}} where Da = _tuple(0, D-1),
-    _value::Number = 1f0,
-    _param::Any = nothing ;
+    _value::Number = 1f0 ;
     center::NTuple{D,RealU} = _center,
     width::NTuple{D,RealU} = _width,
     angle::Union{RealU, NTuple{Da,RealU}} where Da = _angle,
     value::Number = _value,
-    param::Any = _param,
 ) where {D}
-    Object{typeof(shape)}(center, width, angle, value, param)
+    Object{typeof(shape)}(center, width, angle, value)
 end
 
 
 """
-    Object(shape ; cx, cy, wx=1, wy=wx, ϕ=0, value=1 ; param=nothing)
-    Object(shape ; [6-vector] ; param=nothing)
+    Object(shape ; cx, cy, wx=1, wy=wx, ϕ=0, value=1)
+    Object(shape ; [6-vector])
 2D object constructor from values (without tuples).
 """
 function Object(
@@ -132,21 +131,20 @@ function Object(
     wx::RealU = oneunit(cx),
     wy::RealU = wx,
     ϕ::RealU = 0,
-    value::Number = 1 ;
-    param = nothing,
+    value::Number = 1,
 ) where {C <: RealU}
-    Object(shape, (cx, cy), (wx, wy), (ϕ,), value, param)
+    Object(shape, (cx, cy), (wx, wy), (ϕ,), value)
 end
 
-function Object(shape::AbstractShape{2}, p::AbstractVector ; kwargs...)
-    length(p) == 6 || throw(ArgumentError("2D object needs 6 parameters"))
-    return Object(shape, p...; kwargs...)
+function Object(shape::AbstractShape{2}, v::AbstractVector ; kwargs...)
+    length(v) == 6 || throw(ArgumentError("2D object needs 6 parameters"))
+    return Object(shape, v...; kwargs...)
 end
 
 
 """
-    Object(shape ; cx, cy, cz, wx=1, wy=wx, wz=wx, ϕ=0, θ=0, value=1 ; param=nothing)
-    Object(shape ; [9-vector] ; param=nothing)
+    Object(shape ; cx, cy, cz, wx=1, wy=wx, wz=wx, ϕ=0, θ=0, value=1)
+    Object(shape ; [9-vector])
 3D object constructor from values (without tuples).
 """
 function Object(
@@ -159,10 +157,9 @@ function Object(
     wz::RealU = wx,
     ϕ::RealU = 0,
     θ::RealU = 0,
-    value::Number = 1 ;
-    param = nothing,
+    value::Number = 1,
 ) where {C <: RealU}
-    Object(shape, (cx, cy, cz), (wx, wy, wz), (ϕ, θ), value, param)
+    Object(shape, (cx, cy, cz), (wx, wy, wz), (ϕ, θ), value)
 end
 
 function Object(shape::AbstractShape{3}, p::AbstractVector ; kwargs...)
@@ -174,7 +171,7 @@ end
 # methods for objects
 
 """
-    Object(ob::Object ; center, width, angle, value, param)
+    Object(ob::Object ; center, width, angle, value)
 Make a copy of Object `ob`, optionally modifying some values.
 """
 function Object(ob::Object{S,D} ;
@@ -182,10 +179,9 @@ function Object(ob::Object{S,D} ;
     width::NTuple{D,RealU} = ob.width,
     angle::NTuple{Da,RealU} = ob.angle,
     value::Number = ob.value,
-    param = ob.param,
 ) where {S, D, Da}
     Da == D-1 || throw(ArgumentError("Da=$Da != D-1, where D=$D"))
-    Object(S(), center, width, angle, value, param)
+    Object(S(), center, width, angle, value)
 end
 
 
@@ -199,7 +195,7 @@ Base.ndims(::AbstractShape{D}) where D = D
 """
 function Base.show(io::IO, ::MIME"text/plain", ob::Object{S,D}) where {S,D}
     println(io, typeof(ob), " (S, D, V, ...)")
-    for f in (:center, :width, :angle, :value, :param)
+    for f in (:center, :width, :angle, :value)
         p = getproperty(ob, f)
         t = typeof(p)
         t = t == NTuple{D,eltype(t)} ? "NTuple{$D,$(eltype(t))}" : "$t"
@@ -216,7 +212,7 @@ end
 Scale the width(s) by `factor`.
 """
 scale(ob::Object{S,D}, factor::NTuple{D,RealU}) where {S,D} =
-    Object(S(), ob.center, ob.width .* factor, ob.angle, ob.value, ob.param)
+    Object(S(), ob.center, ob.width .* factor, ob.angle, ob.value)
 scale(ob::Object{S,D}, factor::RealU) where {S,D} = scale(ob, _tuple(factor,D))
 
 
@@ -228,7 +224,7 @@ scale(ob::Object{S,D}, factor::RealU) where {S,D} = scale(ob, _tuple(factor,D))
 Scale object `value` by `x`.
 """
 Base.:(*)(ob::Object{S}, x::Number) where {S} =
-    Object(S(), ob.center, ob.width, ob.angle, ob.value * x, ob.param)
+    Object(S(), ob.center, ob.width, ob.angle, ob.value * x)
 Base.:(/)(ob::Object, x::Number) = ob * (1 / x)
 Base.:(*)(x::Number, ob::Object) = ob * x
 
@@ -242,6 +238,6 @@ Base.:(*)(x::Number, ob::Object) = ob * x
 Translate the center coordinates of an object by `shift`
 """
 translate(ob::Object{S,D}, shift::NTuple{D,RealU}) where {S, D} =
-    Object(S(), ob.center .+ shift, ob.width, ob.angle, ob.value, ob.param)
+    Object(S(), ob.center .+ shift, ob.width, ob.angle, ob.value)
 translate(ob::Object{S,2}, x::RealU, y::RealU) where {S} = translate(ob, (x,y))
 translate(ob::Object{S,3}, x::RealU, y::RealU, z::RealU) where {S} = translate(ob, (x,y,z))

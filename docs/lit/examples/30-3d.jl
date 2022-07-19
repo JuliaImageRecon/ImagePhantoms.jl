@@ -68,7 +68,7 @@ is a collection of (2D) plane integrals,
 whereas the
 [X-ray transform](https://en.wikipedia.org/wiki/X-ray_transform)
 is a collection of (1D) line integrals.
-See 
+See
 [Section II.1, Natterer 2001](http://doi.org/10.1137/1.9780898719284).
 So strictly speaking the `radon` function is a misnomer in 3D,
 whereas for 2D functions

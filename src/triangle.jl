@@ -22,18 +22,20 @@ going from (-p,0) to (1-p,0)` and with height=sqrt(3)/2.
 
 The methods currently support only the default case `p=0.5`.
 """
-struct Triangle <: AbstractShape{2} end
-
-#=
-struct Triangle{T} <: AbstractShape{2}
-    param::T # fraction in interval (0,1) 
-    function Triangle{T}(param::T = 0.5) where {T <: Real}
+#struct Triangle <: AbstractShape{2} end
+#struct Triangle{T} <: AbstractShape{2}
+struct Triangle <: AbstractShape{2}
+#   param::T # fraction in interval (0,1)
+#   function Triangle{T}(param::T = 0.5) where {T <: Real}
+    function Triangle(param::T = 0.5) where {T <: Real}
         0 < param < 1 || throw(ArgumentError("param=$param"))
-        new{T}(param)
+        param == 0.5 || throw("Need param = 0.5")
+#       new{T}(param)
+        new()
     end
 end
-Triangle(param::T = 0.5) where {T <: Real} = Triangle{T}(param)
-=#
+#Triangle(param::T = 0.5) where {T <: Real} = Triangle{T}(param)
+#Triangle(param::T = 0.5) where {T <: Real} = Triangle(param)
 
 
 # constructors
@@ -48,16 +50,14 @@ In the typical case where `param=0.5` and `width[1] == width[2]`,
 this is an equilateral triangle with base `width[1]` centered along the x axis.
 """
 function triangle(args... ; param::Real = 0.5, kwargs...)
-    0 < param < 1 || throw("Need param ∈ (0,1)")
-#   param == 0.5 || throw("Need param = 0.5")
-    return Object(Triangle(), args...; param, kwargs...)
+    return Object(Triangle(param), args...; kwargs...)
 end
 
 
 # helper
 
 function _trifun(x, y, param)
-    param == 1/2 || throw("todo")
+#   param == 1/2 || throw("todo") # no need to check because constructor is 1/2
     return (0 ≤ y ≤ sqrt3/2) && y ≤ sqrt3 * (0.5 - abs(x))
 end
 
@@ -130,13 +130,15 @@ end
 Evaluate unit triangle at `(x,y)`,
 for unitless coordinates.
 """
-phantom1(ob::Object2d{Triangle}, xy::NTuple{2,Real}) = _trifun(xy..., ob.param)
+phantom1(ob::Object2d{Triangle}, xy::NTuple{2,Real}) =
+    _trifun(xy..., 0.5)
+#   _trifun(xy..., ob.param)
 
 
 # x-ray transform (line integral) of unit triangle
 # `r` should be unitless
 function xray1(::Triangle, r::Real, ϕ::RealU)
-    # todo: check ob.param == 1/2
+    # valid only for param == 1/2, but that's ok now because constructor is 1/2
     T = promote_type(eltype(r), Float32)
     return abs(r) ≥ sqrt(3)/2 ? zero(T) : T(radon_tri(r, sincos(ϕ)...))
 end
@@ -148,6 +150,6 @@ Spectrum of unit triangle at `(kx,ky)`,
 for unitless spatial frequency coordinates.
 """
 function spectrum1(ob::Object2d{Triangle}, kxy::NTuple{2,Real})
-    ob.param == 1/2 || throw("todo")
+#   param == 1/2 || throw("todo")
     return spectrum_tri(kxy...)
 end
