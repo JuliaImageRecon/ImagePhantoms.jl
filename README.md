@@ -72,6 +72,18 @@ gif(anim, "disk.gif", fps = 8)
 ![animated phantom gif](https://github.com/JuliaImageRecon/ImagePhantoms.jl/blob/gh-pages/dev/generated/examples/disk.gif)
 
 
+### Philosophy
+
+Often "phantoms" are treated as digital images.
+Here, the shapes (rectangles, gaussians, ellipses, etc.)
+are all defined *analytically*
+as functions,
+as are their line integrals
+and Fourier transforms.
+Then one can sample those analytical functions
+to make digital images, sinograms, and spectra.
+
+
 ### Parallel MRI (SENSE)
 
 Most of the methods here are of general use
