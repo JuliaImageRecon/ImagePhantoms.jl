@@ -35,7 +35,7 @@ struct Triangle <: AbstractShape{2}
     end
 end
 #Triangle(param::T = 0.5) where {T <: Real} = Triangle{T}(param)
-Triangle(param::T = 0.5) where {T <: Real} = Triangle(param)
+#Triangle(param::T = 0.5) where {T <: Real} = Triangle(param)
 
 
 # constructors
