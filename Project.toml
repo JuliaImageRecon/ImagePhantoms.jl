@@ -1,0 +1,11 @@
+name = "ImagePhantoms"
+uuid = "71a99df6-f52c-4da1-bd2a-69d6f37f3252"
+authors = ["Jeff Fessler <fessler@umich.edu> and contributors"]
+version = "0.0.1"
+
+[deps]
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+
+[compat]
+SpecialFunctions = "1.5"
+julia = "1.6"
