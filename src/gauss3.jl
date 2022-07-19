@@ -5,7 +5,7 @@ gauss3.jl
 
 #using ImagePhantoms #: Object, Object3d
 
-export Gauss3
+export Gauss3, gauss3
 export phantom, radon, spectrum
 
 
@@ -15,50 +15,18 @@ export phantom, radon, spectrum
 struct Gauss3 <: AbstractShape{3} end
 
 
-# constructors
+# constructor
 
 
 """
-    Gauss3(cx, cy, cz, wx, wy, wz, Φ=0, Θ=0, value::Number = 1)
-    Gauss3(center::NTuple{3,RealU}, radii::NTuple{3,RealU}=(1,1,1), angle::NTuple{2,RealU}=(0,0), v=1)
-    Gauss3([9-vector])
-    Gauss3(r, v=1) (isotropic of width `w`)
-Construct `Gauss3` object from parameters;
+    gauss3(cx, cy, cz, wx, wy, wz, Φ=0, Θ=0, value::Number = 1)
+    gauss3(center::NTuple{3,RealU}, radii::NTuple{3,RealU}=(1,1,1), angle::NTuple{2,RealU}=(0,0), v=1)
+    gauss3([9-vector])
+    gauss3(r, v=1) (isotropic of width `w`)
+Construct `Object{Gauss3}` from parameters;
 here `width` = FWHM (full-width at half-maximum).
 """
-function Gauss3(
-    cx::RealU,
-    cy::RealU,
-    cz::RealU,
-    wx::RealU,
-    wy::RealU = wx,
-    wz::RealU = wx,
-    Φ::RealU = 0,
-    Θ::RealU = 0,
-    value::Number = 1,
-)
-    (cx, cy, cz, wx, wy, wz) = promote(cx, cy, cz, wx, wy, wz)
-    Object(Gauss3(), (cx,cy,cz), (wx,wy,wz), (Φ, Θ), value)
-end
-
-function Gauss3(
-    center::NTuple{3,RealU},
-    radii::NTuple{3,RealU} = (1,1,1) .* oneunit(center[1]),
-    angle::NTuple{2,RealU} = (0, 0),
-    value::Number = 1,
-)
-    Gauss3(center..., radii..., angle..., value)
-end
-
-function Gauss3(v::AbstractVector{<:Number})
-    length(v) == 9 || throw(ArgumentError("$v wrong length"))
-    Gauss3(v...)
-end
-
-Gauss3(w::RealU, v::Number = 1) =
-    Gauss3((zero(w),zero(w),zero(w)), (w,w,w), (0,0), v)
-
-
+gauss3(args... ; kwargs...) = Object(Gauss3(), args...; kwargs...)
 
 
 # methods

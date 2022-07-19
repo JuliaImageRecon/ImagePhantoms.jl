@@ -13,8 +13,8 @@ export phantom, radon, spectrum
     rotate(ob::Object2d, θ::RealU)
 Rotate a 2D object.
 """
-rotate(ob::Object2d, θ::RealU) =
-    Object(ob.shape, ob.center, ob.width, ob.angle .+ (θ,), ob.value, ob.param)
+rotate(ob::Object2d{S}, θ::RealU) where S =
+    Object(S(), ob.center, ob.width, ob.angle .+ (θ,), ob.value, ob.param)
 
 
 """
@@ -150,10 +150,10 @@ end
 
 
 # this gateway seems to help type inference
-function _radon(ob::Object2d, r::RealU, ϕ::RealU)
+function _radon(ob::Object2d{S}, r::RealU, ϕ::RealU) where S
     Tc = eltype(ob.center[1] / oneunit(ob.center[1]))
     T = promote_type(Tc, eltype(ob.value))
-    return T(ob.value) * _xray(ob.shape, ob.center, ob.width, ob.angle, r, ϕ)
+    return T(ob.value) * _xray(S(), ob.center, ob.width, ob.angle, r, ϕ)
 end
 
 

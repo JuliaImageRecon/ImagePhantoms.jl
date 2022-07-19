@@ -14,8 +14,8 @@ export phantom, radon, spectrum
     rotate(ob::Object3d, α, β=0)
 Rotate a 3D object.
 """
-rotate(ob::Object3d, θ::NTuple{2,RealU}) =
-    Object(ob.shape, ob.center, ob.width, ob.angle .+ θ, ob.value, ob.param)
+rotate(ob::Object3d{S}, θ::NTuple{2,RealU}) where S =
+    Object(S(), ob.center, ob.width, ob.angle .+ θ, ob.value, ob.param)
 rotate(ob::Object3d, α::RealU, β::RealU=0) = rotate(ob, (α,β))
 
 
@@ -179,9 +179,9 @@ line integrals along the ``y`` axis
 for an object ``f(x,y,z)``.
 Then as `ϕ` increases, the line integrals rotate counter-clockwise.
 """
-function radon(ob::Object3d)
+function radon(ob::Object3d{S}) where S
     return (u,v,ϕ,θ) -> ob.value *
-        _xray(ob.shape, ob.center, ob.width, ob.angle, u, v, ϕ, θ)
+        _xray(S(), ob.center, ob.width, ob.angle, u, v, ϕ, θ)
 end
 
 

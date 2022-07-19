@@ -1,6 +1,6 @@
 # core.jl
 
-using ImagePhantoms: Object, Circle, Ellipse, Square
+using ImagePhantoms: Object, Ellipse, circle, square
 using ImagePhantoms: phantom, radon, spectrum
 import ImagePhantoms as IP
 using Unitful: m, °
@@ -9,7 +9,7 @@ using Test: @test, @testset, @test_throws, @inferred
 
 
 @testset "methods" begin
-    ob = Circle(1)
+    ob = circle(1)
     show(isinteractive() ? stdout : devnull, ob)
     show(isinteractive() ? stdout : devnull, MIME("text/plain"), ob)
 
@@ -40,7 +40,7 @@ end
     @test all((@inferred IP.rotate2d((2, 1), π/2)) .≈ (1,-2))
     @test ≈(collect(@inferred IP.rotate3d(2, 1, 3, π/2, 0)), [1,-2,3]; atol= 1e-15)
     @test all((@inferred IP.rotate3d((2, 1, 3), π/2, 0)) .≈ (1,-2, 3))
-    @test (@inferred IP.coords(Square(3m), 9m, 6m)) == (3, 2)
+    @test (@inferred IP.coords(square(3m), 9m, 6m)) == (3, 2)
 
     @inferred IP.xray_shift(1.0f0, π/3, 3, 4//5)
     @inferred IP.xray_shift(1.0f0m, π/3, 3m, (4//5)m)

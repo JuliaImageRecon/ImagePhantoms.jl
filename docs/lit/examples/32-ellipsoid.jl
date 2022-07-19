@@ -25,7 +25,8 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms: Ellipsoid, phantom, radon, spectrum
+using ImagePhantoms: ellipsoid, phantom, radon, spectrum
+using ImagePhantoms: Object, Ellipsoid
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt, mid3
 using FFTW: fft, fftshift
@@ -53,7 +54,7 @@ All of the methods in `ImagePhantoms` support physical units,
 so we use such units throughout this example.
 (Using units is recommended but not required.)
 
-Here are 3 ways to define an ellipsoid object,
+Here are 4 ways to define an `Object{Ellipsoid}`,
 using physical units.
 =#
 
@@ -61,9 +62,10 @@ center = (20mm, 10mm, 5mm)
 radii = (25mm, 35mm, 15mm)
 ϕ0s = :(π/6) # symbol version for nice plot titles
 angles = (eval(ϕ0s), 0)
-Ellipsoid([20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
-Ellipsoid( 20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0 ) # 9 arguments
-ob = Ellipsoid(center, radii, angles, 1.0f0) # tuples (recommended use)
+Object(Ellipsoid(), center, radii, angles, 1.0f0) # top-level constructor
+ellipsoid([20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
+ellipsoid( 20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0 ) # 9 arguments
+ob = ellipsoid(center, radii, angles, 1.0f0) # tuples (recommended use)
 
 
 #=

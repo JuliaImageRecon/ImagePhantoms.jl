@@ -25,7 +25,7 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms: Gauss2, phantom, radon, spectrum
+using ImagePhantoms: gauss2, phantom, radon, spectrum
 import ImagePhantoms as IP
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
@@ -56,7 +56,7 @@ using physical units.
 =#
 
 width = (50mm, 20mm) # full-width at half-maximum (FHWM)
-ob = Gauss2((20mm, 30mm), width, π/6, 1.0f0)
+ob = gauss2((20mm, 30mm), width, π/6, 1.0f0)
 
 
 # ### Phantom image using `phantom`
@@ -176,5 +176,5 @@ The good agreement between the analytical spectra (solid lines)
 and the DFT samples (disks)
 validates that `phantom`, `radon`, and `spectrum`
 are all self consistent
-for this `Gauss2` object.
+for this `Gauss2` shape.
 =#

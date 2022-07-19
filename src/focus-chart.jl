@@ -6,7 +6,7 @@ generate "focus chart" phantom from triangles
 
 export focus_chart
 
-using ImagePhantoms: Triangle, Object2d, RealU
+using ImagePhantoms: Triangle, triangle, Object2d, RealU
 
 
 """
@@ -35,5 +35,5 @@ function focus_chart(i::Int, nspoke::Int, radius::RealU, value::Number)
     θ = π/nspoke
     (w,h) = sincos(θ) .* radius .* (2, 2/sqrt(3))
     offset = cos(θ) * radius + eps() # trick to avoid center pile up
-    return Triangle((s, -c) .* offset, (w,h), ϕ, value)
+    return triangle((s, -c) .* offset, (w,h), ϕ, value)
 end
