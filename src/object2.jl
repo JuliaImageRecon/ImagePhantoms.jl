@@ -14,7 +14,7 @@ export phantom, radon, spectrum
 Rotate a 2D object.
 """
 rotate(ob::Object2d{S}, θ::RealU) where S =
-    Object(S(), ob.center, ob.width, ob.angle .+ (θ,), ob.value, ob.param)
+    Object(S(), ob.center, ob.width, ob.angle .+ (θ,), ob.value)
 
 
 """

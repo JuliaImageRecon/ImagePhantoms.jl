@@ -15,7 +15,7 @@ export phantom, radon, spectrum
 Rotate a 3D object.
 """
 rotate(ob::Object3d{S}, θ::NTuple{2,RealU}) where S =
-    Object(S(), ob.center, ob.width, ob.angle .+ θ, ob.value, ob.param)
+    Object(S(), ob.center, ob.width, ob.angle .+ θ, ob.value)
 rotate(ob::Object3d, α::RealU, β::RealU=0) = rotate(ob, (α,β))
 
 
