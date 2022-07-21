@@ -127,6 +127,7 @@ ellipsoids/spheres, cuboids/cubes, gaussians.
 * [ImageGeoms.jl](https://github.com/JuliaImageRecon/ImageGeoms.jl)
 * [JuliaImages/Images.jl](https://github.com/JuliaImages/Images.jl) `shepp_logan`
 * [TestImages.jl](https://github.com/JuliaImages/TestImages.jl): `shepp_logan`
+* [KomaMRI.jl](https://github.com/cncastillo/KomaMRI.jl)
 
 
 ### Compatibility
