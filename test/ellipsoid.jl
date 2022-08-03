@@ -133,7 +133,8 @@ end
     @test kspace[L÷2+1,M÷2+1,N÷2+1] ≈ 1
 
     @test abs(maximum(abs, X) - 1) < 1e-2
-    @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
+    err = maximum(abs, kspace - X) / maximum(abs, kspace)
+    @test err < 2e-2
 
     # test sinogram with projection-slice theorem
 

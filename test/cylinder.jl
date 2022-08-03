@@ -85,6 +85,8 @@ end
 
     @test radon([0], [0], [0], [0], [ob])[1] isa Real # todo
 
+    @test radon([9], [3], [0], [0], [ob])[1] == 0 # outside
+
     volume = IP.volume(ob)
 
     fun = @inferred spectrum([ob])
@@ -142,8 +144,9 @@ end
     ϕ = deg2rad.(0:6:180) # * Unitful.rad # todo round unitful Unitful.°
     θ = [π/7]
     sino = @inferred radon(u, v, ϕ, θ, [ob])
-end
 
 #=
 todo projection slice
 =#
+
+end
