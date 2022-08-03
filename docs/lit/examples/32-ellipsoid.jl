@@ -155,7 +155,7 @@ the maximum projection value is about
 70mm.
 =#
 
-maxes = round.((smax, maximum.(proj3)...) ./ 1mm; digits=2)
+maxes = round.((smax, maximum.(proj2)...) ./ 1mm; digits=2)
 
 
 #=

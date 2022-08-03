@@ -155,14 +155,14 @@ the maximum projection value is about
 `fwhm2spread(35mm) = 35mm * sqrt(π / log(16))` ≈ 37.25mm.
 =#
 
-maxes = round.((smax, maximum.(proj3)...) ./ 1mm; digits=2)
+maxes = round.((smax, maximum.(proj2)...) ./ 1mm; digits=2)
 
 
 #=
 The integral of each projection should match the object volume:
 =#
 
-vols = round.(((p -> sum(p)*prod(pg.deltas)).(proj3)..., volume) ./ 1mm^3; digits=2)
+vols = round.(((p -> sum(p)*prod(pg.deltas)).(proj2)..., volume) ./ 1mm^3; digits=2)
 
 
 # Look at a set of projections as the views orbit around the object.
