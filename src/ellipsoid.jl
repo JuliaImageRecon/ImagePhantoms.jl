@@ -51,6 +51,9 @@ end
 # methods
 
 
+volume(ob::Object3d{Ellipsoid}) = 4/3 * π * prod(ob.width)
+
+
 """
     phantom1(ob::Object3d{Ellipsoid}, (x,y,z))
 Evaluate unit sphere at `(x,y,z)`,

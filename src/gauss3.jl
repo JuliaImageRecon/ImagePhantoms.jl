@@ -32,6 +32,9 @@ gauss3(args... ; kwargs...) = Object(Gauss3(), args...; kwargs...)
 # methods
 
 
+volume(ob::Object3d{Gauss3}) = fwhm2spread(1)^3 * prod(ob.width)
+
+
 """
     phantom1(ob::Object3d{Gauss3}, (x,y,z))
 Evaluate Gauss3 `(x,y,z)`, for unitless coordinates.

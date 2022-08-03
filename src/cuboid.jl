@@ -53,6 +53,9 @@ end
 # methods
 
 
+volume(ob::Object3d{Cuboid}) = prod(ob.width)
+
+
 """
     phantom1(ob::Object3d{Cuboid}, (x,y,z))
 Evaluate unit cube at `(x,y,z)`,

@@ -29,6 +29,9 @@ cylinder(args... ; kwargs...) = Object(Cylinder(), args...; kwargs...)
 # methods
 
 
+volume(ob::Object3d{Cylinder}) = π * prod(ob.width[1:2]) * ob.width[3]
+
+
 """
     phantom1(ob::Object3d{Cylinder}, (x,y,z))
 Evaluate unit cylinder at `(x,y,z)`,
@@ -41,13 +44,11 @@ phantom1(ob::Object3d{Cylinder}, xyz::NTuple{3,Real}) =
 # radon
 
 
-# projection of rectangle of width (wx,wy) at (r,ϕ)
-function _rect_proj(wx, wy, r, ϕ)
+# line integral through rectangle of width (wx,wy) at (r,ϕ)
+function _rect_proj(wx::Real, wy::Real, r::Real, ϕ::Real)
     (sϕ, cϕ) = sincos(ϕ)
 	rp = sqrt((wx * cϕ)^2 + (wy * sϕ)^2) # projected radius
 	dis = r / rp # scaled distance from center
-
-	# projection angle after affine scaling and rotate
 	abs_cos_ang_pi = wx * abs(cϕ) / rp
 	abs_sin_ang_pi = wy * abs(sϕ) / rp
 
@@ -73,48 +74,16 @@ function xray1(
 )
     T = promote_type(eltype(u), eltype(v), Float32)
 
-#   (sϕ, cϕ) = sincos(ϕ)
-#   (sθ, cθ) = sincos(θ)
-
     r = abs(u)
     if r > 1
         return zero(T)
     end
 
-    # think about rectangle in plane of distance `r` from origin
-    wz = 1
+    # rectangle in plane of distance `r` from origin
+    wz = 1 # from unit-height of cylinder
     wy = 2 * sqrt(1 - r^2)
 
-    return T(_rect_proj(wy, wz, v, θ))
-
-#=
-    p1 = u * cϕ + v * sϕ * sθ
-    p2 = u * sϕ - v * cϕ * sθ
-    p3 = v * cθ
-
-    e1 = -sϕ * cθ # x = p1 + ℓ * e1
-    e2 = cϕ * cθ  # y = p2 + ℓ * e2
-    e3 = sθ       # z = p3 + ℓ * e3
-
-    ℓxmin, ℓxmax = cube_bounds(p1, e1)
-    ℓymin, ℓymax = cube_bounds(p2, e2)
-    ℓzmin, ℓzmax = cube_bounds(p3, e3)
-
-    minℓ = max(ℓxmin, ℓymin, ℓzmin)
-    maxℓ = min(ℓxmax, ℓymax, ℓzmax)
-    ℓ = max(maxℓ - minℓ, zero(T))
-
-    if abs(e1) < eps(T)
-        ℓ *= (-1/2 ≤ u < 1/2)
-    end
-    if abs(e2) < eps(T)
-        ℓ *= (-1/2 ≤ u < 1/2)
-    end
-    if abs(e3) < eps(T)
-        ℓ *= (-1/2 ≤ v < 1/2)
-    end
-    return ℓ
-=#
+    return T(_rect_proj(wz, wy, v, θ))
 end
 
 
