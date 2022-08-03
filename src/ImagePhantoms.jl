@@ -19,6 +19,7 @@ include("triangle.jl")
 include("ellipsoid.jl")
 include("gauss3.jl")
 include("cuboid.jl")
+include("cylinder.jl")
 
 # phantoms:
 include("shepplogan.jl")

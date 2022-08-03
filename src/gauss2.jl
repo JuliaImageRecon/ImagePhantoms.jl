@@ -71,11 +71,11 @@ end
 
 
 """
-    spectrum1(ob::Object2d{Gauss2}, (kx,ky))
+    spectrum1(::Object2d{Gauss2}, (kx,ky))
 Spectrum of unit gauss2 at `(kx,ky)`,
 for unitless spatial frequency coordinates.
 """
-function spectrum1(ob::Object2d{Gauss2}, kxy::NTuple{2,Real})
+function spectrum1(::Object2d{Gauss2}, kxy::NTuple{2,Real})
     s = fwhm2spread(1)
     return s^2 * exp(-π * sum(abs2, kxy) * s^2)
 end

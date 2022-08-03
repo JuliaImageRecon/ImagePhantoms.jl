@@ -100,10 +100,10 @@ end
 
 
 """
-    spectrum1(ob::Object3d{Ellipsoid}, (kx,ky,kz))
+    spectrum1(::Object3d{Ellipsoid}, (kx,ky,kz))
 Spectrum of unit sphere at `(kx,ky,kz)`,
 for unitless spatial frequency coordinates.
 """
-function spectrum1(ob::Object3d{Ellipsoid}, kxyz::NTuple{3,Real})
+function spectrum1(::Object3d{Ellipsoid}, kxyz::NTuple{3,Real})
     return sphere_transform(sqrt(sum(abs2, kxyz)))
 end

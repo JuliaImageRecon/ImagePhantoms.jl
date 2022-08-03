@@ -126,10 +126,10 @@ end
 # spectrum
 
 """
-    spectrum(ob::Object3d{Cuboid}, (kx,ky,kz))
+    spectrum1(::Object3d{Cuboid}, (kx,ky,kz))
 Spectrum of unit cube at `(kx,ky,kz)`,
 for unitless spatial frequency coordinates.
 """
-function spectrum1(ob::Object3d{Cuboid}, kxyz::NTuple{3,Real})
+function spectrum1(::Object3d{Cuboid}, kxyz::NTuple{3,Real})
     return prod(sinc, kxyz)
 end

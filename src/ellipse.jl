@@ -69,10 +69,10 @@ end
 
 
 """
-    spectrum1(ob::Object2d{Ellipse}, (kx,ky))
+    spectrum1(::Object2d{Ellipse}, (kx,ky))
 Spectrum of unit circle at `(kx,ky)`,
 for unitless spatial frequency coordinates.
 """
-function spectrum1(ob::Object2d{Ellipse}, kxy::NTuple{2,Real})
+function spectrum1(::Object2d{Ellipse}, kxy::NTuple{2,Real})
     return 4 * jinc(2 * sqrt(sum(abs2, kxy)))
 end
