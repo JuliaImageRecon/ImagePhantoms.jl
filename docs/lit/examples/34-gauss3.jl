@@ -25,7 +25,8 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms: gauss3, phantom, radon, spectrum
+using ImagePhantoms: Object, phantom, radon, spectrum
+using ImagePhantoms: Gauss3, gauss3
 import ImagePhantoms as IP
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt, mid3
@@ -61,7 +62,9 @@ using physical units.
 center = (20mm, 10mm, 5mm)
 width = (25mm, 35mm, 15mm)
 ϕ0s = :(π/6) # symbol version for nice plot titles
-angles = (eval(ϕ0s), 0)
+ϕ0 = eval(ϕ0s)
+angles = (ϕ0, 0)
+Object(Gauss3(), center, width, angles, 1.0f0) # top-level constructor
 gauss3([40mm, 20mm, 2mm, 25mm, 35mm, 12mm, π/6, 0, 1.0f0]) # Vector{Number}
 gauss3(20mm, 20mm, 2mm, 25mm, 35mm, 12mm, π/6, 0, 1.0f0) # 9 arguments
 ob = gauss3(center, width, angles, 1.0f0) # tuples (recommended use)
@@ -85,7 +88,7 @@ p1 = jim(axes(ig), img;
 
 
 # The image integral should match the object volume:
-volume = IP.fwhm2spread(1)^3 * prod(width)
+volume = IP.volume(ob)
 (sum(img)*prod(ig.deltas), volume)
 
 
@@ -150,10 +153,16 @@ Because the object has maximum FWHM of 35mm,
 and one of the two views above was along the corresponding axis,
 the maximum projection value is about
 `fwhm2spread(35mm) = 35mm * sqrt(π / log(16))` ≈ 37.25mm.
+=#
 
+maxes = round.((smax, maximum.(proj3)...) ./ 1mm; digits=2)
+
+
+#=
 The integral of each projection should match the object volume:
 =#
-((p -> sum(p)*prod(pg.deltas)).(proj2)..., volume)
+
+vols = round.(((p -> sum(p)*prod(pg.deltas)).(proj3)..., volume) ./ 1mm^3; digits=2)
 
 
 # Look at a set of projections as the views orbit around the object.
