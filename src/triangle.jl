@@ -150,6 +150,6 @@ Spectrum of unit triangle at `(kx,ky)`,
 for unitless spatial frequency coordinates.
 """
 function spectrum1(ob::Object2d{Triangle}, kxy::NTuple{2,Real})
-#   param == 1/2 || throw("todo")
+#   ob.param == 1/2 || throw("todo")
     return spectrum_tri(kxy...)
 end

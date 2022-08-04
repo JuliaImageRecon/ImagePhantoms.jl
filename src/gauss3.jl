@@ -32,6 +32,9 @@ gauss3(args... ; kwargs...) = Object(Gauss3(), args...; kwargs...)
 # methods
 
 
+volume(ob::Object3d{Gauss3}) = fwhm2spread(1)^3 * prod(ob.width)
+
+
 """
     phantom1(ob::Object3d{Gauss3}, (x,y,z))
 Evaluate Gauss3 `(x,y,z)`, for unitless coordinates.
@@ -55,10 +58,10 @@ end
 
 
 """
-    spectrum1(ob::Object3d{Gauss3}, (kx,ky,kz))
+    spectrum1(::Object3d{Gauss3}, (kx,ky,kz))
 Spectrum of unit sphere at `(kx,ky,kz)`, for unitless spatial frequency coordinates.
 """
-function spectrum1(ob::Object3d{Gauss3}, kxyz::NTuple{3,Real})
+function spectrum1(::Object3d{Gauss3}, kxyz::NTuple{3,Real})
     s = fwhm2spread(1)
     return s^3 * exp(-π * sum(abs2, kxyz) * s^2)
 end

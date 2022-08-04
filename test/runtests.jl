@@ -20,6 +20,7 @@ include("focus-chart.jl")
 include("ellipsoid.jl")
 include("gauss3.jl")
 include("cuboid.jl")
+include("cylinder.jl")
 
 @testset "mri-sense" begin
     include("mri-sense.jl")

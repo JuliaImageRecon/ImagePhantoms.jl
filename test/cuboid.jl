@@ -104,10 +104,11 @@ end
 
     @test radon([0], [0], [0], [0], [ob])[1] isa Real # todo
 
+    volume = IP.volume(ob)
 
     fun = @inferred spectrum([ob])
     @test fun isa Function
-    @test fun(0,0,0) ≈ prod(ob.width) * ob.value
+    @test fun(0,0,0) ≈ ob.value * volume
 end
 
 
@@ -135,7 +136,8 @@ end
     oversample = 2
     img = phantom(x, y, z, [ob], oversample)
 
-    zscale = 1 / (prod(width) * ob.value) # normalize spectra
+    volume = IP.volume(ob)
+    zscale = 1 / (ob.value * volume) # normalize spectra
     fx = (-L÷2:L÷2-1) / L / dx
     fy = (-M÷2:M÷2-1) / M / dy
     fz = (-N÷2:N÷2-1) / N / dz

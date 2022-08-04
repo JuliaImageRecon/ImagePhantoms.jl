@@ -25,7 +25,8 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms: cuboid, phantom, radon, spectrum
+using ImagePhantoms: Object, phantom, radon, spectrum
+using ImagePhantoms: Cuboid, cuboid
 import ImagePhantoms as IP
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt, mid3
@@ -63,6 +64,7 @@ width = (35mm, 25mm, 15mm)
 ϕ0s = :(π/6) # symbol version for nice plot titles
 ϕ0 = eval(ϕ0s)
 angles = (ϕ0, 0)
+Object(Cuboid(), center, width, angles, 1.0f0) # top-level constructor
 cuboid([10mm, 8mm, 6mm, 35mm, 25mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
 cuboid( 10mm, 8mm, 6mm, 35mm, 25mm, 15mm, π/6, 0, 1.0f0 ) # 9 arguments
 ob = cuboid(center, width, angles, 1.0f0) # tuples (recommended use)
@@ -86,7 +88,7 @@ p1 = jim(axes(ig), img;
 
 
 # The image integral should match the object volume:
-volume = prod(width)
+volume = IP.volume(ob)
 (sum(img)*prod(ig.deltas), volume)
 
 
@@ -154,10 +156,16 @@ Because the object has maximum chord length of
 `smax = sqrt(35^2+25^2+15^2)` ≈ 45.6mm,
 and one of the views above was along the corresponding axis,
 the maximum projection value is about that value.
+=#
 
+maxes = round.((smax, maximum.(proj3)...) ./ 1mm; digits=2)
+
+
+#=
 The integral of each projection should match the object volume:
 =#
-((p -> sum(p)*prod(pg.deltas)).(proj3)..., volume)
+
+vols = round.(((p -> sum(p)*prod(pg.deltas)).(proj3)..., volume) ./ 1mm^3; digits=2)
 
 
 # Look at a set of projections as the views orbit around the object.

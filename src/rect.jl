@@ -95,10 +95,10 @@ end
 
 
 """
-    spectrum1(ob::Object2d{Rect}, (kx,ky))
+    spectrum1(::Object2d{Rect}, (kx,ky))
 Spectrum of unit square at `(kx,ky)`,
 for unitless spatial frequency coordinates.
 """
-function spectrum1(ob::Object2d{Rect}, kxy::NTuple{2,Real})
+function spectrum1(::Object2d{Rect}, kxy::NTuple{2,Real})
     return prod(sinc, kxy)
 end

@@ -1,15 +1,15 @@
 #=
-test/ellipsoid.jl
+test/cylinder.jl
 =#
 
 using ImagePhantoms: Object3d, AbstractShape, phantom, radon, spectrum
-using ImagePhantoms: Object, Ellipsoid, ellipsoid, sphere
+using ImagePhantoms: Object, Cylinder, cylinder
 import ImagePhantoms as IP
 using Unitful: m, unit, °
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
 
-(Shape, shape, shape3) = (Ellipsoid, ellipsoid, sphere)
+(Shape, shape) = (Cylinder, cylinder)
 
 macro isob3(ex) # @isob macro to streamline tests
     :(@test $(esc(ex)) isa Object3d{Shape})
@@ -25,13 +25,8 @@ end
     @isob3 @inferred Object(Shape(), center=(1,2,3))
     @isob3 @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
     @isob3 @inferred shape(1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0)
+#   @isob3 @inferred shape(1, 5.0f0)
     @isob3 @NOTinferred shape(Number[1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0])
-
-    # spheres
-    @isob3 @inferred shape3(1, 5.0f0)
-    @isob3 @inferred shape3(1, 2, 3, 4., 5.0f0)
-    @isob3 @inferred shape3((1, 2, 3), 4., 5.0f0)
-    @isob3 @NOTinferred shape3(Number[1, 2, 3, 4., 5.0f0])
 end
 
 
@@ -67,12 +62,12 @@ end
     fun = @inferred phantom(ob)
     @test fun isa Function
     @test fun(ob.center...) == ob.value
-    @test fun((ob.center .+ 2 .* ob.width)...) == 0
+    @test fun((ob.center .+ 9 .* ob.width)...) < 1e-20
 
     fun = @inferred phantom([ob])
     @test fun isa Function
     @test fun(ob.center...) == ob.value
-    @test fun((ob.center .+ 2 .* ob.width)...) == 0
+    @test fun((ob.center .+ 9 .* ob.width)...) < 1e-20
 
     img = @inferred phantom(x, y, z, [ob])
     @test img isa Array{<:Real, 3}
@@ -89,6 +84,8 @@ end
     fun(0,0,0,0) # todo
 
     @test radon([0], [0], [0], [0], [ob])[1] isa Real # todo
+
+    @test radon([9], [3], [0], [0], [ob])[1] == 0 # outside
 
     volume = IP.volume(ob)
 
@@ -132,9 +129,9 @@ end
     @test maximum(abs, kspace) ≈ 1
     @test kspace[L÷2+1,M÷2+1,N÷2+1] ≈ 1
 
-    @test abs(maximum(abs, X) - 1) < 1e-2
+    @test abs(maximum(abs, X) - 1) < 2e-2
     err = maximum(abs, kspace - X) / maximum(abs, kspace)
-    @test err < 2e-2
+    @test err < 5e-2
 
     # test sinogram with projection-slice theorem
 
@@ -150,15 +147,6 @@ end
 
 #=
 todo projection slice
-    ia = argmin(abs.(ϕ .- deg2rad(55)))
-    slice = sino[:,ia]
-    Slice = myfft(slice) * dr
-    angle = round(rad2deg(ϕ[ia]), digits=1)
-
-    kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
-    ideal = spectrum(ob).(kx, ky)
-
-    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 2e-4
 =#
 
 end

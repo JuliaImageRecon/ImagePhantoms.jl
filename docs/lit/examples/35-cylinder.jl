@@ -1,13 +1,13 @@
 #---------------------------------------------------------
-# # [Gauss3](@id 34-gauss3)
+# # [Cylinder](@id 35-cylinder)
 #---------------------------------------------------------
 
 #=
-This page illustrates the `Gauss3` shape in the Julia package
+This page illustrates the `Cylinder` shape in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
 
 This page was generated from a single Julia file:
-[34-gauss3.jl](@__REPO_ROOT_URL__/34-gauss3.jl).
+[35-cylinder.jl](@__REPO_ROOT_URL__/35-cylinder.jl).
 =#
 
 #md # In any such Julia documentation,
@@ -16,9 +16,9 @@ This page was generated from a single Julia file:
 
 #md # The corresponding notebook can be viewed in
 #md # [nbviewer](http://nbviewer.jupyter.org/) here:
-#md # [`34-gauss3.ipynb`](@__NBVIEWER_ROOT_URL__/34-gauss3.ipynb),
+#md # [`35-cylinder.ipynb`](@__NBVIEWER_ROOT_URL__/35-cylinder.ipynb),
 #md # and opened in [binder](https://mybinder.org/) here:
-#md # [`34-gauss3.ipynb`](@__BINDER_ROOT_URL__/34-gauss3.ipynb).
+#md # [`35-cylinder.ipynb`](@__BINDER_ROOT_URL__/35-cylinder.ipynb).
 
 
 # ### Setup
@@ -26,7 +26,7 @@ This page was generated from a single Julia file:
 # Packages needed here.
 
 using ImagePhantoms: Object, phantom, radon, spectrum
-using ImagePhantoms: Gauss3, gauss3
+using ImagePhantoms: Cylinder, cylinder
 import ImagePhantoms as IP
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt, mid3
@@ -49,25 +49,25 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 #=
 A basic shape used in constructing 3D digital image phantoms
-is the 3D gaussian,
-specified by its center, fwhm, angle(s) and value.
+is the cylinder,
+specified by its center, radii, height, angle(s) and value.
 All of the methods in `ImagePhantoms` support physical units,
 so we use such units throughout this example.
 (Using units is recommended but not required.)
 
-Here are 3 ways to define a 3D `Object{Gauss3}`,
+Here are 4 ways to define a `Object{Cylinder}`,
 using physical units.
 =#
 
 center = (20mm, 10mm, 5mm)
-width = (25mm, 35mm, 15mm)
+width = (25mm, 35mm, 15mm) # x radius, y radius, height
 ϕ0s = :(π/6) # symbol version for nice plot titles
 ϕ0 = eval(ϕ0s)
 angles = (ϕ0, 0)
-Object(Gauss3(), center, width, angles, 1.0f0) # top-level constructor
-gauss3([40mm, 20mm, 2mm, 25mm, 35mm, 12mm, π/6, 0, 1.0f0]) # Vector{Number}
-gauss3(20mm, 20mm, 2mm, 25mm, 35mm, 12mm, π/6, 0, 1.0f0) # 9 arguments
-ob = gauss3(center, width, angles, 1.0f0) # tuples (recommended use)
+Object(Cylinder(), center, width, angles, 1.0f0) # top-level constructor
+cylinder([20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
+cylinder( 20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0) # 9 arguments
+ob = cylinder(center, width, angles, 1.0f0) # tuples (recommended use)
 
 
 #=
@@ -77,14 +77,14 @@ Make a 3D digital image of it using `phantom` and display it.
 We use `ImageGeoms` to simplify the indexing.
 =#
 
-deltas = (1.0mm, 1.1mm, 1.2mm)
+deltas = (1.0mm, 1.1mm, 0.9mm)
 dims = (2^8, 2^8+2, 48)
 offsets = (0.5, 0.5, 0.5) # for FFT spectra later
 ig = ImageGeom( ; dims, deltas, offsets)
-oversample = 2
+oversample = 3
 img = phantom(axes(ig)..., [ob], oversample)
 p1 = jim(axes(ig), img;
-   title="Gauss3, rotation ϕ=$ϕ0s", xlabel="x", ylabel="y")
+   title="Cylinder, rotation ϕ=$ϕ0s", xlabel="x", ylabel="y")
 
 
 # The image integral should match the object volume:
@@ -126,9 +126,9 @@ p3 = jim(axesf(ig), sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
 # Compare the DFT and analytical spectra to validate the code
 err = maximum(abs, spectrum_exact - spectrum_fft) / maximum(abs, spectrum_exact)
-@assert err < 1e-3
+@assert err < 4e-2
 p4 = jim(axesf(ig), 1e3*abs.(spectrum_fft - spectrum_exact);
-   title="Difference × 10³", xlabel, ylabel)
+   title="|Difference| × 10³", xlabel, ylabel)
 jim(p1, p4, p2, p3)
 
 
@@ -140,29 +140,32 @@ Validate it using the projection-slice theorem aka Fourier-slice theorem.
 =#
 
 pg = ImageGeom((2^8,2^7), (0.6mm,1.0mm), (0.5,0.5)) # projection sampling
-ϕs, θs = (:(π/2), ϕ0s), (:(π/7), :(0))
-ϕ, θ = [eval.(ϕs)...], [eval.(θs)...]
-proj2 = [radon(axes(pg)..., ϕ[i], θ[i], [ob]) for i in 1:2] # 2 projections
-smax = ob.value * IP.fwhm2spread(maximum(ob.width))
-p5 = jim(axes(pg)..., proj2; xlabel="u", ylabel="v", title =
-    "Projections at (ϕ,θ) = ($(ϕs[1]), $(θs[1])) and ($(ϕs[2]), $(θs[2]))")
+ϕs, θs = (:(π/3), ϕ0s), (:(π/7), :(0))
+ϕ3 = ϕ0
+θ3 = atan(ob.width[3]/2, maximum(ob.width[1:2]))
+ϕ, θ = [eval.(ϕs)..., ϕ3], [eval.(θs)..., θ3]
+proj3 = [radon(axes(pg)..., ϕ[i], θ[i], [ob]) for i in 1:3] # 3 projections
+smax = ob.value * sqrt(maximum(abs2, 2 .* ob.width[1:2]) + abs2(ob.width[3]))
+p5 = jim(axes(pg)..., proj3; xlabel="u", ylabel="v", nrow = 1, title =
+    "Projections at (ϕ,θ) = ($(ϕs[1]), $(θs[1])) and ($(ϕs[2]), $(θs[2]))\n
+    and along long axis")
 
 
 #=
-Because the object has maximum FWHM of 35mm,
+Because the cylinder has maximum diameter of 70mm and height 15mm,
 and one of the two views above was along the corresponding axis,
 the maximum projection value is about
-`fwhm2spread(35mm) = 35mm * sqrt(π / log(16))` ≈ 37.25mm.
+`sqrt(70^2 + 15^2)` ≈ 71.6mm.
 =#
 
-maxes = round.((smax, maximum.(proj2)...) ./ 1mm; digits=2)
+maxes = round.((smax, maximum.(proj3)...) ./ 1mm; digits=2)
 
 
 #=
 The integral of each projection should match the object volume:
 =#
 
-vols = round.(((p -> sum(p)*prod(pg.deltas)).(proj2)..., volume) ./ 1mm^3; digits=2)
+vols = round.(((p -> sum(p)*prod(pg.deltas)).(proj3)..., volume) ./ 1mm^3; digits=2)
 
 
 # Look at a set of projections as the views orbit around the object.
@@ -179,7 +182,7 @@ else
         jim(axes(pg), projs[:,:,ip,1]; xlabel="u", ylabel="v", prompt=false,
             title="ϕ=$(ϕd[ip])° θ=$θs", clim = (0,1) .* smax)
     end
-    gif(anim, "gauss3.gif", fps = 6)
+    gif(anim, "cylinder.gif", fps = 6)
 end
 
 
@@ -219,9 +222,9 @@ p8 = jim(axesf(pg), sp.(proj_fft); prompt=false,
      title = "log10|FFT Spectrum|", clim, xlabel, ylabel)
 
 err = maximum(abs, spectrum_slice - proj_fft) / maximum(abs, spectrum_slice)
-@assert err < 1e-5
-p9 = jim(axesf(pg), 1e6*abs.(proj_fft - spectrum_slice);
-    title="Difference × 10⁶", xlabel, ylabel, prompt=false)
+@assert err < 1e-3
+p9 = jim(axesf(pg), 1e3*abs.(proj_fft - spectrum_slice);
+    title="Difference × 10³", xlabel, ylabel, prompt=false)
 jim(p6, p7, p8, p9)
 
 

@@ -25,8 +25,9 @@ This page was generated from a single Julia file:
 
 # Packages needed here.
 
-using ImagePhantoms: ellipsoid, phantom, radon, spectrum
-using ImagePhantoms: Object, Ellipsoid
+using ImagePhantoms: Object, phantom, radon, spectrum
+using ImagePhantoms: Ellipsoid, ellipsoid
+import ImagePhantoms as IP
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt, mid3
 using FFTW: fft, fftshift
@@ -61,7 +62,8 @@ using physical units.
 center = (20mm, 10mm, 5mm)
 radii = (25mm, 35mm, 15mm)
 ϕ0s = :(π/6) # symbol version for nice plot titles
-angles = (eval(ϕ0s), 0)
+ϕ0 = eval(ϕ0s)
+angles = (ϕ0, 0)
 Object(Ellipsoid(), center, radii, angles, 1.0f0) # top-level constructor
 ellipsoid([20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
 ellipsoid( 20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0 ) # 9 arguments
@@ -86,7 +88,7 @@ p1 = jim(axes(ig), img;
 
 
 # The image integral should match the object volume:
-volume = 4/3*π*prod(ob.width)
+volume = IP.volume(ob)
 (sum(img)*prod(ig.deltas), volume)
 
 
@@ -126,7 +128,7 @@ p3 = jim(axesf(ig), sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 err = maximum(abs, spectrum_exact - spectrum_fft) / maximum(abs, spectrum_exact)
 @assert err < 3e-3
 p4 = jim(axesf(ig), 1e3*abs.(spectrum_fft - spectrum_exact);
-   title="Difference × 10³", xlabel, ylabel)
+   title="|Difference| × 10³", xlabel, ylabel)
 jim(p1, p4, p2, p3)
 
 
@@ -141,6 +143,7 @@ pg = ImageGeom((2^8,2^7), (0.6mm,1.0mm), (0.5,0.5)) # projection sampling
 ϕs, θs = (:(π/2), ϕ0s), (:(π/7), :(0))
 ϕ, θ = [eval.(ϕs)...], [eval.(θs)...]
 proj2 = [radon(axes(pg)..., ϕ[i], θ[i], [ob]) for i in 1:2] # 2 projections
+smax = ob.value * maximum(ob.width) * 2
 p5 = jim(axes(pg)..., proj2; xlabel="u", ylabel="v", title =
     "Projections at (ϕ,θ) = ($(ϕs[1]), $(θs[1])) and ($(ϕs[2]), $(θs[2]))")
 
@@ -150,10 +153,16 @@ Because the ellipsoid has major axis of length 70mm
 and one of the two views above was along that axis,
 the maximum projection value is about
 70mm.
+=#
 
+maxes = round.((smax, maximum.(proj2)...) ./ 1mm; digits=2)
+
+
+#=
 The integral of each projection should match the object volume:
 =#
-((p -> sum(p)*prod(pg.deltas)).(proj2)..., volume)
+
+vols  = round.(((p -> sum(p)*prod(pg.deltas)).(proj2)..., volume) ./ 1mm^3; digits=2)
 
 
 # Look at a set of projections as the views orbit around the object.
@@ -168,8 +177,7 @@ if isinteractive()
 else
     anim = @animate for ip in 1:length(ϕd)
         jim(axes(pg), projs[:,:,ip,1]; xlabel="u", ylabel="v", prompt=false,
-            title="ϕ=$(ϕd[ip])° θ=$θs",
-            clim = (0,1) .* (2 * maximum(radii) * ob.value))
+            title="ϕ=$(ϕd[ip])° θ=$θs", clim = (0,1) .* smax)
     end
     gif(anim, "ellipsoid.gif", fps = 6)
 end
