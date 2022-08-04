@@ -224,7 +224,7 @@ p8 = jim(axesf(pg), sp.(proj_fft); prompt=false,
 err = maximum(abs, spectrum_slice - proj_fft) / maximum(abs, spectrum_slice)
 @assert err < 2e-3
 p9 = jim(axesf(pg), 1e6*abs.(proj_fft - spectrum_slice);
-    title="Difference × 10⁶", xlabel, ylabel, prompt=false)
+    title="|Difference| × 10⁶", xlabel, ylabel, prompt=false)
 jim(p6, p7, p8, p9)
 
 

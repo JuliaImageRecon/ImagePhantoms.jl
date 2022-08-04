@@ -114,7 +114,7 @@ p3 = jim(axesf(ig), sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 err = maximum(abs, spectrum_exact - spectrum_fft) / maximum(abs, spectrum_exact)
 @assert err < 4e-4
 p4 = jim(axesf(ig), 1e3*abs.(spectrum_fft - spectrum_exact),
-    "Difference × 10³"; xlabel, ylabel)
+    "|Difference| × 10³"; xlabel, ylabel)
 jim(p1, p4, p2, p3)
 
 
