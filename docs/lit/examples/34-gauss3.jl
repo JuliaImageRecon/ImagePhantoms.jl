@@ -167,7 +167,7 @@ vols = round.(((p -> sum(p)*prod(pg.deltas)).(proj2)..., volume) ./ 1mm^3; digit
 
 # Look at a set of projections as the views orbit around the object.
 ϕd = 0:6:360
-ϕs = deg2rad.(ϕd) # * Unitful.rad # todo round unitful Unitful.°
+ϕs = deg2rad.(ϕd)
 θs = :(π/7)
 θ = eval(θs)
 projs = radon(axes(pg)..., ϕs, [θ], [ob]) # many projection views
