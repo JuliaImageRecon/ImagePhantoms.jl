@@ -7,6 +7,9 @@ using LazyGrids: ndgrid
 export phantom, radon, spectrum
 
 
+volume(ob::Object3d{S}) where S = volume1(S()) * prod(ob.width)
+
+
 # rotate
 
 """

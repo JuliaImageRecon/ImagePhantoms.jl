@@ -51,7 +51,7 @@ end
 # methods
 
 
-volume(ob::Object3d{Ellipsoid}) = 4/3 * π * prod(ob.width)
+volume1(::Ellipsoid) = 4/3 * π # volume of unit sphere
 
 
 """

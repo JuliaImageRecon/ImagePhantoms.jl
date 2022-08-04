@@ -32,7 +32,7 @@ gauss3(args... ; kwargs...) = Object(Gauss3(), args...; kwargs...)
 # methods
 
 
-volume(ob::Object3d{Gauss3}) = fwhm2spread(1)^3 * prod(ob.width)
+volume1(::Gauss3) = fwhm2spread(1)^3
 
 
 """
