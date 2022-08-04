@@ -7,6 +7,9 @@ Utilities for 2D objects
 export phantom, radon, spectrum
 
 
+area(ob::Object2d{S}) where S = area1(S()) * prod(ob.width)
+
+
 # rotate
 
 """

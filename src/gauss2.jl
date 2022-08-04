@@ -53,6 +53,9 @@ Convert FWHM `w` to equivalent Gaussian spread `s` for ``\\exp(-π (x/s)^2)``.
 # methods
 
 
+area1(::Gauss2) = fwhm2spread(1)^2
+
+
 """
     phantom1(ob::Object2d{Gauss2}, (x,y))
 Evaluate unit gauss2 at `(x,y)`,

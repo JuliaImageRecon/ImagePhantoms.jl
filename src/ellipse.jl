@@ -51,6 +51,9 @@ end
 # methods
 
 
+area1(::Ellipse) = π # area of unit circle
+
+
 """
     phantom1(ob::Object2d{Ellipse}, (x,y))
 Evaluate unit circle at `(x,y)`,
