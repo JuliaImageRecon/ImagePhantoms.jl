@@ -127,6 +127,13 @@ end
 
 area1(::Triangle) = sqrt(3)/4 # area of unit base equilateral
 
+ℓmax1(::Triangle) = 1
+
+ℓmax(ob::Object2d{Triangle}) = sqrt(
+    (ob.width[1]/2)^2 +
+    (ob.width[2] * sqrt(3) / 2)^2
+)
+
 
 """
     phantom1(ob::Object2d{Triangle}, (x,y))

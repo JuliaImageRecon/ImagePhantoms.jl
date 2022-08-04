@@ -75,6 +75,10 @@ end
 
 area1(::Rect) = 1 # area of unit square
 
+ℓmax1(::Rect) = √2 # max line integral through unit square
+
+ℓmax(ob::Object2d{Rect}) = sqrt(sum(abs2, ob.width))
+
 
 """
     phantom1(ob::Object2d{Rect}, (x,y))

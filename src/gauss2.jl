@@ -55,6 +55,8 @@ Convert FWHM `w` to equivalent Gaussian spread `s` for ``\\exp(-π (x/s)^2)``.
 
 area1(::Gauss2) = fwhm2spread(1)^2
 
+ℓmax1(::Gauss2) = fwhm2spread(1) # max line integral through a unit gauss2
+
 
 """
     phantom1(ob::Object2d{Gauss2}, (x,y))

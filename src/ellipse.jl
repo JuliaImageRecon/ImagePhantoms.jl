@@ -53,6 +53,8 @@ end
 
 area1(::Ellipse) = π # area of unit circle
 
+ℓmax1(::Ellipse) = 2 # maximum chord through a unit circle
+
 
 """
     phantom1(ob::Object2d{Ellipse}, (x,y))
