@@ -158,7 +158,7 @@ end
     v = (-nv÷2:nv÷2-1) * dv
     fu = (-nu÷2:nu÷2-1) / nu / du
     fv = (-nv÷2:nv÷2-1) / nv / dv
-    ϕ = deg2rad.(0:6:180) # * Unitful.rad # todo round unitful Unitful.°
+    ϕ = (0:6:180) * deg2rad(1)
     θ = [π/7]
     sino = @inferred radon(u, v, ϕ, θ, [ob])
 

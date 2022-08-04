@@ -127,8 +127,7 @@ end
     nr = 2^12
     r = (-nr÷2:nr÷2-1) * dr
     fr = (-nr÷2:nr÷2-1) / nr / dr
-    ϕ = deg2rad.(0:360) # * Unitful.rad # todo round unitful Unitful.°
-#   ϕ = deg2rad.((0:360)°) # not yet due to Unitful issue
+    ϕ = (0:30:360) * deg2rad(1)
     sino = @NOTinferred radon(r, ϕ, [ob])
 
     ia = argmin(abs.(ϕ .- deg2rad(35)))
@@ -155,5 +154,5 @@ if DEBUG
     plot(p1, p2, p3, p4); gui()
 end
 
-    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 4e-6
+    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 5e-6
 end
