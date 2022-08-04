@@ -108,7 +108,7 @@ end
     ob = shape((2m, 3m), width, π/6, 1.0f0)
     img = @inferred phantom(x, y, [ob])
 
-    zscale = 1 / IP.fwhm2spread(1)^2 / prod(width) # normalize spectra by area
+    zscale = 1 / (ob.value * IP.area(ob)) # normalize spectra by area
     fx = (-M÷2:M÷2-1) / M / dx
     fy = (-N÷2:N÷2-1) / N / dy
     X = myfft(img) * dx * dy * zscale
@@ -135,8 +135,7 @@ end
     nr = 2^10
     r = (-nr÷2:nr÷2-1) * dr
     fr = (-nr÷2:nr÷2-1) / nr / dr
-    ϕ = deg2rad.(0:360) # * Unitful.rad # todo round unitful Unitful.°
-#   ϕ = deg2rad.((0:180)°) # not yet due to Unitful issue
+    ϕ = (0:30:360) * deg2rad(1)
     sino = @NOTinferred radon(r, ϕ, [ob])
 
     ia = argmin(abs.(ϕ .- deg2rad(55)))

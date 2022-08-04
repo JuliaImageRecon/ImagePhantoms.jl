@@ -53,7 +53,7 @@ end
 # methods
 
 
-volume(ob::Object3d{Cuboid}) = prod(ob.width)
+volume1(::Cuboid) = 1 # volume of unit cube
 
 
 """

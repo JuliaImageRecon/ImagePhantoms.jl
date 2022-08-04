@@ -125,6 +125,9 @@ end
 # methods
 
 
+area1(::Triangle) = sqrt(3)/4 # area of unit base equilateral
+
+
 """
     phantom1(ob::Object2d{Triangle}, (x,y))
 Evaluate unit triangle at `(x,y)`,

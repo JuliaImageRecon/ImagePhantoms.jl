@@ -114,7 +114,7 @@ p3 = jim(axesf(ig), sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 err = maximum(abs, spectrum_exact - spectrum_fft) / maximum(abs, spectrum_exact)
 @assert err < 4e-4
 p4 = jim(axesf(ig), 1e3*abs.(spectrum_fft - spectrum_exact),
-    "Difference × 10³"; xlabel, ylabel)
+    "|Difference| × 10³"; xlabel, ylabel)
 jim(p1, p4, p2, p3)
 
 
@@ -127,7 +127,7 @@ dr = 0.2mm # radial sample spacing
 nr = 2^10 # radial sinogram bins
 r = (-nr÷2:nr÷2-1) * dr # radial samples
 fr = (-nr÷2:nr÷2-1) / nr / dr # corresponding spectral axis
-ϕ = deg2rad.(0:180) # * Unitful.rad # todo round unitful Unitful.°
+ϕ = deg2rad.(0:180)
 sino = radon(ob).(r, ϕ') # sample Radon transform of a single shape object
 smax = ob.value * IP.fwhm2spread(50mm)
 p5 = jim(r, rad2deg.(ϕ), sino; title="sinogram",

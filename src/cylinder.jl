@@ -29,7 +29,7 @@ cylinder(args... ; kwargs...) = Object(Cylinder(), args...; kwargs...)
 # methods
 
 
-volume(ob::Object3d{Cylinder}) = π * prod(ob.width[1:2]) * ob.width[3]
+volume1(::Cylinder) = π
 
 
 """

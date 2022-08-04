@@ -73,6 +73,9 @@ end
 # methods
 
 
+area1(::Rect) = 1 # area of unit square
+
+
 """
     phantom1(ob::Object2d{Rect}, (x,y))
 Evaluate unit square at `(x,y)`,

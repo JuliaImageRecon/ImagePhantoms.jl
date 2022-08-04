@@ -2,7 +2,6 @@
 shepplogan.jl
 =#
 
-#using MIRTjim: jim, prompt
 using ImagePhantoms # many
 using Test: @test, @testset, @test_throws, @inferred
 
@@ -14,38 +13,33 @@ using Test: @test, @testset, @test_throws, @inferred
     end
     @test ellipse_parameters(SouthPark()) isa Matrix
 
-    image0 = @NOTinferred shepp_logan(256, SheppLoganEmis())
+    image0 = @NOTinferred shepp_logan(2^6, SheppLoganEmis())
     @test image0 isa Matrix
-    image1 = @NOTinferred shepp_logan(256, SheppLoganEmis(); oversample=1)
-    image2 = @NOTinferred shepp_logan(256, SheppLoganEmis(); oversample=3)
+    image1 = @NOTinferred shepp_logan(2^6, SheppLoganEmis(); oversample=1)
+    image2 = @NOTinferred shepp_logan(2^6, SheppLoganEmis(); oversample=3)
     @test image0 == image2
-#   jim(jim(image1), jim(image2))
 
     ob = shepp_logan(SheppLoganEmis())
-    x = LinRange(-1,1,201) * 0.5
-    y = LinRange(-1,1,200) * 0.5
+    x = LinRange(-1,1,2^6+1) * 0.5
+    y = LinRange(-1,1,2^6) * 0.5
     image = phantom(x, y, ob)
     @test image isa Matrix
     image = phantom(ob).(x,y')
     @test image isa Matrix
-#   jim(x, y, image)
 
-    r = LinRange(-0.5,0.5,101)
-    ϕ = deg2rad.(0:180)
+    r = LinRange(-0.5,0.5,2^5)
+    ϕ = (0:30:180) * deg2rad(1)
     sino = radon(ob).(r,ϕ')
     @test sino isa Matrix
     sino = radon(r, ϕ, ob)
     @test sino isa Matrix
-#   jim(r, ϕ, sino; aspect_ratio=:none, yflip=false)
 
-    kx = LinRange(-1,1,100) * 9
-    ky = LinRange(-1,1,101) * 9
+    kx = LinRange(-1,1,2^6) * 9
+    ky = LinRange(-1,1,2^6+1) * 9
     kspace = spectrum(ob).(kx, ky')
     @test kspace isa Matrix
     kspace = spectrum(kx, ky, ob)
     @test kspace isa Matrix
-#   jim(kx, ky, kspace)
 
-    image = shepp_logan(80, 100, SouthPark(), fovs=(1,1))
-#   jim(image)
+    image = shepp_logan(40, 50, SouthPark(), fovs=(1,1))
 end

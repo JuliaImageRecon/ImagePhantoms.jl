@@ -99,7 +99,7 @@ end
     for ob in obs
         nr, dr = 2^4, 0.02m
         r = (-nr÷2:nr÷2-1) * dr .+ ob.center[1]
-        ϕ = deg2rad.(0:20:360)
+        ϕ = (0:30:360) * deg2rad(1)
         @inferred IP._radon(ob, r[1], ϕ[1])
         sino1 = @inferred radon([r[1]], [ϕ[1]], [ob])
         sino = @inferred radon(r, ϕ, [ob])
@@ -118,7 +118,7 @@ end
     ob = shape((4m, 3m), radii, π/6, 1.0f0)
     img = @inferred phantom(x, y, [ob])
 
-    zscale = 1 / π / prod(radii) # normalize spectra by area
+    zscale = 1 / (ob.value * IP.area(ob)) # normalize spectra by area
     fx = (-M÷2:M÷2-1) / M / dx
     fy = (-N÷2:N÷2-1) / N / dy
     X = myfft(img) * dx * dy * zscale
@@ -145,8 +145,7 @@ end
     nr = 2^10
     r = (-nr÷2:nr÷2-1) * dr
     fr = (-nr÷2:nr÷2-1) / nr / dr
-    ϕ = deg2rad.(0:360) # * Unitful.rad # todo round unitful Unitful.°
-#   ϕ = deg2rad.((0:360)°) # not yet due to Unitful issue
+    ϕ = (0:30:360) * deg2rad(1)
     sino = @inferred radon(r, ϕ, [ob])
 
     ia = argmin(abs.(ϕ .- deg2rad(55)))
