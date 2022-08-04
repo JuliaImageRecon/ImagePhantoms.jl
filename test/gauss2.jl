@@ -66,6 +66,9 @@ end
     show(devnull, ob)
     @test (@inferred eltype(ob)) == Float32
 
+    @test (@inferred IP.ℓmax(ob)) ≈ IP.fwhm2spread(4)
+    @test (@inferred IP.ℓmax1(Shape())) > 0
+
     fun = @inferred phantom(ob)
     @test fun isa Function
     @test fun(ob.center...) == ob.value

@@ -74,6 +74,9 @@ end
     show(devnull, ob)
     @test (@inferred eltype(ob)) == Float32
 
+    @test (@inferred IP.ℓmax(ob)) ≈ sqrt((4/2)^2 + (3 * sqrt(3) / 2)^2)
+    @test (@inferred IP.ℓmax1(Shape())) > 0
+
     fun = @inferred phantom(ob)
     @test fun isa Function
     @test fun(ob.center...) == ob.value

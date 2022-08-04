@@ -61,6 +61,7 @@ end
     @isob @inferred IP.scale(ob, 2)
     @isob @inferred IP.translate(ob, (2, 3))
     @isob @inferred IP.translate(ob, 2, 3)
+
 end
 
 
@@ -71,6 +72,9 @@ end
 
     show(devnull, ob)
     @test (@inferred eltype(ob)) == Float32
+
+    @test (@inferred IP.ℓmax(ob)) == 8
+    @test (@inferred IP.ℓmax1(Shape())) > 0
 
     fun = @inferred phantom(ob)
     @test fun isa Function
