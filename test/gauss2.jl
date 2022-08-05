@@ -76,6 +76,7 @@ end
 
     img = @inferred phantom(x, y, [ob])
 
+
     fun = @inferred radon(ob)
     @test fun isa Function
     fun(0,0)

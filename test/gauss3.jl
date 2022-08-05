@@ -58,6 +58,8 @@ end
     show(devnull, ob)
     @test (@inferred eltype(ob)) == Float32
 
+    @test (@inferred IP.ℓmax(ob)) ≈ IP.fwhm2spread(6)
+    @test (@inferred IP.ℓmax1(Shape())) ≈ IP.fwhm2spread(1)
 
     fun = @inferred phantom(ob)
     @test fun isa Function

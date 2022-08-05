@@ -77,6 +77,8 @@ end
     show(devnull, ob)
     @test (@inferred eltype(ob)) == Float32
 
+    @test (@inferred IP.ℓmax(ob)) ≈ sqrt(4^2 + 5^2 + 6^2)
+    @test (@inferred IP.ℓmax1(Shape())) ≈ √3
 
     fun = @inferred phantom(ob)
     @test fun isa Function

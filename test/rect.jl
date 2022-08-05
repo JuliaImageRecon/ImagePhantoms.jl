@@ -73,7 +73,7 @@ end
     @test (@inferred eltype(ob)) == Float32
 
     @test (@inferred IP.ℓmax(ob)) ≈ 5
-    @test (@inferred IP.ℓmax1(Shape())) > 0
+    @test (@inferred IP.ℓmax1(Shape())) ≈ √2
 
     fun = @inferred phantom(ob)
     @test fun isa Function
@@ -81,6 +81,7 @@ end
     @test fun((ob.center .+ 2 .* ob.width)...) == 0
 
     img = @inferred phantom(x, y, [ob])
+
 
     fun = @inferred radon(ob)
     @test fun isa Function
