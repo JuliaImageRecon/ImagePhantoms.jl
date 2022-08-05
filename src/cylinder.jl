@@ -31,6 +31,10 @@ cylinder(args... ; kwargs...) = Object(Cylinder(), args...; kwargs...)
 
 volume1(::Cylinder) = π
 
+ℓmax1(::Cylinder) = √5 # max line integral through unit cylinder
+
+ℓmax(ob::Object3d{Cylinder}) = sqrt(sum(abs2, (2maximum(ob.width[1:2]), ob.width[3])))
+
 
 """
     phantom1(ob::Object3d{Cylinder}, (x,y,z))

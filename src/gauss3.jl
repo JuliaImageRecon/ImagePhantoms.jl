@@ -34,6 +34,8 @@ gauss3(args... ; kwargs...) = Object(Gauss3(), args...; kwargs...)
 
 volume1(::Gauss3) = fwhm2spread(1)^3
 
+ℓmax1(::Gauss3) = fwhm2spread(1) # max line integral through a unit gauss2
+
 
 """
     phantom1(ob::Object3d{Gauss3}, (x,y,z))

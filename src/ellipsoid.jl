@@ -53,6 +53,8 @@ end
 
 volume1(::Ellipsoid) = 4/3 * π # volume of unit sphere
 
+ℓmax1(::Ellipsoid) = 2 # maximum chord through a unit sphere
+
 
 """
     phantom1(ob::Object3d{Ellipsoid}, (x,y,z))

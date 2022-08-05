@@ -55,6 +55,10 @@ end
 
 volume1(::Cuboid) = 1 # volume of unit cube
 
+ℓmax1(::Cuboid) = √3 # max line integral through unit cuboid
+
+ℓmax(ob::Object3d{Cuboid}) = sqrt(sum(abs2, ob.width))
+
 
 """
     phantom1(ob::Object3d{Cuboid}, (x,y,z))
