@@ -121,7 +121,6 @@ end
 
 """
     Object(shape ; cx, cy, wx=1, wy=wx, ϕ=0, value=1)
-    Object(shape ; [6-vector])
 2D object constructor from values (without tuples).
 """
 function Object(
@@ -136,15 +135,9 @@ function Object(
     Object(shape, (cx, cy), (wx, wy), (ϕ,), value)
 end
 
-function Object(shape::AbstractShape{2}, v::AbstractVector ; kwargs...)
-    length(v) == 6 || throw(ArgumentError("2D object needs 6 parameters"))
-    return Object(shape, v...; kwargs...)
-end
-
 
 """
     Object(shape ; cx, cy, cz, wx=1, wy=wx, wz=wx, ϕ=0, θ=0, value=1)
-    Object(shape ; [9-vector])
 3D object constructor from values (without tuples).
 """
 function Object(
@@ -160,11 +153,6 @@ function Object(
     value::Number = 1,
 ) where {C <: RealU}
     Object(shape, (cx, cy, cz), (wx, wy, wz), (ϕ, θ), value)
-end
-
-function Object(shape::AbstractShape{3}, p::AbstractVector ; kwargs...)
-    length(p) == 9 || throw(ArgumentError("3D object needs 9 parameters"))
-    return Object(shape, p...; kwargs...)
 end
 
 

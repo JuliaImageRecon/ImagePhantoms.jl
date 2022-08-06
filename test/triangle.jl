@@ -34,7 +34,6 @@ end
     @isob @inferred Object(Shape(), center=(1,2))
     @isob @inferred shape((1,2.), (3,4//1), π, 5.0f0)
     @isob @inferred shape(1, 2., 3, 4//1, π, 5.0f0)
-    @isob @NOTinferred shape(Number[1, 2., 3, 4//1, π, 5.0f0])
     @isob @inferred shape(1, 5.0f0)
 end
 

@@ -21,7 +21,6 @@ struct Ellipsoid <: AbstractShape{3} end
 """
     ellipsoid(cx, cy, cz, rx=1, ry=1, rz=1, Φ=0, Θ=0, value::Number = 1)
     ellipsoid(center::NTuple{3,RealU}, radii::NTuple{3,RealU}, angle::NTuple{2,RealU}, v)
-    ellipsoid([9-vector])
 Construct `Object{Ellipsoid}` from parameters.
 """
 ellipsoid(args... ; kwargs...) = Object(Ellipsoid(), args...; kwargs...)
@@ -32,7 +31,6 @@ ellipsoid(args... ; kwargs...) = Object(Ellipsoid(), args...; kwargs...)
 """
     sphere(x, y, z, r,v=1) (sphere of radius `r` centered at `(x,y,z)`)
     sphere((x,y,z), r, v=1) ditto
-    sphere([5-vector]) ditto
     sphere(r, v=1) centered at origin
 Construct spheres as special cases of `Ellipsoid`.
 """
@@ -41,11 +39,6 @@ sphere(cx::RealU, cy::RealU, cz::RealU, r::RealU, v::Number = 1) =
 sphere(center::NTuple{3,RealU}, r::RealU, v::Number = 1) =
     sphere(center..., r, v)
 sphere(r::RealU, v::Number = 1) = sphere((zero(r), zero(r), zero(r)), v)
-
-function sphere(v::AbstractVector{<:Number})
-    length(v) == 5 || throw(ArgumentError("$v wrong length"))
-    sphere(v...)
-end
 
 
 # methods

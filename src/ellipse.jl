@@ -21,7 +21,6 @@ struct Ellipse <: AbstractShape{2} end
 """
     ellipse(cx, cy, rx=1, ry=rx, ϕ=0, value::Number=1)
     ellipse(center::NTuple{2,RealU}, radii::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1)
-    ellipse([6-vector])
 Construct `Object{Ellipse}` from parameters.
 """
 ellipse(args... ; kwargs...) = Object(Ellipse(), args...; kwargs...)
@@ -32,7 +31,6 @@ ellipse(args... ; kwargs...) = Object(Ellipse(), args...; kwargs...)
 """
     circle(x, y, r, v=1) (circle of radius `r` centered at `(x,y)`)
     circle((x,y), r=1, v=1) ditto
-    circle([4-vector]) ditto
     circle(r, v=1) centered at origin
 Construct circles as special cases of `Ellipse`.
 """
@@ -41,11 +39,6 @@ circle(cx::RealU, cy::RealU, r::RealU, v::Number = 1) =
 circle(center::NTuple{2,RealU}, r::RealU = oneunit(center[1]), v::Number = 1) =
     circle(center..., r, v)
 circle(r::RealU, v::Number = 1) = circle((zero(r), zero(r)), r, v)
-
-function circle(v::AbstractVector{<:Number})
-    length(v) == 4 || throw(ArgumentError("$v wrong length"))
-    circle(v...)
-end
 
 
 # methods

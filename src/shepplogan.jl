@@ -68,7 +68,7 @@ Return vector of `Object{Ellipse}`, one for each row of input matrix.
 """
 function ellipse(params::AbstractMatrix{<:RealU})
     size(params,2) == 6 || throw("ellipses need 6 parameters")
-    return [ellipse(params[n,:]) for n in 1:size(params,1)]
+    return [ellipse(params[n,:]...) for n in 1:size(params,1)]
 end
 
 function shepp_logan(case::EllipsePhantomVersion; kwargs...)
@@ -80,7 +80,7 @@ end
     image = shepp_logan(M, [N,], case, options...)
 Convenience method for generating `M×N` samples of Shepp-Logan phantoms.
 
-In
+# In
 * `M::Int` : horizontal size
 * `N::Int` : vertical size, defaults to `M`
 * `case::EllipsePhantomVersion = SheppLogan()`
@@ -133,7 +133,7 @@ If `disjoint==true` then the middle ellipse positions are adjusted to avoid over
 function ellipse_parameters(
     case::EllipsePhantomVersion = SheppLogan() ;
     fovs::NTuple{2,RealU} = (1,1),
-    u::NTuple{3,Any} = (1,1,1), # unit scaling
+    u::NTuple{3,Number} = (1,1,1), # unit scaling
     disjoint::Bool = false,
 )
     (xfov, yfov) = fovs
