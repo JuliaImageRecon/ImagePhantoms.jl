@@ -55,7 +55,7 @@ All of the methods in `ImagePhantoms` support physical units,
 so we use such units throughout this example.
 (Using units is recommended but not required.)
 
-Here are 4 ways to define a `Object{Cylinder}`,
+Here are 3 ways to define a `Object{Cylinder}`,
 using physical units.
 =#
 
@@ -65,7 +65,6 @@ width = (25mm, 35mm, 15mm) # x radius, y radius, height
 ϕ0 = eval(ϕ0s)
 angles = (ϕ0, 0)
 Object(Cylinder(), center, width, angles, 1.0f0) # top-level constructor
-cylinder([20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
 cylinder( 20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0) # 9 arguments
 ob = cylinder(center, width, angles, 1.0f0) # tuples (recommended use)
 

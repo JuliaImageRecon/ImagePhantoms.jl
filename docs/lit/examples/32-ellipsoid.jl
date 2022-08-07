@@ -55,7 +55,7 @@ All of the methods in `ImagePhantoms` support physical units,
 so we use such units throughout this example.
 (Using units is recommended but not required.)
 
-Here are 4 ways to define an `Object{Ellipsoid}`,
+Here are 3 ways to define an `Object{Ellipsoid}`,
 using physical units.
 =#
 
@@ -65,7 +65,6 @@ radii = (25mm, 35mm, 15mm)
 ϕ0 = eval(ϕ0s)
 angles = (ϕ0, 0)
 Object(Ellipsoid(), center, radii, angles, 1.0f0) # top-level constructor
-ellipsoid([20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0]) # Vector{Number}
 ellipsoid( 20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0 ) # 9 arguments
 ob = ellipsoid(center, radii, angles, 1.0f0) # tuples (recommended use)
 
