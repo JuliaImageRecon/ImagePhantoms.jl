@@ -88,10 +88,10 @@ function phantom(
     x::AbstractVector,
     y::AbstractVector,
     z::AbstractVector,
-    oa::Array{<:Object3d},
+    oa::Array{<:Object3d{S,V}},
     oversample::Int;
-    T::DataType = promote_type(eltype.(oa)..., Float32),
-)
+    T::DataType = promote_type(V, Float32),
+) where {S, V <: Number}
 
     oversample < 1 && throw(ArgumentError("oversample $oversample"))
     dx = x[2] - x[1]
@@ -104,7 +104,8 @@ function phantom(
     o3 = oversample^3
     ophantom = ob -> (x,y,z) ->
         T(sum(phantom(ob).(ndgrid(x .+ dx*tmp, y .+ dy*tmp, z .+ dz*tmp)...)) / o3)
-    return sum(ob -> ophantom(ob).(ndgrid(x,y,z)...), oa)
+    out = sum(ob -> ophantom(ob).(ndgrid(x,y,z)...), oa)
+    return out::Array{T, 3}
 end
 
 

@@ -79,7 +79,7 @@ end
     @test size(img) == length.((x, y, z))
 
     over = 2
-    img = @NOTinferred phantom(x, y, z, [ob], over)
+    img = @inferred phantom(x, y, z, [ob], over)
     @test img isa Array{<:Real, 3}
     @test size(img) == length.((x, y, z))
 

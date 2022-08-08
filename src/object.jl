@@ -16,7 +16,8 @@ abstract type AbstractObject end
 
 
 """
-    Object{S, D, V, ...}(center, width, angle, value) <: AbstractObject
+    Object{S, D, V, C, A, Da}(center, width, angle, value) <: AbstractObject
+        where {S <: AbstractShape, V <: Number, C,A <: RealU}
 General container for 2D and 3D objects for defining image phantoms.
 
 * `center::NTuple{D,C}` coordinates of "center" of this object
@@ -83,16 +84,16 @@ end
 
 
 """
-    Object2d = Object{S,2} where S <: AbstractShape
+    Object2d{S,V} = Object{S,2,V} where {S <: AbstractShape, V <: Number}
 For 2D objects
 """
-const Object2d = Object{S,2} where S
+const Object2d{S,V} = Object{S,2,V}
 
 """
-    Object3d = Object{S,3} where S <: AbstractShape
+    Object3d{S,V} = Object{S,3,V} where {S <: AbstractShape, V <: Number}
 For 3D objects
 """
-const Object3d = Object{S,3} where S
+const Object3d{S,V} = Object{S,3,V}
 
 
 # constructors
