@@ -66,9 +66,11 @@ shepp_logan_values(::SheppLoganToft) =
     phantom = ellipse(n × 6 AbstractMatrix)
 Return vector of `Object{Ellipse}`, one for each row of input matrix.
 """
-function ellipse(params::AbstractMatrix{<:RealU})
+function ellipse(params::AbstractMatrix{T}) where {T <: RealU}
     size(params,2) == 6 || throw("ellipses need 6 parameters")
-    return [ellipse(params[n,:]...) for n in 1:size(params,1)]
+    O = Object2d{Ellipse, T, T, T, 1}
+    out = [ellipse(params[n,:]...) for n in 1:size(params,1)]
+    return out::Vector{O}
 end
 
 function shepp_logan(case::EllipsePhantomVersion; kwargs...)
