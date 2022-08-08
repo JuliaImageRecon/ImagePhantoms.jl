@@ -1,18 +1,20 @@
 #=
 shepplogan.jl
+Note: shepp_logan() is type unstable because of possible over-sampling.
 =#
 
 using ImagePhantoms # many
+import ImagePhantoms as IP
 using Test: @test, @testset, @test_throws, @inferred
 
 
 @testset "shepp" begin
     for case in (SheppLogan, SheppLoganToft, SheppLoganEmis, SheppLoganBrainWeb)
-        @test ImagePhantoms.shepp_logan_values(case()) isa Vector
-        @test ellipse_parameters(case()) isa Matrix
+        @test (@inferred IP.shepp_logan_values(case())) isa Vector
+        @test (@inferred ellipse_parameters(case())) isa Vector{<:Tuple}
         image = @NOTinferred shepp_logan(2^6, case())
     end
-    @test ellipse_parameters(SouthPark()) isa Matrix
+    @test (@inferred ellipse_parameters(SouthPark())) isa Vector{<:Tuple}
 
     image0 = @NOTinferred shepp_logan(2^6, SheppLoganEmis())
     @test image0 isa Matrix

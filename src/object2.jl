@@ -84,7 +84,7 @@ function phantom(
     x::AbstractVector,
     y::AbstractVector,
     oa::Array{<:Object2d},
-    oversample::Int;
+    oversample::Int ;
     T::DataType = promote_type(eltype.(oa)..., Float32),
 )
 

@@ -19,10 +19,11 @@ x = (-(nx÷2):(nx÷2-1)) * dx
 y = (-(ny÷2):(ny÷2-1)) * dy
 
 # define object
-oa = ellipse_parameters(SheppLoganBrainWeb() ; disjoint=true, fovs)
+params = ellipse_parameters(SheppLoganBrainWeb() ; disjoint=true, fovs)
 seed!(0)
-oa[:,end] = [1; rand(ComplexF32,9)] # random phases
-oa = ellipse(oa)
+phases = [1; rand(ComplexF32,9)] # random phases
+params = [(p[1:5]..., phases[i]) for (i, p) in enumerate(params)]
+oa = ellipse(params)
 oversample = 3
 image0 = phantom(x, y, oa, oversample)
 cfun = z -> cat(dims = ndims(z)+1, real(z), imag(z))
@@ -104,4 +105,4 @@ image2 = [image0 .* s for s in smaps] # digital
 kspace2 = myfft.(image2) * (dx * dy)
 
 norma = za -> sqrt(sum(abs2, norm.(za))) # for array of arrays
-@test norma(kspace2 - kspace1) / norma(kspace2) ≤ 0.03
+@test norma(kspace2 - kspace1) / norma(kspace2) ≤ 0.04
