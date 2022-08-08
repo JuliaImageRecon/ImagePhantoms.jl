@@ -74,6 +74,9 @@ end
 
     img = @inferred phantom(x, y, [ob])
 
+    @inferred IP.xray1(Triangle(), 0.5f0, π/6)
+    @inferred IP._xray(Triangle(), (0., 0.), (2,2), (π/3,), 0.5f0, π/6)
+
     fun = @inferred radon(ob)
     @test fun isa Function
     fun(0,0)
@@ -111,7 +114,8 @@ end
     r = (-nr÷2:nr÷2-1) * dr
     fr = (-nr÷2:nr÷2-1) / nr / dr
     ϕ = (0:30:360) * deg2rad(1)
-    sino = @NOTinferred radon(r, ϕ, [ob])
+    tmp = @inferred IP._radon(ob, 0.5f0m, π/6)
+    sino = @inferred radon(r, ϕ, [ob])
 
     ia = argmin(abs.(ϕ .- deg2rad(35)))
     slice = sino[:,ia]

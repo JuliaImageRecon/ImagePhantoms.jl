@@ -112,7 +112,7 @@ end
     r = (-nr÷2:nr÷2-1) * dr
     fr = (-nr÷2:nr÷2-1) / nr / dr
     ϕ = (0:30:360) * deg2rad(1)
-    sino = @NOTinferred radon(r, ϕ, [ob])
+    sino = @inferred radon(r, ϕ, [ob])
 
     ia = argmin(abs.(ϕ .- deg2rad(55)))
     slice = sino[:,ia]

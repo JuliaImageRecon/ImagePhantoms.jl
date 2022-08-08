@@ -201,7 +201,7 @@ function radon(
     ϕ::AbstractVector,
     oa::Array{<:Object2d},
 )
-    return sum(ob -> radon(ob).(r,ϕ'), oa)
+    return radon(oa).(r,ϕ')
 end
 
 
