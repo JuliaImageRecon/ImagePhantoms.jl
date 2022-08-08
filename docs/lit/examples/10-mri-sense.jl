@@ -88,10 +88,11 @@ with random complex phases
 to make it a bit more realistic.
 =#
 
-oa = ellipse_parameters(SheppLoganBrainWeb() ; disjoint=true, fovs)
+params = ellipse_parameters(SheppLoganBrainWeb() ; disjoint=true, fovs)
 seed!(0)
-oa[:,end] = [1; randn(ComplexF32, 9)] # random phases
-oa = ellipse(oa)
+phases = [1; rand(ComplexF32,9)] # random phases
+params = [(p[1:5]..., phases[i]) for (i, p) in enumerate(params)]
+oa = ellipse(params)
 oversample = 3
 image0 = phantom(x, y, oa, oversample)
 cfun = z -> cat(dims = ndims(z)+1, real(z), imag(z))
