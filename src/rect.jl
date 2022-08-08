@@ -21,7 +21,6 @@ struct Rect <: AbstractShape{2} end
 """
     rect(cx, cy, wx=1, wy=wx, ϕ=0, value::Number=1)
     rect(center::NTuple{2,RealU}, width::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1)
-    rect([6-vector])
 Construct `Object{Rect}` from parameters;
 here `width` is the full-width.
 """
@@ -33,7 +32,6 @@ rect(args... ; kwargs...) = Object(Rect(), args...; kwargs...)
 """
     square(x, y, w,v=1) (square of width `w` centered at `(x,y)`)
     square((x,y), w=1, v=1) ditto
-    square([4-vector]) ditto
     square(w, v=1) centered at origin
 Construct squares as special cases of `Rect`.
 """
@@ -42,11 +40,6 @@ square(cx::RealU, cy::RealU, w::RealU, v::Number = 1) =
 square(center::NTuple{2,RealU}, w::RealU = oneunit(center[1]), v::Number = 1) =
     square(center..., w, v)
 square(w::RealU, v::Number = 1) = square((zero(w), zero(w)), w, v)
-
-function square(v::AbstractVector{<:Number})
-    length(v) == 4 || throw(ArgumentError("$v wrong length"))
-    square(v...)
-end
 
 
 # helper
@@ -74,6 +67,10 @@ end
 
 
 area1(::Rect) = 1 # area of unit square
+
+ℓmax1(::Rect) = √2 # max line integral through unit square
+
+ℓmax(ob::Object2d{Rect}) = sqrt(sum(abs2, ob.width))
 
 
 """

@@ -21,7 +21,6 @@ struct Gauss2 <: AbstractShape{2} end
 """
     gauss2(cx, cy, wx, wy=wx, ϕ=0, value::Number=1)
     gauss2(center::NTuple{2,RealU}, width::NTuple{2,RealU}=(1,1), ϕ::RealU=0, v=1)
-    gauss2([6-vector])
     gauss2(w, v=1) (isotropic of width `w`)
 Construct `Object{Gauss2}` from parameters;
 here `width` = FWHM (full-width at half-maximum).
@@ -54,6 +53,8 @@ Convert FWHM `w` to equivalent Gaussian spread `s` for ``\\exp(-π (x/s)^2)``.
 
 
 area1(::Gauss2) = fwhm2spread(1)^2
+
+ℓmax1(::Gauss2) = fwhm2spread(1) # max line integral through a unit gauss2
 
 
 """

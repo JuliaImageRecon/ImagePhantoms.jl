@@ -65,8 +65,7 @@ width = (25mm, 35mm, 15mm)
 ϕ0 = eval(ϕ0s)
 angles = (ϕ0, 0)
 Object(Gauss3(), center, width, angles, 1.0f0) # top-level constructor
-gauss3([40mm, 20mm, 2mm, 25mm, 35mm, 12mm, π/6, 0, 1.0f0]) # Vector{Number}
-gauss3(20mm, 20mm, 2mm, 25mm, 35mm, 12mm, π/6, 0, 1.0f0) # 9 arguments
+gauss3(20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0) # 9 arguments
 ob = gauss3(center, width, angles, 1.0f0) # tuples (recommended use)
 
 

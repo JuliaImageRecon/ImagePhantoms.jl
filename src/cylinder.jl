@@ -19,7 +19,6 @@ struct Cylinder <: AbstractShape{3} end
 """
     cylinder(cx, cy, cz, wx, wy, wz, Φ, Θ, value::Number)
     cylinder(center::NTuple{3,RealU}, width::NTuple{3,RealU}, angle::NTuple{2,RealU}, v)
-    cylinder([9-vector])
 Construct `Object{Cylinder}` from parameters;
 here `width` is the *radius* in x,y and the *height* in z.
 """
@@ -30,6 +29,10 @@ cylinder(args... ; kwargs...) = Object(Cylinder(), args...; kwargs...)
 
 
 volume1(::Cylinder) = π
+
+ℓmax1(::Cylinder) = √5 # max line integral through unit cylinder
+
+ℓmax(ob::Object3d{Cylinder}) = sqrt(sum(abs2, (2maximum(ob.width[1:2]), ob.width[3])))
 
 
 """

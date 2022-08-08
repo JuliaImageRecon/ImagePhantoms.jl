@@ -25,13 +25,11 @@ end
     @isob3 @inferred Object(Shape(), center=(1,2,3))
     @isob3 @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
     @isob3 @inferred shape(1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0)
-    @isob3 @NOTinferred shape(Number[1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0])
 
     # spheres
     @isob3 @inferred shape3(1, 5.0f0)
     @isob3 @inferred shape3(1, 2, 3, 4., 5.0f0)
     @isob3 @inferred shape3((1, 2, 3), 4., 5.0f0)
-    @isob3 @NOTinferred shape3(Number[1, 2, 3, 4., 5.0f0])
 end
 
 
@@ -63,6 +61,8 @@ end
     show(devnull, ob)
     @test (@inferred eltype(ob)) == Float32
 
+    @test (@inferred IP.ℓmax(ob)) == 12
+    @test (@inferred IP.ℓmax1(Shape())) == 2
 
     fun = @inferred phantom(ob)
     @test fun isa Function

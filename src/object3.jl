@@ -9,6 +9,8 @@ export phantom, radon, spectrum
 
 volume(ob::Object3d{S}) where S = volume1(S()) * prod(ob.width)
 
+ℓmax(ob::Object3d{S}) where S = ℓmax1(S()) * maximum(ob.width)
+
 
 # rotate
 

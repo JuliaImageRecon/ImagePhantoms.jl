@@ -9,6 +9,8 @@ export phantom, radon, spectrum
 
 area(ob::Object2d{S}) where S = area1(S()) * prod(ob.width)
 
+ℓmax(ob::Object2d{S}) where S = ℓmax1(S()) * maximum(ob.width)
+
 
 # rotate
 

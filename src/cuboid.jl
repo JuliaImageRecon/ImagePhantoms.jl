@@ -22,7 +22,6 @@ struct Cuboid <: AbstractShape{3} end
 """
     cuboid(cx, cy, cz, wx, wy, wz, Φ, Θ, value::Number)
     cuboid(center::NTuple{3,RealU}, width::NTuple{3,RealU}, angle::NTuple{2,RealU}, v)
-    cuboid([9-vector])
 Construct `Object{Cuboid}` from parameters;
 here `width` is the full-width.
 """
@@ -34,7 +33,6 @@ cuboid(args... ; kwargs...) = Object(Cuboid(), args...; kwargs...)
 """
     cube(x, y, z, w, v=1) (cube of width `w` centered at `(x,y,z)`)
     cube((x,y,z), w, v=1) ditto
-    cube([5-vector]) ditto
     cube(w, v=1) centered at origin
 Construct cubes as special cases of `Cuboid`.
 """
@@ -44,16 +42,15 @@ cube(center::NTuple{3,RealU}, w::RealU, v::Number = 1) =
     cube(center..., w, v)
 cube(w::RealU, v::Number = 1) = cube((zero(w), zero(w), zero(w)), v)
 
-function cube(v::AbstractVector{<:Number})
-    length(v) == 5 || throw(ArgumentError("$v wrong length"))
-    cube(v...)
-end
-
 
 # methods
 
 
 volume1(::Cuboid) = 1 # volume of unit cube
+
+ℓmax1(::Cuboid) = √3 # max line integral through unit cuboid
+
+ℓmax(ob::Object3d{Cuboid}) = sqrt(sum(abs2, ob.width))
 
 
 """
