@@ -68,9 +68,9 @@ Return vector of `Object{Ellipse}`, one for each row of input matrix.
 """
 function ellipse(params::AbstractMatrix{T}) where {T <: RealU}
     size(params,2) == 6 || throw("ellipses need 6 parameters")
-    O = Object2d{Ellipse, T, T, T, 1}
+#   O = Object2d{Ellipse, T, T, T, 1} # attempt to infer, fails due to Number
     out = [ellipse(params[n,:]...) for n in 1:size(params,1)]
-    return out::Vector{O}
+    return out #::Vector{O}
 end
 
 function shepp_logan(case::EllipsePhantomVersion; kwargs...)
@@ -138,10 +138,8 @@ function ellipse_parameters(
     u::NTuple{3,Number} = (1,1,1), # unit scaling
     disjoint::Bool = false,
 )
-    (xfov, yfov) = fovs
 
-    # The "Number" here is to enable units
-    params = Number[ # original CT version
+    params = Float64[ # original CT version
     0       0       0.92    0.69    90    2     # skull
     0       -0.0184 0.874   0.6624  90    -0.98 # brain
     0.22    0       0.31    0.11    72    -0.02 # right big
@@ -159,8 +157,9 @@ function ellipse_parameters(
         params[5,2] += 0.07
     end
 
-    params[:,[1,3]] .*= xfov/2
-    params[:,[2,4]] .*= yfov/2
+    params = convert(Matrix{Number}, params) # enable units
+    params[:,[1,3]] .*= fovs[1]/2
+    params[:,[2,4]] .*= fovs[2]/2
     params[:,5] .*= π/180
     params[:,6] = shepp_logan_values(case)
 
@@ -173,6 +172,7 @@ end
 Ellipse parameters for "South Park" phantom.
 """
 function ellipse_parameters(::SouthPark ; fovs::NTuple{2,RealU} = (100,100))
+
     params = Float64[
         0 0 85 115 0 100
         0 -60 30 20 0 -80 # mouth
@@ -182,6 +182,8 @@ function ellipse_parameters(::SouthPark ; fovs::NTuple{2,RealU} = (100,100))
         -15 25 7 7 0 -100
         0 75 60 15 0 -50  # hat
     ]
+
+    params = convert(Matrix{Number}, params) # enable units
     params[:,[1,3]] .*= fovs[1] / 256
     params[:,[2,4]] .*= fovs[2] / 256
     params[:,5] .*= π/180

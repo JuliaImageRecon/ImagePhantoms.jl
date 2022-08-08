@@ -10,6 +10,7 @@ using Test: @test, @testset, @test_throws, @inferred
     for case in (SheppLogan, SheppLoganToft, SheppLoganEmis, SheppLoganBrainWeb)
         @test ImagePhantoms.shepp_logan_values(case()) isa Vector
         @test ellipse_parameters(case()) isa Matrix
+        image = @NOTinferred shepp_logan(2^6, case())
     end
     @test ellipse_parameters(SouthPark()) isa Matrix
 
