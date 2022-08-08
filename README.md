@@ -59,8 +59,8 @@ function disk_phantom(title::String)
     x = (-M÷2:M÷2-1) * dx
     y = (-N÷2:N÷2-1) * dy
     params = disk_phantom_params( ; rhead = () -> rand(100:105))
-    objects = Ellipse(params) # vector of Ellipse objects
-    img = phantom(x, y, objects)
+    objects = ellipse(params) # vector of Object2d{Ellipse}
+    img = phantom(x, y, objects) # sampled at all (x,y) pairs
     jim(x, y, img; title, clim=(0,1300))
 end
 anim = @animate for i in 1:8
