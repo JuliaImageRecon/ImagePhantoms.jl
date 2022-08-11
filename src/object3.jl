@@ -174,6 +174,14 @@ function _xray(
 end
 
 
+# this gateway seems to help type inference
+function _radon(ob::Object3d{S}, u::RealU, v::RealU, ϕ::RealU, θ::RealU) where S
+    Tc = eltype(ob.center[1] / oneunit(ob.center[1]))
+    T = promote_type(Tc, eltype(ob.value))
+    return T(ob.value) * _xray(S(), ob.center, ob.width, ob.angle, u, v, ϕ, θ)
+end
+
+
 """
     radon(ob::Object3d)::Function
 Return function of `(u,v,ϕ,θ)` that user can sample
@@ -186,8 +194,7 @@ for an object ``f(x,y,z)``.
 Then as `ϕ` increases, the line integrals rotate counter-clockwise.
 """
 function radon(ob::Object3d{S}) where S
-    return (u,v,ϕ,θ) -> ob.value *
-        _xray(S(), ob.center, ob.width, ob.angle, u, v, ϕ, θ)
+    return (u::RealU, v::RealU, ϕ::RealU, θ::RealU) -> _radon(ob, u, v, ϕ, θ)
 end
 
 
