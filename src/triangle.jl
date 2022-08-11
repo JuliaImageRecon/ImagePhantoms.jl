@@ -146,9 +146,9 @@ phantom1(ob::Object2d{Triangle}, xy::NTuple{2,Real}) =
 
 # x-ray transform (line integral) of unit triangle
 # `r` should be unitless
-function xray1(::Triangle, r::Real, ϕ::RealU)
+function xray1(::Triangle, r::R, ϕ::RealU) where {R <: Real}
     # valid only for param == 1/2, but that's ok now because constructor is 1/2
-    T = promote_type(eltype(r), Float32)
+    T = promote_type(R, Float32)
     return abs(r) ≥ sqrt(3)/2 ? zero(T) : T(radon_tri(r, sincos(ϕ)...))
 end
 
