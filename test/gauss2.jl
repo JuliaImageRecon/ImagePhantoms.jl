@@ -5,12 +5,12 @@ gauss2.jl
 using ImagePhantoms: Object, Object2d, AbstractShape, phantom, radon, spectrum
 using ImagePhantoms: Gauss2, gauss2
 import ImagePhantoms as IP
-using Unitful: m, unit, °
+using Unitful: m, °
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
 
-(Shape, shape, lmax, lmax1, X1, errk, errps) =
- (Gauss2, gauss2, IP.fwhm2spread(4), IP.fwhm2spread(1), 1e-6, 1e-6, 4e-4)
+(Shape, shape, lmax, lmax1, X1, errk, errps, swidth) =
+ (Gauss2, gauss2, IP.fwhm2spread(4), IP.fwhm2spread(1), 7e-6, 7e-6, 4e-4, (5m, 2m))
 
 macro isob(ex) # @isob macro to streamline tests
     :(@test $(esc(ex)) isa Object2d{Shape})
@@ -63,7 +63,11 @@ end
     fun = @inferred phantom(ob)
     @test fun isa Function
     @test fun(ob.center...) == ob.value
-    @test fun((ob.center .+ 9 .* ob.width)...) < 1e-20
+    if shape == gauss2
+        @test fun((ob.center .+ 9 .* ob.width)...) < 1e-20
+    else
+        @test fun((ob.center .+ 2 .* ob.width)...) == 0
+    end
 
     img = @inferred phantom(x, y, [ob])
     @test img isa Matrix{<:Real}
@@ -101,22 +105,23 @@ end
 end
 
 
+if shape == gauss2
 @testset "fwhm" begin
     fwhm = 10
     ob = @inferred shape((0, 0), (fwhm, Inf), 0, 1)
     tmp = @inferred phantom((-1:1)*fwhm/2, [0], [ob])
     @test tmp ≈ [0.5, 1, 0.5]
 end
+end
 
 
 @testset "spectrum" begin
     dx = 0.02m
-    dy = 0.024m
-    (M,N) = (1.5*2^10,2^10+2)
+    dy = 0.025m
+    (M,N) = (2^10,2^10+2)
     x = (-M÷2:M÷2-1) * dx
     y = (-N÷2:N÷2-1) * dy
-    width = (5m, 2m)
-    ob = shape((2m, -3m), width, π/6, 1.0f0)
+    ob = shape((2m, -3m), swidth, π/6, 1.0f0)
     img = @inferred phantom(x, y, [ob])
 
     zscale = 1 / (ob.value * IP.area(ob)) # normalize spectra by area
@@ -140,7 +145,7 @@ end
     ϕ = (0:30:360) * deg2rad(1)
     sino = @inferred radon(r, ϕ, [ob])
 
-    ia = argmin(abs.(ϕ .- deg2rad(55)))
+    ia = argmin(abs.(ϕ .- deg2rad(50)))
     slice = sino[:,ia]
     Slice = myfft(slice) * dr
     angle = round(rad2deg(ϕ[ia]), digits=1)
