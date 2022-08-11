@@ -2,8 +2,8 @@
 test/shape2.jl
 =#
 
-using ImagePhantoms: Object, Object2d, AbstractShape, phantom, radon, spectrum
-using ImagePhantoms: circle, square
+using ImagePhantoms: Object2d, circle, square
+using ImagePhantoms: Object, AbstractShape, phantom, radon, spectrum
 using ImagePhantoms: Gauss2, gauss2
 using ImagePhantoms: Ellipse, ellipse
 using ImagePhantoms: Rect, rect
@@ -12,6 +12,7 @@ import ImagePhantoms as IP
 using Unitful: m, °
 using FFTW: fftshift, fft
 using Test: @test, @testset, @inferred
+
 
 @testset "circle-square" begin # special constructors
     args = [(1, 5.0f0), (1, 2, 3., 5.0f0), ((1, 2), 3., 5.0f0)]
@@ -32,6 +33,14 @@ end
 end
 
 
+@testset "gauss2-fwhm" begin
+    fwhm = 10
+    ob = @inferred gauss2((0, 0), (fwhm, Inf), 0, 1)
+    tmp = @inferred phantom((-1:1)*fwhm/2, [0], [ob])
+    @test tmp ≈ [0.5, 1, 0.5]
+end
+
+
 # parameters for testing each shape
 list = [
  (Ellipse, ellipse, 8, 2, 1e-6, 6e-4, 2e-4, (2m, 8m)),
@@ -40,8 +49,7 @@ list = [
  (Triangle, triangle, sqrt((4/2)^2 + (3 * sqrt(3) / 2)^2), 1, 3e-5, 2e-3, 3e-5, (13m, 14m)),
 ]
 
-macro isob(ex) # @isob macro to streamline tests
-#   :(@test $(esc(ex)) isa Object2d{Shape})
+macro isob(ex) # macro to streamline tests
     :(@test $(esc(ex)) isa Object2d)
 end
 
@@ -93,7 +101,6 @@ end
     @test (@inferred IP.ℓmax1(Shape())) ≈ lmax1
 
     fun = @inferred phantom(ob)
-    @test fun isa Function
     @test fun(ob.center...) == ob.value
     if shape == gauss2
         @test fun((ob.center .+ 9 .* ob.width)...) < 1e-20
@@ -109,8 +116,7 @@ end
     @inferred IP._xray(Shape(), (0., 0.), (2,2), (π/3,), 0.5f0, π/6)
 
     fun = @inferred radon([ob])
-    @test fun isa Function
-    fun(0,0)
+    @inferred fun(0,0)
 
     r = LinRange(-1,1,51)*2
     s1 = @inferred radon(r, [0], [ob])
@@ -137,16 +143,6 @@ end
 end
 
 
-if shape == gauss2
-    @testset "fwhm" begin
-        fwhm = 10
-        ob = @inferred shape((0, 0), (fwhm, Inf), 0, 1)
-        tmp = @inferred phantom((-1:1)*fwhm/2, [0], [ob])
-        @test tmp ≈ [0.5, 1, 0.5]
-    end
-end
-
-
 @testset "spectrum" begin
     dx = 0.02m
     dy = 0.025m
@@ -160,10 +156,11 @@ end
     fx = (-M÷2:M÷2-1) / M / dx
     fy = (-N÷2:N÷2-1) / N / dy
     X = myfft(img) * dx * dy * zscale
-    kspace = @inferred spectrum(fx, fy, [ob]) * zscale
+    kspace = (@inferred spectrum(fx, fy, [ob])) * zscale
+    @test maximum(abs, kspace) ≈ 1
+    @test kspace[M÷2+1,N÷2+1] ≈ 1
 
     @test abs(maximum(abs, X) - 1) < tol1
-    @test abs(maximum(abs, kspace) - 1) < 1e-5
     err = maximum(abs, kspace - X) / maximum(abs, kspace)
     @test err < tolk
 

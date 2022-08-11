@@ -5,18 +5,24 @@ test/cuboid.jl
 using ImagePhantoms: Object3d, AbstractShape, phantom, radon, spectrum
 using ImagePhantoms: Object, Cuboid, cuboid
 import ImagePhantoms as IP
-using Unitful: m, unit, °
+using ImageGeoms: ImageGeom, axesf
+using LazyGrids: ndgrid
+using Unitful: m, mm, °
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
 
-(Shape, shape) = (Cuboid, cuboid)
+(Shape, shape, lmax, lmax1, tol1, tolk, tolp) =
+ (Cuboid, cuboid, sqrt(4^2 + 5^2 + 6^2), √3, 1e-2, 2e-2, 2e-3)
 
 macro isob3(ex) # @isob macro to streamline tests
     :(@test $(esc(ex)) isa Object3d{Shape})
 end
 
 
+if shape == cuboid
 @testset "xray1" begin
+    @test (@inferred IP.xray1(Cuboid(), 0, 0, 0, 0)) == 1 # e1,e3
+    @test (@inferred IP.xray1(Cuboid(), 0, 0, π/2, 0)) == 1 # e2,e3
     @inferred IP.xray1(Cuboid(), 0.5f0, 0.4, π/6, π/7)
     fun = (u, v, ϕ, θ) -> IP.xray1(Cuboid(), u, v, ϕ, θ)
     @test fun(0, 0, 0, 0) ≈ 1
@@ -27,6 +33,7 @@ end
     @inferred IP.cube_bounds(0.2, 0.5f0)
     @inferred IP.cube_bounds(0.2, 0.5)
     @test IP.cube_bounds(0.2, 0.5f0) == IP.cube_bounds(0.2, 0.5)
+end
 end
 
 
@@ -70,16 +77,14 @@ end
     show(devnull, ob)
     @test (@inferred eltype(ob)) == Float32
 
-    @test (@inferred IP.ℓmax(ob)) ≈ sqrt(4^2 + 5^2 + 6^2)
-    @test (@inferred IP.ℓmax1(Shape())) ≈ √3
+    @test (@inferred IP.ℓmax(ob)) ≈ lmax
+    @test (@inferred IP.ℓmax1(Shape())) ≈ lmax1
 
     fun = @inferred phantom(ob)
-    @test fun isa Function
     @test fun(ob.center...) == ob.value
     @test fun((ob.center .+ 2 .* ob.width)...) == 0
 
     fun = @inferred phantom([ob])
-    @test fun isa Function
     @test fun(ob.center...) == ob.value
     @test fun((ob.center .+ 2 .* ob.width)...) == 0
 
@@ -98,6 +103,7 @@ end
     fun(0,0,0,0) # todo
 
     @test radon([0], [0], [0], [0], [ob])[1] isa Real # todo
+    @test radon([9], [3], [0], [0], [ob])[1] == 0 # outside
 
     volume = IP.volume(ob)
 
@@ -142,9 +148,9 @@ end
     @test maximum(abs, kspace) ≈ 1
     @test kspace[L÷2+1,M÷2+1,N÷2+1] ≈ 1
 
-    @test abs(maximum(abs, X) - 1) < 1e-2
+    @test abs(maximum(abs, X) - 1) < tol1
     err = maximum(abs, kspace - X) / maximum(abs, kspace)
-    @test err < 2e-2
+    @test err < tolk
 
     # test sinogram with projection-slice theorem
 
@@ -154,10 +160,29 @@ end
     v = (-nv÷2:nv÷2-1) * dv
     fu = (-nu÷2:nu÷2-1) / nu / du
     fv = (-nv÷2:nv÷2-1) / nv / dv
-#   ϕ = (0:6:180) * deg2rad(1)
-    ϕ = deg2rad.(0:6:180) # helps coverage of "abs(e2) < eps(T)"
+    ϕ = (0:30:180) * deg2rad(1)
     θ = [π/7]
     sino = @inferred radon(u, v, ϕ, θ, [ob])
+end
 
-# todo projection slice
+
+@testset "proj-slice" begin
+    center = (20mm, 10mm, 5mm)
+    width = (25mm, 35mm, 15mm)
+    angles = (π/6, 0)
+    ob = shape(center, width, angles, 1.0f0)
+
+    pg = ImageGeom((2^8,2^7), (0.6mm,1.0mm), (0.5,0.5)) # projection sampling
+    ϕ, θ = π/3, π/7
+    proj = @inferred radon(axes(pg)..., ϕ, θ, [ob])
+
+    e1 = (cos(ϕ), sin(ϕ), 0)
+    e3 = (sin(ϕ)*sin(θ), -cos(ϕ)*sin(θ), cos(θ))
+    fu, fv = ndgrid(axesf(pg)...)
+    ff = vec(fu) * [e1...]' + vec(fv) * [e3...]' # fx,fy,fz for Fourier-slice theorem
+    spectrum_slice = spectrum(ob).(ff[:,1], ff[:,2], ff[:,3]) / IP.volume(ob)
+    spectrum_slice = reshape(spectrum_slice, pg.dims)
+    proj_fft = myfft(proj) * prod(pg.deltas) / IP.volume(ob)
+    err = maximum(abs, spectrum_slice - proj_fft) / maximum(abs, spectrum_slice)
+    @test err < tolp
 end
