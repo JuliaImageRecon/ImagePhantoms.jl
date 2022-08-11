@@ -3,13 +3,14 @@ rect.jl
 =#
 
 using ImagePhantoms: Object, Object2d, AbstractShape, phantom, radon, spectrum
-using ImagePhantoms: Rect, rect, square
+using ImagePhantoms: Rect, rect
 import ImagePhantoms as IP
 using Unitful: m, unit, °
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
 
-(Shape, shape, shape2) = (Rect, rect, square)
+(Shape, shape, lmax, lmax1, X1, errk, errps) =
+ (Rect, rect, 5, √2, 2e-4, 6e-3, 3e-5)
 
 macro isob(ex) # @isob macro to streamline tests
     :(@test $(esc(ex)) isa Object2d{Shape})
@@ -25,11 +26,7 @@ end
     @isob @inferred Object(Shape(), center=(1,2))
     @isob @inferred shape((1,2.), (3,4//1), π, 5.0f0)
     @isob @inferred shape(1, 2., 3, 4//1, π, 5.0f0)
-
-    # squares
-    @isob @inferred shape2(1, 5.0f0)
-    @isob @inferred shape2(1, 2, 3., 5.0f0)
-    @isob @inferred shape2((1, 2), 3., 5.0f0)
+    @isob @inferred shape(1, 5.0f0)
 end
 
 
@@ -60,8 +57,8 @@ end
     show(devnull, ob)
     @test (@inferred eltype(ob)) == Float32
 
-    @test (@inferred IP.ℓmax(ob)) ≈ 5
-    @test (@inferred IP.ℓmax1(Shape())) ≈ √2
+    @test (@inferred IP.ℓmax(ob)) ≈ lmax
+    @test (@inferred IP.ℓmax1(Shape())) ≈ lmax1
 
     fun = @inferred phantom(ob)
     @test fun isa Function
@@ -69,16 +66,38 @@ end
     @test fun((ob.center .+ 2 .* ob.width)...) == 0
 
     img = @inferred phantom(x, y, [ob])
-    @test img isa Array{<:Real, 2}
+    @test img isa Matrix{<:Real}
     @test size(img) == length.((x, y))
 
+    @inferred IP.xray1(Shape(), 0.5f0, π/6)
+    @inferred IP._xray(Shape(), (0., 0.), (2,2), (π/3,), 0.5f0, π/6)
 
     fun = @inferred radon([ob])
     @test fun isa Function
     fun(0,0)
 
+    r = LinRange(-1,1,51)*2
+    s1 = @inferred radon(r, [0], [ob])
+    s2 = @inferred radon(r, 0, [ob])
+    @test s1[:] == s2
+
     fun = @inferred spectrum(ob)
     @test fun isa Function
+end
+
+
+@testset "infer" begin
+    obs = [shape((4m, 3m), (2m, 5m), π/6, 1.0f0),
+           shape((4f0m, 3f0m), (2f0m, 5f0m), π/6, 1.0)]
+    for ob in obs
+        nr, dr = 2^4, 0.02m
+        r = (-nr÷2:nr÷2-1) * dr .+ ob.center[1]
+        ϕ = (0:30:360) * deg2rad(1)
+        @inferred IP._radon(ob, r[1], ϕ[1])
+        sino1 = @inferred radon([r[1]], [ϕ[1]], [ob])
+        sino = @inferred radon(r, ϕ, [ob])
+        @test sino1[1] == sino[1]
+    end
 end
 
 
@@ -89,7 +108,7 @@ end
     x = (-M÷2:M÷2-1) * dx
     y = (-N÷2:N÷2-1) * dy
     width = (2m, 8m)
-    ob = shape((4m, 3m), width, π/6, 1.0f0)
+    ob = shape((2m, -3m), width, π/6, 1.0f0)
     img = @inferred phantom(x, y, [ob])
 
     zscale = 1 / (ob.value * IP.area(ob)) # normalize spectra by area
@@ -98,9 +117,10 @@ end
     X = myfft(img) * dx * dy * zscale
     kspace = @inferred spectrum(fx, fy, [ob]) * zscale
 
-    @test abs(maximum(abs, X) - 1) < 2e-4
+    @test abs(maximum(abs, X) - 1) < X1
     @test abs(maximum(abs, kspace) - 1) < 1e-5
-    @test maximum(abs, kspace - X) / maximum(abs, kspace) < 6e-3
+    err = maximum(abs, kspace - X) / maximum(abs, kspace)
+    @test err < errk
 
 
     # test sinogram with projection-slice theorem
@@ -120,5 +140,6 @@ end
     kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
     ideal = spectrum(ob).(kx, ky)
 
-    @test maximum(abs, ideal - Slice) / maximum(abs, ideal) < 3e-5
+    err = maximum(abs, ideal - Slice) / maximum(abs, ideal)
+    @test err < errps
 end

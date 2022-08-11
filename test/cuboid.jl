@@ -3,13 +3,13 @@ test/cuboid.jl
 =#
 
 using ImagePhantoms: Object3d, AbstractShape, phantom, radon, spectrum
-using ImagePhantoms: Object, Cuboid, cuboid, cube
+using ImagePhantoms: Object, Cuboid, cuboid
 import ImagePhantoms as IP
 using Unitful: m, unit, °
 using FFTW: fftshift, fft
 using Test: @test, @testset, @test_throws, @inferred
 
-(Shape, shape, shape3) = (Cuboid, cuboid, cube)
+(Shape, shape) = (Cuboid, cuboid)
 
 macro isob3(ex) # @isob macro to streamline tests
     :(@test $(esc(ex)) isa Object3d{Shape})
@@ -39,11 +39,6 @@ end
     @isob3 @inferred Object(Shape(), center=(1,2,3))
     @isob3 @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
     @isob3 @inferred shape(1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0)
-
-    # cubes
-    @isob3 @inferred shape3(1, 5.0f0)
-    @isob3 @inferred shape3(1, 2, 3, 4., 5.0f0)
-    @isob3 @inferred shape3((1, 2, 3), 4., 5.0f0)
 end
 
 
@@ -148,7 +143,8 @@ end
     @test kspace[L÷2+1,M÷2+1,N÷2+1] ≈ 1
 
     @test abs(maximum(abs, X) - 1) < 1e-2
-    @test maximum(abs, kspace - X) / maximum(abs, kspace) < 2e-2
+    err = maximum(abs, kspace - X) / maximum(abs, kspace)
+    @test err < 2e-2
 
     # test sinogram with projection-slice theorem
 
