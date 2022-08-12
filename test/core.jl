@@ -31,6 +31,8 @@ using Test: @test, @testset, @test_throws, @inferred
     @test spectrum([ob]) isa Function
     @test spectrum([ob])(0,0) ≈ π
     @test spectrum(zeros(2), zeros(3), [ob]) ≈ π*ones(2,3)
+
+    @inferred IP.radon_type(ob)
 end
 
 

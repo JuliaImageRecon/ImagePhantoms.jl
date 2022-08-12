@@ -156,6 +156,7 @@ end
     center = (8m, 7m, 6m)
     ϕ = π/6
     ob = shape(center, width, (ϕ, 0), 1.0f0)
+    @inferred IP._radon(ob, 0m, (1//2)m, 3f0, 4.)
     x1 = radon([center[1]], [center[3]], [0], [0], [ob])[1]
     x2 = radon([center[1]], [center[3]], 0, 0, [ob])[1]
     @test x2 ≈ x1
