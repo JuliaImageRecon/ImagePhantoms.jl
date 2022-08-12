@@ -176,9 +176,8 @@ end
 
 # this gateway seems to help type inference
 function _radon(ob::Object3d{S}, u::RealU, v::RealU, ϕ::RealU, θ::RealU) where S
-    Tc = eltype(ob.center[1] / oneunit(ob.center[1]))
-    T = promote_type(Tc, eltype(ob.value))
-    return T(ob.value) * _xray(S(), ob.center, ob.width, ob.angle, u, v, ϕ, θ)
+    T = radon_type(ob)
+    return T(ob.value * _xray(S(), ob.center, ob.width, ob.angle, u, v, ϕ, θ))::T
 end
 
 
@@ -206,7 +205,7 @@ to make projection views
 for an array of 3D objects.
 """
 function radon(oa::Array{<:Object3d})
-    return (u,v,ϕ,θ) -> sum(ob -> radon(ob)(u,v,ϕ,θ), oa)
+    return (u::RealU, v::RealU, ϕ::RealU, θ::RealU) -> sum(ob -> radon(ob)(u,v,ϕ,θ), oa)
 end
 
 

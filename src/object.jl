@@ -84,16 +84,16 @@ end
 
 
 """
-    Object2d{S,V} = Object{S,2,V} where {S <: AbstractShape, V <: Number}
+    Object2d{S,V,C} = Object{S,2,V,C} where {S <: AbstractShape, V,C <: Number}
 For 2D objects
 """
-const Object2d{S,V} = Object{S,2,V}
+const Object2d{S,V,C} = Object{S,2,V,C}
 
 """
-    Object3d{S,V} = Object{S,3,V} where {S <: AbstractShape, V <: Number}
+    Object3d{S,V,C} = Object{S,3,V,C} where {S <: AbstractShape, V,C <: Number}
 For 3D objects
 """
-const Object3d{S,V} = Object{S,3,V}
+const Object3d{S,V,C} = Object{S,3,V,C}
 
 
 # constructors
@@ -230,3 +230,14 @@ translate(ob::Object{S,D}, shift::NTuple{D,RealU}) where {S, D} =
     Object(S(), ob.center .+ shift, ob.width, ob.angle, ob.value)
 translate(ob::Object{S,2}, x::RealU, y::RealU) where {S} = translate(ob, (x,y))
 translate(ob::Object{S,3}, x::RealU, y::RealU, z::RealU) where {S} = translate(ob, (x,y,z))
+
+
+"""
+    radon_type(::Object)
+Determine the element type of the Radon transform of an object
+(including units if applicable).
+Ensures that its precision is at least `Float32`.
+"""
+function radon_type(::Object{S, D, V, C, A}) where {S, D, V <: Number, C <: RealU, A <: RealU}
+    return eltype(oneunit(C) * oneunit(V) * one(A) * one(Float32))
+end
