@@ -67,8 +67,8 @@ function xray1(
     θ::RealU, # irrelevant
 ) where {Ru <: Real, Rv <: Real}
     T = promote_type(Ru, Rv, Float32)
-    r2 = T(u^2 + v^2)
-    return T(r2 < 1 ? 2 * sqrt(one(T) - r2) : zero(T))
+    r2 = u^2 + v^2
+    return (r2 < 1 ? 2 * sqrt(one(T) - r2) : zero(T))::T
 end
 
 
