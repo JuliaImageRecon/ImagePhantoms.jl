@@ -184,16 +184,6 @@ end
     @test abs(maximum(abs, X) - 1) < tol1
     err = maximum(abs, kspace - X) / maximum(abs, kspace)
     @test err < tolk
-
-    du,dv = 0.02m, 0.03m
-    nu,nv = 2^9, 2^8
-    u = (-nu÷2:nu÷2-1) * du
-    v = (-nv÷2:nv÷2-1) * dv
-    ϕ = (0:30:180) * deg2rad(1)
-    θ = [π/7]
-    sino = @inferred radon(u, v, ϕ, θ, [ob])
-#= todo
-=#
 end
 
 
@@ -205,7 +195,7 @@ end
 
     pg = ImageGeom((2^8,2^7), (0.6mm,1.0mm), (0.5,0.5)) # projection sampling
     ϕ, θ = π/3, π/7
-    proj = @NOTinferred radon(axes(pg)..., ϕ, θ, [ob])
+    proj = @inferred radon(axes(pg)..., ϕ, θ, [ob])
 
     e1 = (cos(ϕ), sin(ϕ), 0)
     e3 = (sin(ϕ)*sin(θ), -cos(ϕ)*sin(θ), cos(θ))

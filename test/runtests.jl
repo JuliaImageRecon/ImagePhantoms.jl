@@ -15,10 +15,10 @@ include("focus-chart.jl")
 
 # 3d:
 include("shape3.jl")
-include("ellipsoid.jl")
-include("gauss3.jl")
-include("cuboid.jl")
-include("cylinder.jl")
+#include("ellipsoid.jl")
+#include("gauss3.jl")
+#include("cuboid.jl")
+#include("cylinder.jl")
 
 @testset "mri-sense" begin
     include("mri-sense.jl")

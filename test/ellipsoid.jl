@@ -161,7 +161,7 @@ end
 
     pg = ImageGeom((2^8,2^7), (0.6mm,1.0mm), (0.5,0.5)) # projection sampling
     ϕ, θ = π/3, π/7
-    proj = @NOTinferred radon(axes(pg)..., ϕ, θ, [ob]) # todo
+    proj = @inferred radon(axes(pg)..., ϕ, θ, [ob]) # todo
 
     e1 = (cos(ϕ), sin(ϕ), 0)
     e3 = (sin(ϕ)*sin(θ), -cos(ϕ)*sin(θ), cos(θ))
