@@ -57,6 +57,11 @@ end
 for (Shape, shape, lmax, lmax1, tol1, tolk, tolp) in list
     @show shape
 
+@testset "xray1" begin
+    @test (@inferred IP.xray1(Shape(), 0, 0, 0, 0)) > 0
+    @test (@inferred IP.xray1(Shape(), 0f0, 0., 0, 0)) > 0
+end
+
 
 @testset "construct-$shape" begin
     @test Shape <: AbstractShape{3}
@@ -132,7 +137,7 @@ end
     fun = @inferred radon([ob])
     @inferred fun(0,0,0,0)
 
-    @test radon([0], [0], [0], [0], [ob])[1] isa Real # todo
+    @test radon([0], [0], [0], [0], [ob])[1] isa Real
     if shape == gauss3
         @test radon([9], [8], [0], [0], [ob])[1] < 3e-4 # outside
     else
