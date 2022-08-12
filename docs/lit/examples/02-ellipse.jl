@@ -127,7 +127,7 @@ dr = 0.2mm # radial sample spacing
 nr = 2^10 # radial sinogram bins
 r = (-nr÷2:nr÷2-1) * dr # radial samples
 fr = (-nr÷2:nr÷2-1) / nr / dr # corresponding spectral axis
-ϕ = deg2rad.(0:180) # * Unitful.rad # todo round unitful Unitful.°
+ϕ = deg2rad.(0:180)
 sino = radon(ob).(r, ϕ') # sample Radon transform of a single shape object
 smax = ob.value * 2 * maximum(radii)
 p5 = jim(r, rad2deg.(ϕ), sino; title="sinogram",
