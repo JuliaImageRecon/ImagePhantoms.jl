@@ -84,7 +84,7 @@ function mri_smap_fit(
 
     smaps_fit = [embed(B * coef, mask) for coef in coefs]
     ss(v) = sum(x -> sum(abs2, x), v)
-    nrmse = Float64( sqrt( ss(smaps_fit - smaps) / ss(smaps) ))
+    nrmse = Float64( sqrt( ss(smaps_fit - smaps) / ss(smaps) ))::Float64
     return (; B, ν, coefs, nrmse, smaps = smaps_fit)
 end
 
