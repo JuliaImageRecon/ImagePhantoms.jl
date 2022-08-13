@@ -81,7 +81,7 @@ end
 
 
 """
-    image = shepp_logan(M, [N,], case, options...)
+    image = shepp_logan(M, [N,] [case] ; options...)
 Convenience method for generating `M×N` samples of Shepp-Logan phantoms.
 
 # In
@@ -92,6 +92,7 @@ Convenience method for generating `M×N` samples of Shepp-Logan phantoms.
 # Options
 * `oversample::Int = 3` (usually)
 * `yflip::Bool = true` (reverse `y` samples for convenience.)
+* `T::DataType` default `Float32` (except `Int` for `BrainWeb` version)
 * `kwargs...` remaining options passed to `ellipse_parameters` for parameters.
 
 # Out
@@ -139,6 +140,7 @@ function shepp_logan(
     out = Int.(phantom(x, y, ob))
     return out
 end
+
 
 shepp_logan(M::Int, case::EllipsePhantomVersion = SheppLogan(), args...; kwargs...) =
     shepp_logan(M, M, case, args... ; kwargs...)
