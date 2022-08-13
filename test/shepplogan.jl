@@ -1,10 +1,8 @@
-#=
-shepplogan.jl
-=#
+# test/shepplogan.jl
 
 using ImagePhantoms # many
 import ImagePhantoms as IP
-using Test: @test, @testset, @test_throws, @inferred
+using Test: @test, @testset, @inferred
 
 
 @testset "shepp" begin

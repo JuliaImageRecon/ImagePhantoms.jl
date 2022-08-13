@@ -1,6 +1,4 @@
-#=
-test/shape2.jl
-=#
+# test/shape2.jl
 
 using ImagePhantoms: Object2d, circle, square
 using ImagePhantoms: Object, AbstractShape, phantom, radon, spectrum

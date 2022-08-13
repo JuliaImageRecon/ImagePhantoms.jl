@@ -1,6 +1,4 @@
-#=
-test/shape3.jl
-=#
+# test/shape3.jl
 
 using ImagePhantoms: Object3d, sphere, cube
 using ImagePhantoms: Object, AbstractShape, phantom, radon, spectrum

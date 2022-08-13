@@ -1,11 +1,10 @@
-# core.jl
+# test/core.jl
 
 using ImagePhantoms: Object, Ellipse, circle, square
 using ImagePhantoms: phantom, radon, spectrum
 import ImagePhantoms as IP
 using Unitful: m, °
-
-using Test: @test, @testset, @test_throws, @inferred
+using Test: @test, @testset, @inferred
 
 
 @testset "methods" begin
