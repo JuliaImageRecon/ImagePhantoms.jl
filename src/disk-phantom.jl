@@ -12,7 +12,7 @@ using Random: seed!
 """
     params = disk_phantom_params( ; ...)
 
-Generate `ndisk × 6` ellipse phantom parameters
+Generate `ndisk` ellipse phantom parameter 6-tuples
 for a head-sized disk plus many disks within it,
 designed so that the disks have some minimum separation `minsep`
 to avoid overlap and to simplify patch-based model fitting.
@@ -31,7 +31,15 @@ to avoid overlap and to simplify patch-based model fitting.
 
 The function options can be replaced with rand() for other Distributions.
 """
-function disk_phantom_params( ;
+function disk_phantom_params( ; kwargs...)
+    params = _disk_phantom_params( ; kwargs...)
+
+    out = ellipse_parameters_uscale(params, (1,1), 1, 1, 1)
+    return out
+end
+
+
+function _disk_phantom_params( ;
     fov::RealU = 240,
 #   rhead::RealU = 100, # background radius for "head" [mm]
     rhead::Function = () -> 100, # background radius for "head" [mm]
@@ -63,9 +71,9 @@ function disk_phantom_params( ;
 
     (seed != 0) && seed!(seed)
 
-    for id=1:ndisk
+    for id in 1:ndisk
         trial = 0
-        for ii=1:maxtry
+        for ii in 1:maxtry
 #           rc = randu(0, rhead - rmin - minsep, f = x->x^0.5)
             rc = cdisk()
             phi = rand() * 2π

@@ -68,9 +68,10 @@ phantom1(ob::Object2d{Gauss2}, xy::NTuple{2,Real}) =
 
 # x-ray transform (line integral) of unit gauss2
 # `r` should be unitless
-function xray1(::Gauss2, r::Real, ϕ::RealU)
+function xray1(::Gauss2, r::R, ϕ::RealU) where {R <: Real}
+    T = promote_type(R, Float32)
     s = fwhm2spread(1)
-    return s * exp(-π * abs2(r / s))
+    return T(s * exp(-π * abs2(r / s)))
 end
 
 

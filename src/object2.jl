@@ -84,7 +84,7 @@ function phantom(
     x::AbstractVector,
     y::AbstractVector,
     oa::Array{<:Object2d},
-    oversample::Int;
+    oversample::Int ;
     T::DataType = promote_type(eltype.(oa)..., Float32),
 )
 
@@ -201,7 +201,7 @@ function radon(
     ϕ::AbstractVector,
     oa::Array{<:Object2d},
 )
-    return sum(ob -> radon(ob).(r,ϕ'), oa)
+    return radon(oa).(r,ϕ')
 end
 
 

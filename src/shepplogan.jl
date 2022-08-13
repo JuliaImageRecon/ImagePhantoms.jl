@@ -63,13 +63,17 @@ shepp_logan_values(::SheppLoganToft) =
 
 
 """
-    phantom = ellipse(n × 6 AbstractMatrix)
-Return vector of `Object{Ellipse}`, one for each row of input matrix.
+    phantom = ellipse(Vector{Tuple{6 params}})
+Return vector of `Object{Ellipse}`,
+one for each element of input vector of tuples.
+Often the input comes from `ellipse_parameters`.
 """
-function ellipse(params::AbstractMatrix{<:RealU})
-    size(params,2) == 6 || throw("ellipses need 6 parameters")
-    return [ellipse(params[n,:]...) for n in 1:size(params,1)]
+function ellipse(params::Vector{<:Tuple})
+    length(params[1]) == 6 || throw("ellipses need 6 parameters")
+    out = [ellipse(p...) for p in params]
+    return out
 end
+
 
 function shepp_logan(case::EllipsePhantomVersion; kwargs...)
     return ellipse(ellipse_parameters(case; kwargs...))
@@ -77,7 +81,7 @@ end
 
 
 """
-    image = shepp_logan(M, [N,], case, options...)
+    image = shepp_logan(M, [N,] [case] ; options...)
 Convenience method for generating `M×N` samples of Shepp-Logan phantoms.
 
 # In
@@ -88,6 +92,7 @@ Convenience method for generating `M×N` samples of Shepp-Logan phantoms.
 # Options
 * `oversample::Int = 3` (usually)
 * `yflip::Bool = true` (reverse `y` samples for convenience.)
+* `T::DataType` default `Float32` (except `Int` for `BrainWeb` version)
 * `kwargs...` remaining options passed to `ellipse_parameters` for parameters.
 
 # Out
@@ -98,9 +103,10 @@ except for the `SheppLoganBrainWeb` phantom that consists of integer indices.
 """
 function shepp_logan(
     M::Int, N::Int,
-    case::EllipsePhantomVersion = SheppLogan() ;
-    oversample::Int = case == SheppLoganBrainWeb() ? 1 : 3,
+    case::EllipsePhantomVersion ;
+    oversample::Int = 3,
     yflip::Bool = true,
+    T::DataType = Float32,
     kwargs...
 )
     ob = shepp_logan(case ; kwargs...)
@@ -109,37 +115,48 @@ function shepp_logan(
     if yflip
         y = reverse(y)
     end
-    return oversample > 1 ?
-        phantom(x, y, ob, oversample) :
-        phantom(x, y, ob) # type unstable because of over-sampling
+    out = oversample > 1 ?
+        phantom(x, y, ob, oversample ; T) :
+        T.(phantom(x, y, ob))
+    return out::Matrix{T}
 end
 
-shepp_logan(M::Int, case::EllipsePhantomVersion = SheppLogan(); kwargs...) =
-    shepp_logan(M, M, case ; kwargs...)
+
+# For type stability, BrainWeb case (with integer values) is separate
+function shepp_logan(
+    M::Int, N::Int,
+    case::SheppLoganBrainWeb ;
+    oversample::Int = 1,
+    yflip::Bool = true,
+    kwargs...
+)
+    oversample == 1 || throw("oversample must be 1 for BrainWeb()")
+    ob = shepp_logan(case ; kwargs...)
+    x = LinRange(-0.5, 0.5, M)
+    y = LinRange(-0.5, 0.5, N)
+    if yflip
+        y = reverse(y)
+    end
+    out = Int.(phantom(x, y, ob))
+    return out
+end
+
+
+shepp_logan(M::Int, case::EllipsePhantomVersion = SheppLogan(), args...; kwargs...) =
+    shepp_logan(M, M, case, args... ; kwargs...)
+
+shepp_logan(M::Int, N::Int ; kwargs...) =
+    shepp_logan(M, N, SheppLogan() ; kwargs...)
 
 
 """
-    params = ellipse_parameters(case::Symbol; fovs::NTuple{2}, u::Tuple, disjoint::Bool)
-
-By default the first four columns are unitless "fractions of field of view",
-so columns 1,3 are scaled by `xfov` and columns 2,4 are scaled by `yfov`,
-where `(xfov, yfov) = fovs`.
-The optional 3-tuple `u` specifies scaling and/or units:
-* columns 1-4 (center, radii) are scaled by `u[1]` (e.g., mm),
-* column 5 (angle) is scaled by `u[2]` (e.g., `1` or `°`),
-* column 6 (value) is scaled by `u[3]` (e.g., `1/cm`) for an attenuation map.
+    ellipse_parameters_shepplogan( ; disjoint::Bool)
+`10 × 6 Matrix{Float64}` of classic Shepp-Logan ellipse parameters.
 If `disjoint==true` then the middle ellipse positions are adjusted to avoid overlap.
 """
-function ellipse_parameters(
-    case::EllipsePhantomVersion = SheppLogan() ;
-    fovs::NTuple{2,RealU} = (1,1),
-    u::NTuple{3,Number} = (1,1,1), # unit scaling
-    disjoint::Bool = false,
-)
-    (xfov, yfov) = fovs
+function ellipse_parameters_shepplogan( ; disjoint::Bool = false)
 
-    # The "Number" here is to enable units
-    params = Number[ # original CT version
+    params = Float64[ # original CT version
     0       0       0.92    0.69    90    2     # skull
     0       -0.0184 0.874   0.6624  90    -0.98 # brain
     0.22    0       0.31    0.11    72    -0.02 # right big
@@ -157,12 +174,69 @@ function ellipse_parameters(
         params[5,2] += 0.07
     end
 
-    params[:,[1,3]] .*= xfov/2
-    params[:,[2,4]] .*= yfov/2
+    return params
+end
+
+
+"""
+    ellipse_parameters_uscale(params, fovs, uc, ua, uv)
+Return vector of Tuples after FOV and unit scaling.
+"""
+function ellipse_parameters_uscale(
+    params::Matrix{Tp},
+    fovs::NTuple{2,Tf},
+    uc::Tc,
+    ua::Ta,
+    uv::Tv,
+) where {Tp <: AbstractFloat, Tf <: RealU, Tc <: RealU, Ta <: RealU, Tv <: Number}
+    C = eltype(oneunit(Tf) * oneunit(Tc) * one(Tp))
+    A = eltype(oneunit(Ta) * one(Tp))
+    V = eltype(oneunit(Tv) * one(Tp))
+    T = Tuple{C, C, C, C, A, V}
+
+    size(params,2) == 6 || throw(ArgumentError("params not N × 6"))
+    N = size(params,1)
+    out = Vector{T}(undef, N)
+    for n in 1:N
+        tmp = params[n,:]
+        tmp = (
+            (tmp[1:2] * uc * fovs[1])...,
+            (tmp[3:4] * uc * fovs[2])...,
+            tmp[5] * ua,
+            tmp[6] * uv,
+        )
+        out[n] = tmp
+    end
+    return out
+end
+
+
+"""
+    ellipse_parameters(case::Symbol; fovs::NTuple{2}, u::Tuple, disjoint::Bool)
+
+By default the first four columns are unitless "fractions of field of view",
+so columns 1,3 are scaled by `xfov` and columns 2,4 are scaled by `yfov`,
+where `(xfov, yfov) = fovs`.
+The optional 3-tuple `u` specifies scaling and/or units:
+* columns 1-4 (center, radii) are scaled by `u[1]` (e.g., mm),
+* column 5 (angle) is scaled by `u[2]` (e.g., `1` or `°`),
+* column 6 (value) is scaled by `u[3]` (e.g., `1/cm`) for an attenuation map.
+If `disjoint==true` then the middle ellipse positions are adjusted to avoid overlap.
+"""
+function ellipse_parameters(
+    case::EllipsePhantomVersion = SheppLogan() ;
+    fovs::NTuple{2,RealU} = (1,1),
+    u::NTuple{3,Number} = (1,1,1), # unit scaling
+    disjoint::Bool = false,
+)
+
+    params = ellipse_parameters_shepplogan( ; disjoint)
+    params[:,1:4] ./= 2
     params[:,5] .*= π/180
     params[:,6] = shepp_logan_values(case)
 
-    return Number[params[:,1:4] * u[1] params[:,5] * u[2] params[:,6] * u[3]]
+    out = ellipse_parameters_uscale(params, fovs, u[1], u[2], u[3])
+    return out
 end
 
 
@@ -171,6 +245,7 @@ end
 Ellipse parameters for "South Park" phantom.
 """
 function ellipse_parameters(::SouthPark ; fovs::NTuple{2,RealU} = (100,100))
+
     params = Float64[
         0 0 85 115 0 100
         0 -60 30 20 0 -80 # mouth
@@ -180,8 +255,11 @@ function ellipse_parameters(::SouthPark ; fovs::NTuple{2,RealU} = (100,100))
         -15 25 7 7 0 -100
         0 75 60 15 0 -50  # hat
     ]
-    params[:,[1,3]] .*= fovs[1] / 256
-    params[:,[2,4]] .*= fovs[2] / 256
+
+    params[:,[1,3]] ./= 256
+    params[:,[2,4]] ./= 256
     params[:,5] .*= π/180
-    return params
+
+    out = ellipse_parameters_uscale(params, fovs, 1, 1, 1)
+    return out
 end

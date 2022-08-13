@@ -7,20 +7,12 @@ include("helper.jl")
 
 include("core.jl")
 
-# 2d:
-include("ellipse.jl")
-include("gauss2.jl")
-include("rect.jl")
-include("triangle.jl")
+include("shape2.jl")
 include("shepplogan.jl")
 include("disk-phantom.jl")
 include("focus-chart.jl")
 
-# 3d:
-include("ellipsoid.jl")
-include("gauss3.jl")
-include("cuboid.jl")
-include("cylinder.jl")
+include("shape3.jl")
 
 @testset "mri-sense" begin
     include("mri-sense.jl")

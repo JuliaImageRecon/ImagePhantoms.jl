@@ -84,12 +84,12 @@ end
 # `u,v` should be unitless
 function xray1(
     ::Cuboid,
-    u::Real,
-    v::Real,
+    u::Ru,
+    v::Rv,
     ϕ::RealU, # azim
-    θ::RealU, # polar
-)
-    T = promote_type(eltype(u), eltype(v), Float32)
+    θ::RealU; # polar
+) where {Ru <: Real, Rv <: Real}
+    T = promote_type(Ru, Rv, Float32)
 
     (sϕ, cϕ) = sincos(ϕ)
     (sθ, cθ) = sincos(θ)
@@ -119,7 +119,7 @@ function xray1(
     if abs(e3) < eps(T)
         ℓ *= (-1/2 ≤ v < 1/2)
     end
-    return ℓ
+    return T(ℓ)::T
 end
 
 

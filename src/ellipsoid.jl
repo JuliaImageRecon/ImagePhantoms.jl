@@ -61,14 +61,14 @@ phantom1(ob::Object3d{Ellipsoid}, xyz::NTuple{3,Real}) = (sum(abs2, xyz) ≤ 1)
 # `u,v` should be unitless
 function xray1(
     ::Ellipsoid,
-    u::Real,
-    v::Real,
+    u::Ru,
+    v::Rv,
     ϕ::RealU, # irrelevant
     θ::RealU, # irrelevant
-)
-    T = promote_type(eltype(u), eltype(v), Float32)
+) where {Ru <: Real, Rv <: Real}
+    T = promote_type(Ru, Rv, Float32)
     r2 = u^2 + v^2
-    return r2 < 1 ? 2 * sqrt(one(T) - r2) : zero(T)
+    return (r2 < 1 ? 2 * sqrt(one(T) - r2) : zero(T))::T
 end
 
 

@@ -1,28 +1,38 @@
-#=
-shepplogan.jl
-=#
+# test/shepplogan.jl
 
 using ImagePhantoms # many
-using Test: @test, @testset, @test_throws, @inferred
+import ImagePhantoms as IP
+using Test: @test, @testset, @inferred
 
 
 @testset "shepp" begin
+    (M, N) = (2^5, 2^5+1)
     for case in (SheppLogan, SheppLoganToft, SheppLoganEmis, SheppLoganBrainWeb)
-        @test ImagePhantoms.shepp_logan_values(case()) isa Vector
-        @test ellipse_parameters(case()) isa Matrix
+        @test (@inferred case()) isa IP.EllipsePhantomVersion
+        @test (@inferred IP.shepp_logan_values(case())) isa Vector
+        @test (@inferred ellipse_parameters(case())) isa Vector{<:Tuple}
+        image = @inferred shepp_logan(M, case())
+        type = case == SheppLoganBrainWeb ? Int : Float32
+        @test image isa Matrix{type}
     end
-    @test ellipse_parameters(SouthPark()) isa Matrix
+    @test (@inferred ellipse_parameters(SouthPark())) isa Vector{<:Tuple}
 
-    image0 = @NOTinferred shepp_logan(2^6, SheppLoganEmis())
-    @test image0 isa Matrix
-    image1 = @NOTinferred shepp_logan(2^6, SheppLoganEmis(); oversample=1)
-    image2 = @NOTinferred shepp_logan(2^6, SheppLoganEmis(); oversample=3)
-    @test image0 == image2
+    image = @inferred shepp_logan(M, N)
+    @test image isa Matrix{Float32}
+    @test size(image) == (M, N)
 
-    ob = shepp_logan(SheppLoganEmis())
-    x = LinRange(-1,1,2^6+1) * 0.5
-    y = LinRange(-1,1,2^6) * 0.5
-    image = phantom(x, y, ob)
+    image = @inferred shepp_logan(M, SheppLoganBrainWeb() ; u = (1,2,3))
+    @test image isa Matrix{Int}
+
+    image0 = @inferred shepp_logan(M, SheppLoganEmis())
+    image1 = @inferred shepp_logan(M, SheppLoganEmis(); oversample=1)
+    image3 = @inferred shepp_logan(M, SheppLoganEmis(); oversample=3)
+    @test image0 == image3
+
+    ob = @inferred shepp_logan(SheppLoganEmis())
+    x = LinRange(-1,1,M) * 0.5
+    y = LinRange(-1,1,N) * 0.5
+    image = @inferred phantom(x, y, ob)
     @test image isa Matrix
     image = phantom(ob).(x,y')
     @test image isa Matrix
@@ -34,12 +44,12 @@ using Test: @test, @testset, @test_throws, @inferred
     sino = radon(r, ϕ, ob)
     @test sino isa Matrix
 
-    kx = LinRange(-1,1,2^6) * 9
-    ky = LinRange(-1,1,2^6+1) * 9
+    kx = LinRange(-1,1,M) * 9
+    ky = LinRange(-1,1,N+1) * 9
     kspace = spectrum(ob).(kx, ky')
     @test kspace isa Matrix
     kspace = spectrum(kx, ky, ob)
     @test kspace isa Matrix
 
-    image = shepp_logan(40, 50, SouthPark(), fovs=(1,1))
+    image = @inferred shepp_logan(M, N, SouthPark(), fovs=(1,1))
 end

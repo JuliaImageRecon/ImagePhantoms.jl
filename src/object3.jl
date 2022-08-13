@@ -88,10 +88,10 @@ function phantom(
     x::AbstractVector,
     y::AbstractVector,
     z::AbstractVector,
-    oa::Array{<:Object3d},
+    oa::Array{<:Object3d{S,V}},
     oversample::Int;
-    T::DataType = promote_type(eltype.(oa)..., Float32),
-)
+    T::DataType = promote_type(V, Float32),
+) where {S, V <: Number}
 
     oversample < 1 && throw(ArgumentError("oversample $oversample"))
     dx = x[2] - x[1]
@@ -104,7 +104,8 @@ function phantom(
     o3 = oversample^3
     ophantom = ob -> (x,y,z) ->
         T(sum(phantom(ob).(ndgrid(x .+ dx*tmp, y .+ dy*tmp, z .+ dz*tmp)...)) / o3)
-    return sum(ob -> ophantom(ob).(ndgrid(x,y,z)...), oa)
+    out = sum(ob -> ophantom(ob).(ndgrid(x,y,z)...), oa)
+    return out::Array{T, 3}
 end
 
 
@@ -173,6 +174,13 @@ function _xray(
 end
 
 
+# this gateway seems to help type inference
+function _radon(ob::Object3d{S}, u::RealU, v::RealU, ϕ::RealU, θ::RealU) where S
+    T = radon_type(ob)
+    return T(ob.value * _xray(S(), ob.center, ob.width, ob.angle, u, v, ϕ, θ))::T
+end
+
+
 """
     radon(ob::Object3d)::Function
 Return function of `(u,v,ϕ,θ)` that user can sample
@@ -185,8 +193,7 @@ for an object ``f(x,y,z)``.
 Then as `ϕ` increases, the line integrals rotate counter-clockwise.
 """
 function radon(ob::Object3d{S}) where S
-    return (u,v,ϕ,θ) -> ob.value *
-        _xray(S(), ob.center, ob.width, ob.angle, u, v, ϕ, θ)
+    return (u::RealU, v::RealU, ϕ::RealU, θ::RealU) -> _radon(ob, u, v, ϕ, θ)
 end
 
 
@@ -198,7 +205,7 @@ to make projection views
 for an array of 3D objects.
 """
 function radon(oa::Array{<:Object3d})
-    return (u,v,ϕ,θ) -> sum(ob -> radon(ob)(u,v,ϕ,θ), oa)
+    return (u::RealU, v::RealU, ϕ::RealU, θ::RealU) -> sum(ob -> radon(ob)(u,v,ϕ,θ), oa)
 end
 
 

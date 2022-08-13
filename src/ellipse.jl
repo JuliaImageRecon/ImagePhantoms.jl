@@ -59,8 +59,8 @@ phantom1(ob::Object2d{Ellipse}, xy::NTuple{2,Real}) = (sum(abs2, xy) ≤ 1)
 
 # x-ray transform (line integral) of unit circle
 # `r` should be unitless
-function xray1(::Ellipse, r::Real, ϕ::RealU)
-    T = promote_type(eltype(r), Float32)
+function xray1(::Ellipse, r::R, ϕ::RealU) where {R <: Real}
+    T = promote_type(R, Float32)
     r2 = r^2
     return r2 < 1 ? 2 * sqrt(one(T) - r2) : zero(T)
 end

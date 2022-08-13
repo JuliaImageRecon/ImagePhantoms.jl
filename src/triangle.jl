@@ -4,7 +4,7 @@ triangle.jl
 =#
 
 
-#using ImagePhantoms #: Object, Object2d
+#using ImagePhantoms #: Object, Object2d, AbstractShape
 
 export Triangle, triangle
 export phantom, radon, spectrum
@@ -22,7 +22,6 @@ going from (-p,0) to (1-p,0)` and with height=sqrt(3)/2.
 
 The methods currently support only the default case `p=0.5`.
 """
-#struct Triangle <: AbstractShape{2} end
 #struct Triangle{T} <: AbstractShape{2}
 struct Triangle <: AbstractShape{2}
 #   param::T # fraction in interval (0,1)
@@ -56,7 +55,7 @@ end
 # helper
 
 function _trifun(x, y, param)
-#   param == 1/2 || throw("todo") # no need to check because constructor is 1/2
+#   param == 1/2 || throw("") # no need to check because constructor is 1/2
     return (0 ≤ y ≤ sqrt3/2) && y ≤ sqrt3 * (0.5 - abs(x))
 end
 
@@ -146,9 +145,9 @@ phantom1(ob::Object2d{Triangle}, xy::NTuple{2,Real}) =
 
 # x-ray transform (line integral) of unit triangle
 # `r` should be unitless
-function xray1(::Triangle, r::Real, ϕ::RealU)
+function xray1(::Triangle, r::R, ϕ::RealU) where {R <: Real}
     # valid only for param == 1/2, but that's ok now because constructor is 1/2
-    T = promote_type(eltype(r), Float32)
+    T = promote_type(R, Float32)
     return abs(r) ≥ sqrt(3)/2 ? zero(T) : T(radon_tri(r, sincos(ϕ)...))
 end
 
@@ -159,6 +158,6 @@ Spectrum of unit triangle at `(kx,ky)`,
 for unitless spatial frequency coordinates.
 """
 function spectrum1(ob::Object2d{Triangle}, kxy::NTuple{2,Real})
-#   ob.param == 1/2 || throw("todo")
+#   ob.param == 1/2 || throw("") # no need to check
     return spectrum_tri(kxy...)
 end

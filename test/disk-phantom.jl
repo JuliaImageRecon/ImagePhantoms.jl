@@ -1,12 +1,12 @@
-# disk-phantom.jl
+# test/disk-phantom.jl
 
 using ImagePhantoms: disk_phantom_params, ellipse, phantom, Object2d
-using Test: @test, @testset, @test_throws, @inferred
+using Test: @test, @testset, @inferred
 
 @testset "disk" begin
     params = @inferred disk_phantom_params( ; rhead = () -> rand(100:105))
-    @test params isa Matrix{Float32}
+    @test params isa Vector{<:Tuple}
 
-    ob = @NOTinferred ellipse(params)
+    ob = @inferred ellipse(params)
     @test ob isa Vector{<:Object2d}
 end
