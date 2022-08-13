@@ -144,7 +144,7 @@ shepp_logan(M::Int, case::EllipsePhantomVersion = SheppLogan(), args...; kwargs.
     shepp_logan(M, M, case, args... ; kwargs...)
 
 shepp_logan(M::Int, N::Int ; kwargs...) =
-    shepp_logan(M, M, SheppLogan() ; kwargs...)
+    shepp_logan(M, N, SheppLogan() ; kwargs...)
 
 
 """
