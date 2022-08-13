@@ -102,9 +102,10 @@ except for the `SheppLoganBrainWeb` phantom that consists of integer indices.
 """
 function shepp_logan(
     M::Int, N::Int,
-    case::EllipsePhantomVersion = SheppLogan() ;
-    oversample::Int = case == SheppLoganBrainWeb() ? 1 : 3,
+    case::EllipsePhantomVersion ;
+    oversample::Int = 3,
     yflip::Bool = true,
+    T::DataType = Float32,
     kwargs...
 )
     ob = shepp_logan(case ; kwargs...)
@@ -113,13 +114,37 @@ function shepp_logan(
     if yflip
         y = reverse(y)
     end
-    return oversample > 1 ?
-        phantom(x, y, ob, oversample) :
-        phantom(x, y, ob) # type unstable because of over-sampling
+    out = oversample > 1 ?
+        phantom(x, y, ob, oversample ; T) :
+        T.(phantom(x, y, ob))
+    return out::Matrix{T}
 end
 
-shepp_logan(M::Int, case::EllipsePhantomVersion = SheppLogan(); kwargs...) =
-    shepp_logan(M, M, case ; kwargs...)
+
+# For type stability, BrainWeb case (with integer values) is separate
+function shepp_logan(
+    M::Int, N::Int,
+    case::SheppLoganBrainWeb ;
+    oversample::Int = 1,
+    yflip::Bool = true,
+    kwargs...
+)
+    oversample == 1 || throw("oversample must be 1 for BrainWeb()")
+    ob = shepp_logan(case ; kwargs...)
+    x = LinRange(-0.5, 0.5, M)
+    y = LinRange(-0.5, 0.5, N)
+    if yflip
+        y = reverse(y)
+    end
+    out = Int.(phantom(x, y, ob))
+    return out
+end
+
+shepp_logan(M::Int, case::EllipsePhantomVersion = SheppLogan(), args...; kwargs...) =
+    shepp_logan(M, M, case, args... ; kwargs...)
+
+shepp_logan(M::Int, N::Int ; kwargs...) =
+    shepp_logan(M, M, SheppLogan() ; kwargs...)
 
 
 """

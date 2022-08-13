@@ -10,22 +10,27 @@ using Test: @test, @testset, @test_throws, @inferred
 
 @testset "shepp" begin
     for case in (SheppLogan, SheppLoganToft, SheppLoganEmis, SheppLoganBrainWeb)
+        @test (@inferred case()) isa IP.EllipsePhantomVersion
         @test (@inferred IP.shepp_logan_values(case())) isa Vector
         @test (@inferred ellipse_parameters(case())) isa Vector{<:Tuple}
-        image = @NOTinferred shepp_logan(2^6, case())
+        image = @inferred shepp_logan(2^5, case())
+        type = case == SheppLoganBrainWeb ? Int : Float32
+        @test image isa Matrix{type}
     end
     @test (@inferred ellipse_parameters(SouthPark())) isa Vector{<:Tuple}
 
-    image0 = @NOTinferred shepp_logan(2^6, SheppLoganEmis())
-    @test image0 isa Matrix
-    image1 = @NOTinferred shepp_logan(2^6, SheppLoganEmis(); oversample=1)
-    image2 = @NOTinferred shepp_logan(2^6, SheppLoganEmis(); oversample=3)
+    image3 = @inferred shepp_logan(2^5, SheppLoganBrainWeb() ; u = (1,2,3))
+    @test image3 isa Matrix{Int}
+
+    image0 = @inferred shepp_logan(2^5, SheppLoganEmis())
+    image1 = @inferred shepp_logan(2^5, SheppLoganEmis(); oversample=1)
+    image2 = @inferred shepp_logan(2^5, SheppLoganEmis(); oversample=3)
     @test image0 == image2
 
-    ob = shepp_logan(SheppLoganEmis())
-    x = LinRange(-1,1,2^6+1) * 0.5
-    y = LinRange(-1,1,2^6) * 0.5
-    image = phantom(x, y, ob)
+    ob = @inferred shepp_logan(SheppLoganEmis())
+    x = LinRange(-1,1,2^5+1) * 0.5
+    y = LinRange(-1,1,2^5) * 0.5
+    image = @inferred phantom(x, y, ob)
     @test image isa Matrix
     image = phantom(ob).(x,y')
     @test image isa Matrix
@@ -37,12 +42,12 @@ using Test: @test, @testset, @test_throws, @inferred
     sino = radon(r, ϕ, ob)
     @test sino isa Matrix
 
-    kx = LinRange(-1,1,2^6) * 9
-    ky = LinRange(-1,1,2^6+1) * 9
+    kx = LinRange(-1,1,2^5) * 9
+    ky = LinRange(-1,1,2^5+1) * 9
     kspace = spectrum(ob).(kx, ky')
     @test kspace isa Matrix
     kspace = spectrum(kx, ky, ob)
     @test kspace isa Matrix
 
-    image = shepp_logan(40, 50, SouthPark(), fovs=(1,1))
+    image = @inferred shepp_logan(30, 40, SouthPark(), fovs=(1,1))
 end
