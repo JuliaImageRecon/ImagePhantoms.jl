@@ -9,7 +9,7 @@ https://github.com/JuliaImageRecon/ImagePhantoms.jl
 [![docs-stable][docs-stable-img]][docs-stable-url]
 [![docs-dev][docs-dev-img]][docs-dev-url]
 [![code-style][code-blue-img]][code-blue-url]
-<img src="https://avatars.githubusercontent.com/u/86683720" alt="logo" width="150"/>
+<img src="https://github.com/JuliaImageRecon/ImagePhantoms.jl/blob/main/docs/src/assets/logo.svg" alt="logo" width="150"/>
 
 This Julia language repo
 provides tools for working with software-defined image phantoms
