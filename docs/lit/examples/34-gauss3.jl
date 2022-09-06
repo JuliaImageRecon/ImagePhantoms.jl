@@ -30,7 +30,7 @@ using ImagePhantoms: Gauss3, gauss3
 import ImagePhantoms as IP
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt, mid3
-using FFTW: fft, fftshift
+using FFTW: fft, fftshift, ifftshift
 using LazyGrids: ndgrid
 using Unitful: mm, unit, °
 using UnitfulRecipes
@@ -48,7 +48,8 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 # ### Overview
 
 #=
-A basic shape used in constructing 3D digital image phantoms
+A useful shape
+for constructing 3D digital image phantoms
 is the 3D gaussian,
 specified by its center, fwhm, angle(s) and value.
 All of the methods in `ImagePhantoms` support physical units,
@@ -77,8 +78,8 @@ We use `ImageGeoms` to simplify the indexing.
 =#
 
 deltas = (1.0mm, 1.1mm, 1.2mm)
-dims = (2^8, 2^8+2, 48)
-offsets = (0.5, 0.5, 0.5) # for FFT spectra later
+dims = (2^8, 2^8+2, 49) # odd
+offsets = 0.5 .* iseven.(dims) # subtle FFT issue!
 ig = ImageGeom( ; dims, deltas, offsets)
 oversample = 2
 img = phantom(axes(ig)..., [ob], oversample)
@@ -116,16 +117,16 @@ p2 = jim(axesf(ig), sp.(spectrum_exact), "log10|Spectrum|"; clim, xlabel, ylabel
 # Sadly `fft` cannot handle units currently, so this function is a work-around:
 function myfft(x)
     u = unit(eltype(x))
-    return fftshift(fft(fftshift(x) / u)) * u
+    return fftshift(fft(ifftshift(x) / u)) * u
 end
 
-spectrum_fft = myfft(img) * prod(ig.deltas) * vscale
+spectrum_fft = myfft(img) * (prod(ig.deltas) * vscale)
 p3 = jim(axesf(ig), sp.(spectrum_fft), "log10|DFT|"; clim, xlabel, ylabel)
 
 
 # Compare the DFT and analytical spectra to validate the code
-err = maximum(abs, spectrum_exact - spectrum_fft) / maximum(abs, spectrum_exact)
-@assert err < 1e-3
+errf = maximum(abs, spectrum_exact - spectrum_fft) / maximum(abs, spectrum_exact)
+@assert errf < 1e-3
 p4 = jim(axesf(ig), 1e3*abs.(spectrum_fft - spectrum_exact);
    title="|Difference| × 10³", xlabel, ylabel)
 jim(p1, p4, p2, p3)
@@ -217,8 +218,8 @@ proj_fft = myfft(proj) * prod(pg.deltas) * vscale
 p8 = jim(axesf(pg), sp.(proj_fft); prompt=false,
      title = "log10|FFT Spectrum|", clim, xlabel, ylabel)
 
-err = maximum(abs, spectrum_slice - proj_fft) / maximum(abs, spectrum_slice)
-@assert err < 1e-5
+errs = maximum(abs, spectrum_slice - proj_fft) / maximum(abs, spectrum_slice)
+@assert errs < 1e-5
 p9 = jim(axesf(pg), 1e6*abs.(proj_fft - spectrum_slice);
     title="|Difference| × 10⁶", xlabel, ylabel, prompt=false)
 jim(p6, p7, p8, p9)
@@ -230,5 +231,5 @@ the 2D slice through the 3D analytical spectrum
 and the FFT of the 2D projection view
 validates that `phantom`, `radon`, and `spectrum`
 are all self consistent
-for this object.
+for this shape.
 =#
