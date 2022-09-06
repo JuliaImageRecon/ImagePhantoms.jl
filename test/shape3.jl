@@ -10,7 +10,7 @@ import ImagePhantoms as IP
 using Unitful: m, mm, °
 using ImageGeoms: ImageGeom, axesf
 using LazyGrids: ndgrid
-using FFTW: fftshift, fft
+using FFTW: fft, fftshift, ifftshift
 using Test: @test, @testset, @inferred
 
 
@@ -41,10 +41,10 @@ end
 
 # parameters for testing each shape
 list = [
- (Ellipsoid, ellipsoid, 12, 2, 1e-2, 2e-2, 1e-3)
- (Gauss3, gauss3, IP.fwhm2spread(6), IP.fwhm2spread(1), 1e-2, 5e-2, 1e-5)
+ (Ellipsoid, ellipsoid, 12, 2, 1e-2, 4e-4, 1e-3)
+ (Gauss3, gauss3, IP.fwhm2spread(6), IP.fwhm2spread(1), 1e-2, 5e-4, 1e-5)
  (Cuboid, cuboid, sqrt(4^2 + 5^2 + 6^2), √3, 1e-2, 2e-2, 2e-3)
- (Cylinder, cylinder, sqrt(10^2 + 6^2), √5, 2e-2, 5e-2, 1e-3)
+ (Cylinder, cylinder, sqrt(10^2 + 6^2), √5, 2e-2, 2e-2, 1e-3)
 ]
 
 macro isob3(ex) # macro to streamline tests
@@ -162,32 +162,25 @@ end
 
 
 @testset "spectrum" begin
-    dx = 1.0m
-    dy = 1.1m
-    dz = 1.2m
-    (L,M,N) = (2^7,2^7+2,2^7+4)
-    x = (-L÷2:L÷2-1) * dx
-    y = (-M÷2:M÷2-1) * dy
-    z = (-N÷2:N÷2-1) * dz
+    (L,M,N) = (2^7,2^7+2,2^7+3) # odd
+    offsets = 0.5 .* iseven.((L,M,N))
+    ig = ImageGeom( dims=(L,M,N), deltas=(1.0m, 1.1m, 1.2m); offsets)
     width = (30m, 40m, 50m)
     ob = shape((8m, 7m, 6m), width, (π/6, 0), 5.0f0)
     oversample = 2
-    img = @inferred phantom(x, y, z, [ob], oversample)
+    img = @inferred phantom(axes(ig)..., [ob], oversample)
 
     volume = IP.volume(ob)
     zscale = 1 / (ob.value * volume) # normalize spectra
-    fx = (-L÷2:L÷2-1) / L / dx
-    fy = (-M÷2:M÷2-1) / M / dy
-    fz = (-N÷2:N÷2-1) / N / dz
-    X = myfft(img) * (dx * dy * dz * zscale)
-    kspace = (@inferred spectrum(fx, fy, fz, [ob])) * zscale
+    X = myfft(img) * (prod(ig.deltas) * zscale)
+    kspace = (@inferred spectrum(axesf(ig)..., [ob])) * zscale
     @test spectrum(ob)(0/m, 0/m, 0/m) * zscale ≈ 1
     @test maximum(abs, kspace) ≈ 1
     @test kspace[L÷2+1,M÷2+1,N÷2+1] ≈ 1
 
     @test abs(maximum(abs, X) - 1) < tol1
-    err = maximum(abs, kspace - X) / maximum(abs, kspace)
-    @test err < tolk
+    errk = maximum(abs, kspace - X) / maximum(abs, kspace)
+    @test errk < tolk
 end
 
 
@@ -208,8 +201,8 @@ end
     spectrum_slice = spectrum(ob).(ff[:,1], ff[:,2], ff[:,3]) / IP.volume(ob)
     spectrum_slice = reshape(spectrum_slice, pg.dims)
     proj_fft = myfft(proj) * prod(pg.deltas) / IP.volume(ob)
-    err = maximum(abs, spectrum_slice - proj_fft) / maximum(abs, spectrum_slice)
-    @test err < tolp
+    errp = maximum(abs, spectrum_slice - proj_fft) / maximum(abs, spectrum_slice)
+    @test errp < tolp
 end
 
 end # for shape

@@ -8,7 +8,8 @@ using ImagePhantoms: Rect, rect
 using ImagePhantoms: Triangle, triangle
 import ImagePhantoms as IP
 using Unitful: m, °
-using FFTW: fftshift, fft
+using ImageGeoms: ImageGeom, axesf
+using FFTW: fft, fftshift, ifftshift
 using Test: @test, @testset, @inferred
 
 
@@ -142,28 +143,24 @@ end
 
 
 @testset "spectrum" begin
-    dx = 0.02m
-    dy = 0.025m
-    (M,N) = (2^10,2^10+2)
-    x = (-M÷2:M÷2-1) * dx
-    y = (-N÷2:N÷2-1) * dy
+    (M,N) = (2^10,2^10+5) # odd
+    offsets = 0.5 .* iseven.((M,N))
+    ig = ImageGeom( dims=(M,N), deltas=(0.02m, 0.025m); offsets)
     ob = shape((2m, -3m), swidth, π/6, 1.0f0)
-    img = @inferred phantom(x, y, [ob])
+    img = @inferred phantom(axes(ig)..., [ob])
 
     zscale = 1 / (ob.value * IP.area(ob)) # normalize spectra by area
-    fx = (-M÷2:M÷2-1) / M / dx
-    fy = (-N÷2:N÷2-1) / N / dy
-    X = myfft(img) * dx * dy * zscale
-    kspace = (@inferred spectrum(fx, fy, [ob])) * zscale
+    X = myfft(img) * (prod(ig.deltas) * zscale)
+    kspace = (@inferred spectrum(axesf(ig)..., [ob])) * zscale
     @test maximum(abs, kspace) ≈ 1
     @test kspace[M÷2+1,N÷2+1] ≈ 1
 
     @test abs(maximum(abs, X) - 1) < tol1
-    err = maximum(abs, kspace - X) / maximum(abs, kspace)
-    @test err < tolk
+    errk = maximum(abs, kspace - X) / maximum(abs, kspace)
+    @test errk < tolk
 
 
-    # test sinogram with projection-slice theorem
+    # test sinogram with Fourier-slice theorem
 
     dr = 0.02m
     nr = 2^10
@@ -180,8 +177,8 @@ end
     kx, ky = (fr * cos(ϕ[ia]), fr * sin(ϕ[ia])) # Fourier-slice theorem
     ideal = spectrum(ob).(kx, ky)
 
-    err = maximum(abs, ideal - Slice) / maximum(abs, ideal)
-    @test err < tolp
+    errp = maximum(abs, ideal - Slice) / maximum(abs, ideal)
+    @test errp < tolp
 end
 
 end # for shape
