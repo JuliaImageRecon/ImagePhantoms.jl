@@ -17,5 +17,5 @@ reale = (z) -> (@assert myisreal(z); real(z))
 # fft cannot handle units so this is a work-around
 function myfft(x::AbstractArray{<:Number})
     u = oneunit(eltype(x))
-    return fftshift(fft(fftshift(x) / u)) * u
+    return fftshift(fft(ifftshift(x) / u)) * u
 end
