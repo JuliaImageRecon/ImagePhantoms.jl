@@ -144,8 +144,7 @@ end
 
 @testset "spectrum" begin
     (M,N) = (2^10,2^10+5) # odd
-    offsets = 0.5 .* iseven.((M,N))
-    ig = ImageGeom( dims=(M,N), deltas=(0.02m, 0.025m); offsets)
+    ig = ImageGeom( dims=(M,N), deltas=(0.02m, 0.025m), offsets=:dsp)
     ob = shape((2m, -3m), swidth, π/6, 1.0f0)
     img = @inferred phantom(axes(ig)..., [ob])
 
