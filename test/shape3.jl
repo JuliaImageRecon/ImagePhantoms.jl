@@ -163,8 +163,7 @@ end
 
 @testset "spectrum" begin
     (L,M,N) = (2^7,2^7+2,2^7+3) # odd
-    offsets = 0.5 .* iseven.((L,M,N))
-    ig = ImageGeom( dims=(L,M,N), deltas=(1.0m, 1.1m, 1.2m); offsets)
+    ig = ImageGeom( dims=(L,M,N), deltas=(1.0m, 1.1m, 1.2m), offsets=:dsp)
     width = (30m, 40m, 50m)
     ob = shape((8m, 7m, 6m), width, (π/6, 0), 5.0f0)
     oversample = 2

@@ -78,8 +78,7 @@ We use `ImageGeoms` to simplify the indexing.
 
 deltas = (1.0mm, 1.1mm, 0.9mm)
 dims = (2^8, 2^8+2, 49) # odd
-offsets = 0.5 .* iseven.(dims) # subtle FFT issue!
-ig = ImageGeom( ; dims, deltas, offsets)
+ig = ImageGeom( ; dims, deltas, offsets=:dsp)
 oversample = 2
 img = phantom(axes(ig)..., [ob], oversample)
 p1 = jim(axes(ig), img;

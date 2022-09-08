@@ -76,8 +76,7 @@ jim(x, y, img, "Rect image")
 # Hereafter we use `ImageGeoms` to simplify the indexing.
 
 M, N = (2^8, 2^8+17) # odd
-offsets = 0.5 .* iseven.((M,N)) # subtle FFT issue!
-ig = ImageGeom(dims=(M,N), deltas=(dx,dy); offsets)
+ig = ImageGeom(dims=(M,N), deltas=(dx,dy), offsets=:dsp)
 @assert axes(ig)[1] ≈ x
 oversample = 2
 img = phantom(axes(ig)..., [ob], oversample)
