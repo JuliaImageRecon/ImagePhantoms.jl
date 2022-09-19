@@ -40,6 +40,7 @@ end
     @test IP.cube_bounds(0.2, 0.5f0) == IP.cube_bounds(0.2, 0.5)
 end
 
+
 # parameters for testing each shape
 # (Shape, shape, lmax, lmax1, tol1, tolk, tolp)
 list = [
@@ -55,19 +56,9 @@ macro isob3(ex) # macro to streamline tests
 end
 
 
-for (Shape, shape, lmax, lmax1, tol1, tolk, tolp) in list
-    @show shape
-
-@testset "xray1" begin
-    @test (@inferred IP.xray1(Shape(), 0, 0, 0, 0)) > 0
-    @test (@inferred IP.xray1(Shape(), 0f0, 0., 0, 0)) > 0
-end
-
-
-@testset "construct-$shape" begin
+# constructors
+function test3_construct(Shape, shape)
     @test Shape <: AbstractShape{3}
-
-    # constructors
     @isob3 @inferred Object(Shape(), (1,2,3), (4,5,6), (π, π/4), 5.0f0)
     @isob3 @inferred Object(Shape(), (1,2,3), (4,5,6), (0, 0), 5.0f0)
     @isob3 @inferred Object(Shape(), center=(1,2,3))
@@ -76,9 +67,8 @@ end
 end
 
 
-@testset "operations" begin
-    # basic methods
-
+# basic methods
+function test3_op(Shape, shape)
     ob = @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
 
     @isob3 @inferred IP.rotate(ob, π)
@@ -95,45 +85,12 @@ end
 end
 
 
-@testset "method" begin
-    x = LinRange(-1,1,13)*5
-    y = LinRange(-1,1,12)*5
-    z = LinRange(-1,1,11)*5
-    ob = @inferred shape((1, 2., 3), (4//1, 5, 6), (π/6, 0), 5.0f0)
-
-    show(devnull, ob)
-    @test (@inferred eltype(ob)) == Float32
-
-    @test (@inferred IP.ℓmax(ob)) ≈ lmax
-    @test (@inferred IP.ℓmax1(Shape())) ≈ lmax1
-
-    fun = @inferred phantom(ob)
-    @test fun(ob.center...) == ob.value
-    if shape == gauss3
-        @test fun((ob.center .+ 9 .* ob.width)...) < 1e-20
-    else
-        @test fun((ob.center .+ 2 .* ob.width)...) == 0
-    end
-
-    fun = @inferred phantom([ob])
-    @test fun(ob.center...) == ob.value
-    if shape == gauss3
-    @test fun((ob.center .+ 9 .* ob.width)...) < 1e-20
-    else
-    @test fun((ob.center .+ 2 .* ob.width)...) == 0
-    end
-
-    img = @inferred phantom(x, y, z, [ob])
-    @test img isa Array{<:Real, 3}
-    @test size(img) == length.((x, y, z))
-
-    over = 2
-    img = @inferred phantom(x, y, z, [ob], over)
-    @test img isa Array{<:Real, 3}
-    @test size(img) == length.((x, y, z))
-
+function test3_radon(Shape, shape, ob)
     @inferred IP.xray1(Shape(), 0.5f0, 0.3, π/6, π/5)
     @inferred IP._xray(Shape(), (0., 0., 0.), (2,2,2), (π/3,0), 0.5f0, 0.3, π/6, π/5)
+
+    @test (@inferred IP.xray1(Shape(), 0, 0, 0, 0)) > 0
+    @test (@inferred IP.xray1(Shape(), 0f0, 0., 0, 0)) > 0
 
     fun = @inferred radon([ob])
     @inferred fun(0,0,0,0)
@@ -144,49 +101,114 @@ end
     else
         @test radon([9], [3], [0], [0], [ob])[1] == 0 # outside
     end
+end
+
+
+for (Shape, shape, lmax, lmax1, tol1, tolk, tolp) in list
+    @show shape
+
+    has_xray = hasmethod(IP.xray1, (Shape, Real, Real, Real, Real))
+    has_phantom = hasmethod(IP.phantom1, (typeof(shape()), NTuple{3,Real}))
+
+    @testset "construct-$shape" begin
+        test3_construct(Shape, shape)
+    end
+
+
+    @testset "operations" begin
+        test3_op(Shape, shape)
+    end
+
+  @testset "method" begin
+    x = LinRange(-1,1,13)*5
+    y = LinRange(-1,1,12)*5
+    z = LinRange(-1,1,11)*5
+
+    ob = @inferred shape((1, 2., 3), (4//1, 5, 6), (π/6, 0), 5.0f0)
+
+    show(devnull, ob)
+    @test (@inferred eltype(ob)) == Float32
+
+    @test (@inferred IP.ℓmax(ob)) ≈ lmax
+    @test (@inferred IP.ℓmax1(Shape())) ≈ lmax1
+
+    if has_phantom
+        fun = @inferred phantom(ob)
+        @test fun(ob.center...) == ob.value
+        if shape == gauss3
+            @test fun((ob.center .+ 9 .* ob.width)...) < 1e-20
+        else
+            @test fun((ob.center .+ 2 .* ob.width)...) == 0
+        end
+
+        fun = @inferred phantom([ob])
+        @test fun(ob.center...) == ob.value
+        if shape == gauss3
+            @test fun((ob.center .+ 9 .* ob.width)...) < 1e-20
+        else
+            @test fun((ob.center .+ 2 .* ob.width)...) == 0
+        end
+
+        img = @inferred phantom(x, y, z, [ob])
+        @test img isa Array{<:Real, 3}
+        @test size(img) == length.((x, y, z))
+
+        over = 2
+        img = @inferred phantom(x, y, z, [ob], over)
+        @test img isa Array{<:Real, 3}
+        @test size(img) == length.((x, y, z))
+    end
 
     volume = IP.volume(ob)
 
     fun = @inferred spectrum([ob])
     @test (@inferred fun(0,0,0)) ≈ ob.value * volume
-end
+
+    if has_xray
+        test3_radon(Shape, shape, ob)
+
+        @testset "radon-units" begin
+            width = (30m, 40m, 50m)
+            center = (8m, 7m, 6m)
+            ϕ = π/6
+            ob = shape(center, width, (ϕ, 0), 1.0f0)
+            @inferred IP._radon(ob, 0m, (1//2)m, 3f0, 4.)
+            x1 = radon([center[1]], [center[3]], [0], [0], [ob])[1]
+            x2 = radon([center[1]], [center[3]], 0, 0, [ob])[1]
+            @test x2 ≈ x1
+        end
+
+    end
+  end
 
 
-@testset "radon-units" begin
-    width = (30m, 40m, 50m)
-    center = (8m, 7m, 6m)
-    ϕ = π/6
-    ob = shape(center, width, (ϕ, 0), 1.0f0)
-    @inferred IP._radon(ob, 0m, (1//2)m, 3f0, 4.)
-    x1 = radon([center[1]], [center[3]], [0], [0], [ob])[1]
-    x2 = radon([center[1]], [center[3]], 0, 0, [ob])[1]
-    @test x2 ≈ x1
-end
-
-
-@testset "spectrum" begin
+  @testset "spectrum" begin
     (L,M,N) = (2^7,2^7+2,2^7+3) # odd
     ig = ImageGeom( dims=(L,M,N), deltas=(1.0m, 1.1m, 1.2m), offsets=:dsp)
     width = (30m, 40m, 50m)
     ob = shape((8m, 7m, 6m), width, (π/6, 0), 5.0f0)
-    oversample = 2
-    img = @inferred phantom(axes(ig)..., [ob], oversample)
-
     volume = IP.volume(ob)
     zscale = 1 / (ob.value * volume) # normalize spectra
-    X = myfft(img) * (prod(ig.deltas) * zscale)
+
     kspace = (@inferred spectrum(axesf(ig)..., [ob])) * zscale
     @test spectrum(ob)(0/m, 0/m, 0/m) * zscale ≈ 1
     @test maximum(abs, kspace) ≈ 1
     @test kspace[L÷2+1,M÷2+1,N÷2+1] ≈ 1
 
-    @test abs(maximum(abs, X) - 1) < tol1
-    errk = maximum(abs, kspace - X) / maximum(abs, kspace)
-    @test errk < tolk
-end
+    if has_phantom
+        oversample = 2
+        img = @inferred phantom(axes(ig)..., [ob], oversample)
+
+        X = myfft(img) * (prod(ig.deltas) * zscale)
+
+        @test abs(maximum(abs, X) - 1) < tol1
+        errk = maximum(abs, kspace - X) / maximum(abs, kspace)
+        @test errk < tolk
+    end
+  end
 
 
-@testset "proj-slice" begin # Fourier-slice theorem
+  @testset "proj-slice" begin # Fourier-slice theorem
     center = (20mm, 10mm, 5mm)
     width = (25mm, 35mm, 15mm)
     angles = (π/6, 0)
@@ -194,17 +216,20 @@ end
 
     pg = ImageGeom((2^8,2^7), (0.6mm,1.0mm), (0.5,0.5)) # projection sampling
     ϕ, θ = π/3, π/7
-    proj = @inferred radon(axes(pg)..., ϕ, θ, [ob])
 
-    e1 = (cos(ϕ), sin(ϕ), 0)
-    e3 = (sin(ϕ)*sin(θ), -cos(ϕ)*sin(θ), cos(θ))
-    fu, fv = ndgrid(axesf(pg)...)
-    ff = vec(fu) * [e1...]' + vec(fv) * [e3...]' # fx,fy,fz for Fourier-slice theorem
-    spectrum_slice = spectrum(ob).(ff[:,1], ff[:,2], ff[:,3]) / IP.volume(ob)
-    spectrum_slice = reshape(spectrum_slice, pg.dims)
-    proj_fft = myfft(proj) * prod(pg.deltas) / IP.volume(ob)
-    errp = maximum(abs, spectrum_slice - proj_fft) / maximum(abs, spectrum_slice)
-    @test errp < tolp
-end
+    if has_xray
+        proj = @inferred radon(axes(pg)..., ϕ, θ, [ob])
+
+        e1 = (cos(ϕ), sin(ϕ), 0)
+        e3 = (sin(ϕ)*sin(θ), -cos(ϕ)*sin(θ), cos(θ))
+        fu, fv = ndgrid(axesf(pg)...)
+        ff = vec(fu) * [e1...]' + vec(fv) * [e3...]' # fx,fy,fz for Fourier-slice theorem
+        spectrum_slice = spectrum(ob).(ff[:,1], ff[:,2], ff[:,3]) / IP.volume(ob)
+        spectrum_slice = reshape(spectrum_slice, pg.dims)
+        proj_fft = myfft(proj) * prod(pg.deltas) / IP.volume(ob)
+        errp = maximum(abs, spectrum_slice - proj_fft) / maximum(abs, spectrum_slice)
+        @test errp < tolp
+    end
+  end
 
 end # for shape
