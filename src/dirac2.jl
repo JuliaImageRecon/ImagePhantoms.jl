@@ -26,7 +26,6 @@ dirac2(args... ; kwargs...) = Object(Dirac2(), args...; kwargs...)
 # dirac(D::Int, args... ; kwargs...) = Object(Dirac{D}(), args...; kwargs...)
 
 
-
 # methods
 
 
@@ -35,6 +34,7 @@ area1(::Dirac2) = 1
 ℓmax1(::Dirac) = 1 # max line integral
 
 
+#=
 """
     phantom1(ob::Object2d{Dirac2}, (x,y))
 Evaluate Dirac at `(x,y)`,
@@ -43,6 +43,7 @@ Caution: this method is meaningless
 because the Dirac impulse is not a function!
 """
 phantom1(ob::Object2d{Dirac2}, xy::NTuple{2,Real}) = (xy == (0,0)) ? 1 : 0
+=#
 
 
 #=
