@@ -9,13 +9,15 @@ include("object2.jl")
 include("object3.jl")
 include("jinc.jl")
 
-# shapes:
+# 2d:
+include("dirac2.jl")
 include("ellipse.jl")
 include("gauss2.jl")
 include("rect.jl")
 include("triangle.jl")
 
 # 3d:
+include("dirac3.jl")
 include("ellipsoid.jl")
 include("gauss3.jl")
 include("cuboid.jl")
