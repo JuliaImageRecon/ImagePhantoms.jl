@@ -3,10 +3,7 @@ rect.jl
 =#
 
 
-#using ImagePhantoms #: Object, Object2d
-
 export Rect, rect, square
-export phantom, radon, spectrum
 
 
 """

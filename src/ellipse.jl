@@ -2,11 +2,7 @@
 ellipse.jl
 =#
 
-
-#using ImagePhantoms #: Object, Object2d
-
 export Ellipse, ellipse, circle
-export phantom, radon, spectrum
 
 
 """
