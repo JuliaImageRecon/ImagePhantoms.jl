@@ -2,11 +2,7 @@
 gauss3.jl
 =#
 
-
-#using ImagePhantoms #: Object, Object3d
-
 export Gauss3, gauss3
-export phantom, radon, spectrum
 
 
 """

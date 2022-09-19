@@ -4,7 +4,6 @@ cylinder.jl
 
 
 export Cylinder, cylinder
-export phantom, radon, spectrum
 
 
 """

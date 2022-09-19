@@ -4,10 +4,7 @@ actually a rectangular cuboid https://en.wikipedia.org/wiki/Cuboid
 =#
 
 
-#using ImagePhantoms #: Object, Object3d
-
 export Cuboid, cuboid, cube
-export phantom, radon, spectrum
 
 
 """

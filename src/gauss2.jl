@@ -2,11 +2,7 @@
 gauss2.jl
 =#
 
-
-#using ImagePhantoms #: Object, Object2d
-
 export Gauss2, gauss2
-export phantom, radon, spectrum, fwhm2spread
 
 
 """

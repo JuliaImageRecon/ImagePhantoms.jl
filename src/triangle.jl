@@ -3,11 +3,7 @@ triangle.jl
 2D triangle shape
 =#
 
-
-#using ImagePhantoms #: Object, Object2d, AbstractShape
-
 export Triangle, triangle
-export phantom, radon, spectrum
 
 const sqrt3 = sqrt(3)
 

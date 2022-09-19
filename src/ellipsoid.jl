@@ -2,11 +2,7 @@
 ellipsoid.jl
 =#
 
-
-#using ImagePhantoms #: Object, Object3d
-
 export Ellipsoid, ellipsoid, sphere
-export phantom, radon, spectrum
 
 
 """
