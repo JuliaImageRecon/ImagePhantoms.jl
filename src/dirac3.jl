@@ -32,11 +32,14 @@ volume1(::Dirac3) = 1
     phantom1(ob::Object3d{Dirac3}, (x,y))
 Evaluate Dirac at `(x,y,z)`,
 for unitless coordinates.
-Caution: this function is meaningless!
+Caution: this method is meaningless
+because the Dirac impulse is not a function!
+
 """
 phantom1(ob::Object3d{Dirac3}, xyz::NTuple{3,Real}) = (xyz == (0,0,0)) ? 1 : 0
 
 
+#=
 """
     xray1(::Dirac3, r::Real, ϕ::RealU)
 X-ray transform (line integral) of Dirac.
@@ -44,6 +47,7 @@ X-ray transform (line integral) of Dirac.
 Caution: this function is meaningless!
 """
 xray1(::Dirac3, u::Real, v::Real, ϕ::RealU, θ::RealU) = ((u,v) == (0,0)) ? 1 : 0
+=#
 
 
 """

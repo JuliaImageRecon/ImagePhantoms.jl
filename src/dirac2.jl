@@ -39,18 +39,22 @@ area1(::Dirac2) = 1
     phantom1(ob::Object2d{Dirac2}, (x,y))
 Evaluate Dirac at `(x,y)`,
 for unitless coordinates.
-Caution: this function is meaningless!
+Caution: this method is meaningless
+because the Dirac impulse is not a function!
 """
 phantom1(ob::Object2d{Dirac2}, xy::NTuple{2,Real}) = (xy == (0,0)) ? 1 : 0
 
 
+#=
 """
     xray1(::Dirac2, r::Real, ϕ::RealU)
 X-ray transform (line integral) of Dirac.
 `r` should be unitless
-Caution: this function is meaningless!
+Caution: this method is meaningless
+because the Dirac impulse is not a function!
 """
 xray1(::Dirac2, r::Real, ϕ::RealU) = (r == 0) ? 1 : 0
+=#
 
 
 """
