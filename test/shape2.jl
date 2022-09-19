@@ -6,6 +6,7 @@ using ImagePhantoms: Gauss2, gauss2
 using ImagePhantoms: Ellipse, ellipse
 using ImagePhantoms: Rect, rect
 using ImagePhantoms: Triangle, triangle
+using ImagePhantoms: Dirac2, dirac2
 import ImagePhantoms as IP
 using Unitful: m, °
 using ImageGeoms: ImageGeom, axesf
@@ -41,7 +42,9 @@ end
 
 
 # parameters for testing each shape
+# (Shape, shape, lmax, lmax1, tol1, tolk, tolp, swidth)
 list = [
+ (Dirac2, dirac2, 4, 1, Inf, Inf, Inf, (2m, 8m)),
  (Ellipse, ellipse, 8, 2, 1e-6, 6e-4, 2e-4, (2m, 8m)),
  (Gauss2, gauss2, IP.fwhm2spread(4), IP.fwhm2spread(1), 7e-6, 7e-6, 4e-4, (5m, 2m)),
  (Rect, rect, 5, √2, 2e-4, 6e-3, 3e-5, (2m, 8m)),
@@ -53,13 +56,10 @@ macro isob(ex) # macro to streamline tests
 end
 
 
-for (Shape, shape, lmax, lmax1, tol1, tolk, tolp, swidth) in list
-   @show shape
-
-@testset "construct-$shape" begin
+# constructors
+function test2_construct(Shape, shape)
     @test Shape <: AbstractShape{2}
 
-    # constructors
     @isob @inferred Object(Shape(), (1,2), (3,4), π, 5.0f0)
     @isob @inferred Object(Shape(), (1,2), (3,4), (π,), 5.0f0)
     @isob @inferred Object(Shape(), center=(1,2))
@@ -69,9 +69,8 @@ for (Shape, shape, lmax, lmax1, tol1, tolk, tolp, swidth) in list
 end
 
 
-@testset "operations" begin
-    # basic methods
-
+# basic methods
+function test2_op(Shape, shape)
     ob = @inferred shape((1,2.), (3,4//1), π, 5.0f0)
 
     @isob @inferred IP.rotate(ob, π)
@@ -87,6 +86,17 @@ end
     @isob @inferred IP.translate(ob, 2, 3)
 end
 
+
+for (Shape, shape, lmax, lmax1, tol1, tolk, tolp, swidth) in list
+    @show shape
+
+    @testset "construct-$shape" begin
+        test2_construct(Shape, shape)
+    end
+
+    @testset "operations" begin
+        test2_op(Shape, shape)
+    end
 
 @testset "method" begin
     x = LinRange(-1,1,51)*5

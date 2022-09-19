@@ -6,6 +6,7 @@ using ImagePhantoms: Gauss3, gauss3
 using ImagePhantoms: Ellipsoid, ellipsoid
 using ImagePhantoms: Cuboid, cuboid
 using ImagePhantoms: Cylinder, cylinder
+using ImagePhantoms: Dirac3, dirac3
 import ImagePhantoms as IP
 using Unitful: m, mm, °
 using ImageGeoms: ImageGeom, axesf
@@ -40,7 +41,9 @@ end
 end
 
 # parameters for testing each shape
+# (Shape, shape, lmax, lmax1, tol1, tolk, tolp)
 list = [
+ (Dirac3, dirac3, 6, 1, Inf, Inf, Inf)
  (Ellipsoid, ellipsoid, 12, 2, 1e-2, 4e-4, 1e-3)
  (Gauss3, gauss3, IP.fwhm2spread(6), IP.fwhm2spread(1), 1e-2, 5e-4, 1e-5)
  (Cuboid, cuboid, sqrt(4^2 + 5^2 + 6^2), √3, 1e-2, 2e-2, 2e-3)
