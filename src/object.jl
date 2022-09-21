@@ -239,5 +239,5 @@ Determine the element type of the Radon transform of an object
 Ensures that its precision is at least `Float32`.
 """
 function radon_type(::Object{S, D, V, C, A}) where {S, D, V <: Number, C <: RealU, A <: RealU}
-    return eltype(oneunit(C) * oneunit(V) * one(A) * one(Float32))
+    return eltype(oneunit(C) * oneunit(V) * one(A) * 1f0) # at least Float32
 end
