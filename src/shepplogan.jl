@@ -3,6 +3,7 @@ shepplogan.jl
 =#
 
 export shepp_logan, ellipse_parameters
+export ellipsoid_parameters
 export SheppLogan
 export SheppLoganEmis
 export SheppLoganBrainWeb
@@ -188,7 +189,14 @@ function ellipse_parameters_uscale(
     uc::Tc,
     ua::Ta,
     uv::Tv,
-) where {Tp <: AbstractFloat, Tf <: RealU, Tc <: RealU, Ta <: RealU, Tv <: Number}
+) where {
+    Tp <: AbstractFloat,
+    Tf <: RealU,
+    Tc <: RealU,
+    Ta <: RealU,
+    Tv <: Number,
+}
+
     C = eltype(oneunit(Tf) * oneunit(Tc) * one(Tp))
     A = eltype(oneunit(Ta) * one(Tp))
     V = eltype(oneunit(Tv) * one(Tp))
@@ -200,8 +208,8 @@ function ellipse_parameters_uscale(
     for n in 1:N
         tmp = params[n,:]
         tmp = (
-            (tmp[1:2] * uc * fovs[1])...,
-            (tmp[3:4] * uc * fovs[2])...,
+            (tmp[1:2] * uc .* fovs)...,
+            (tmp[3:4] * uc .* fovs)...,
             tmp[5] * ua,
             tmp[6] * uv,
         )
@@ -212,15 +220,18 @@ end
 
 
 """
-    ellipse_parameters(case::Symbol; fovs::NTuple{2}, u::Tuple, disjoint::Bool)
+    ellipse_parameters(case; fovs::NTuple{2}, u::NTuple{3}, disjoint::Bool)
 
-By default the first four columns are unitless "fractions of field of view",
-so columns 1,3 are scaled by `xfov` and columns 2,4 are scaled by `yfov`,
+Return vector of Tuples of ellipse parameters.
+By default the first four elements of each tuple
+are unitless "fractions of field of view",
+so elements 1,3 are scaled by `xfov`
+and elements 2,4 are scaled by `yfov`,
 where `(xfov, yfov) = fovs`.
 The optional 3-tuple `u` specifies scaling and/or units:
-* columns 1-4 (center, radii) are scaled by `u[1]` (e.g., mm),
-* column 5 (angle) is scaled by `u[2]` (e.g., `1` or `°`),
-* column 6 (value) is scaled by `u[3]` (e.g., `1/cm`) for an attenuation map.
+* elements 1-4 (center, radii) are scaled by `u[1]` (e.g., mm),
+* elements 5 (angle) is scaled by `u[2]` (e.g., `1` or `°`),
+* elements 6 (value) is scaled by `u[3]` (e.g., `1/cm`) for an attenuation map.
 If `disjoint==true` then the middle ellipse positions are adjusted to avoid overlap.
 """
 function ellipse_parameters(
@@ -262,4 +273,127 @@ function ellipse_parameters(::SouthPark ; fovs::NTuple{2,RealU} = (100,100))
 
     out = ellipse_parameters_uscale(params, fovs, 1, 1, 1)
     return out
+end
+
+
+# 3D
+
+abstract type EllipsoidPhantomVersion end
+
+struct SheppLogan3 <: EllipsoidPhantomVersion end
+
+
+"""
+    ellipsoid_parameters_shepplogan( ; disjoint::Bool)
+`12 × 9 Matrix{Float64}` of 3D Shepp-Logan ellipsoid parameters.
+By default the first 6 columns are unitless "fractions of field of view",
+"""
+function ellipsoid_parameters_shepplogan()
+
+#=
+The following 3D ellipsoid parameters came from leizhu@stanford.edu
+who said that the Kak&Slaney 1988 values are incorrect.
+=#
+#       x       y       z       rx      ry      rz      Φ°     density
+    params = Float64[
+        0       0       0       0.69    0.92    0.9     0       2.0;
+        0       -0.0184 0       0.6624  0.874   0.88    0       -0.98;
+        -0.22   0       -0.25   0.41    0.16    0.21    -72     -0.02;
+        0.22    0       -0.25   0.31    0.11    0.22    72      -0.02;
+        0       0.35    -0.25   0.21    0.25    0.35    0       0.01;
+        0       0.1     -0.25   0.046   0.046   0.046   0       0.01;
+        -0.08   -0.605  -0.25   0.046   0.023   0.02    0       0.01;
+        0       -0.1    -0.25   0.046   0.046   0.046   0       0.01;
+        0       -0.605  -0.25   0.023   0.023   0.023   0       0.01;
+        0.06    -0.605  -0.25   0.046   0.023   0.02    -90     0.01;
+        0.06    -0.105  0.0625  0.056   0.04    0.1     -90     0.02;
+        0       0.1     0.625   0.056   0.056   0.1     0       -0.02
+    ]
+    params[:,1:6] ./= 2 # radii
+    params[:,7] .*= π/180 # radians
+    out = [params[:,1:7] zeros(size(params,1)) params[:,8]] # Θ=0
+    return out
+end
+
+
+"""
+    oa = ellipsoid(Vector{Tuple{9 params}})
+Return vector of `Object{Ellipsoid}`,
+one for each element of input vector of tuples.
+Often the input comes from `ellipsoid_parameters`.
+"""
+function ellipsoid(params::Vector{<:Tuple})
+    length(params[1]) == 9 || throw("ellipsoids need 9 parameters")
+    out = [ellipsoid(p...) for p in params]
+    return out
+end
+
+
+"""
+    ellipsoid_parameters_uscale(params, fovs, uc, ua, uv)
+Return vector of Tuples after FOV and unit scaling.
+"""
+function ellipsoid_parameters_uscale(
+    params::Matrix{Tp},
+    fovs::NTuple{3,Tf},
+    uc::Tc,
+    ua::Ta,
+    uv::Tv,
+) where {
+    Tp <: AbstractFloat,
+    Tf <: RealU,
+    Tc <: RealU,
+    Ta <: RealU,
+    Tv <: Number,
+}
+    C = eltype(oneunit(Tf) * oneunit(Tc) * one(Tp))
+    A = eltype(oneunit(Ta) * one(Tp))
+    V = eltype(oneunit(Tv) * one(Tp))
+    T = Tuple{C, C, C, C, C, C, A, A, V}
+
+    size(params,2) == 9 || throw(ArgumentError("params not N × 9"))
+    N = size(params,1)
+    out = Vector{T}(undef, N)
+    for n in 1:N
+        tmp = params[n,:]
+        tmp = (
+            (tmp[1:3] * uc .* fovs)...,
+            (tmp[4:6] * uc .* fovs)...,
+            (tmp[7:8] * ua)...,
+            tmp[9] * uv,
+        )
+        out[n] = tmp
+    end
+    return out
+end
+
+
+"""
+    ellipsoid_parameters(case; fovs::NTuple{3}, u::NTuple{3})
+
+Return vector of Tuples of ellipsoid parameters.
+By default the parameters are for a 3D Shepp-Logan ellipsoid phantom.
+By default the first 6 elements of each tuple
+are unitless "fractions of field of view",
+so elements 1,4 are scaled by `xfov`
+and elements 2,5 are scaled by `yfov`,
+and elements 3,6 are scaled by `zfov`,
+where `(xfov, yfov, zfov) = fovs`.
+The optional 3-tuple `u` specifies scaling and/or units:
+* elements 1-6 (center, radii) are scaled by `u[1]` (e.g., mm),
+* elements 7-8 (angles) are scaled by `u[2]` (e.g., `1` or `°`),
+* element 9 (value) is scaled by `u[3]` (e.g., `1/cm`) for an attenuation map.
+"""
+function ellipsoid_parameters(
+    case::EllipsoidPhantomVersion = SheppLogan3() ;
+    fovs::NTuple{3,RealU} = (1,1,1),
+    u::NTuple{3,Number} = (1,1,1), # unit scaling
+)
+
+    params = ellipsoid_parameters_shepplogan() # (N,9)
+
+    case == SheppLogan3() || throw("unsupported")
+#   params[:,9] = shepp_logan_values(case)
+
+    out = ellipsoid_parameters_uscale(params, fovs, u...)
 end

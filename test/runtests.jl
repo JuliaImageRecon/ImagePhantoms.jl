@@ -14,6 +14,8 @@ include("focus-chart.jl")
 
 include("shape3.jl")
 
+include("iter.jl")
+
 @testset "mri-sense" begin
     include("mri-sense.jl")
 end
