@@ -2,6 +2,7 @@
 
 using ImagePhantoms # many
 import ImagePhantoms as IP
+using Unitful: cm
 using Test: @test, @testset, @inferred
 
 
@@ -52,4 +53,15 @@ using Test: @test, @testset, @inferred
     @test kspace isa Matrix
 
     image = @inferred shepp_logan(M, N, SouthPark(), fovs=(1,1))
+end
+
+
+@testset "shepp3" begin
+    @test (@inferred ellipsoid_parameters()) isa Vector{<:Tuple}
+    fovs = (8,9,3) .* 1cm
+    @inferred ellipsoid_parameters( ; fovs)
+    u = (1cm,1,1/cm)
+    @inferred ellipsoid_parameters( ; u)
+    u = (1,1,1/cm)
+    @inferred ellipsoid_parameters( ; fovs, u)
 end
