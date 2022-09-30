@@ -3,7 +3,8 @@
 #---------------------------------------------------------
 
 #=
-This page illustrates the Shepp-Logan phantoms in the Julia package
+This page illustrates the 3D Shepp-Logan phantom(s)
+in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
 
 This page was generated from a single Julia file:
