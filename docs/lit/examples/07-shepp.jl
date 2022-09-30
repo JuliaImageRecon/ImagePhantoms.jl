@@ -28,7 +28,6 @@ This page was generated from a single Julia file:
 using ImagePhantoms: shepp_logan, SouthPark
 using ImagePhantoms: SheppLoganToft, SheppLoganEmis, SheppLoganBrainWeb
 using ImagePhantoms: ellipse_parameters, ellipse, phantom
-using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
 using Unitful: g, cm
 

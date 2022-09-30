@@ -241,3 +241,19 @@ Ensures that its precision is at least `Float32`.
 function radon_type(::Object{S, D, V, C, A}) where {S, D, V <: Number, C <: RealU, A <: RealU}
     return eltype(oneunit(C) * oneunit(V) * one(A) * 1f0) # at least Float32
 end
+
+
+"""
+    radon(itr, oa::Array{<:Object})
+Return parallel-beam projections
+sampled at locations
+returned by generator (or iterator) `itr`.
+Returned array size matches `size(itr)`.
+"""
+function radon(
+    itr,
+    oa::Array{<:Object},
+)
+    fun = radon(oa)
+    return [fun(i...) for i in itr]
+end
