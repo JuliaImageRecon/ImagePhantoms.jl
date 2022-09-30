@@ -13,7 +13,8 @@ https://github.com/JuliaImageRecon/ImagePhantoms.jl
 
 This Julia language repo
 provides tools for working with software-defined image phantoms
-like the Shepp-Logan phantom.
+like the Shepp-Logan phantom
+(both 2D and 3D versions).
 
 
 For each phantom shape,
