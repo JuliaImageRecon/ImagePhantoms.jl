@@ -309,9 +309,9 @@ who said that the Kak&Slaney 1988 values are incorrect.
         0.06    -0.105  0.0625  0.056   0.04    0.1     -90     0.02;
         0       0.1     0.625   0.056   0.056   0.1     0       -0.02
     ]
-    params[:,1:6] ./= 2
-    params[:,7] .*= π/180
-    out = [params[:,1:7] zeros(size(params,1)) params[:,8]] # add Θ=0
+    params[:,1:6] ./= 2 # radii
+    params[:,7] .*= π/180 # radians
+    out = [params[:,1:7] zeros(size(params,1)) params[:,8]] # Θ=0
     return out
 end
 
@@ -390,9 +390,7 @@ function ellipsoid_parameters(
     u::NTuple{3,Number} = (1,1,1), # unit scaling
 )
 
-    params = ellipsoid_parameters_shepplogan()
-    params[:,1:6] ./= 2
-    params[:,7:8] .*= π/180
+    params = ellipsoid_parameters_shepplogan() # (N,9)
 
     case == SheppLogan3() || throw("unsupported")
 #   params[:,9] = shepp_logan_values(case)
