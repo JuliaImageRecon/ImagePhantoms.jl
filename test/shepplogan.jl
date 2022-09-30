@@ -63,5 +63,7 @@ end
     u = (1cm,1,1/cm)
     @inferred ellipsoid_parameters( ; u)
     u = (1,1,1/cm)
-    @inferred ellipsoid_parameters( ; fovs, u)
+    param = @inferred ellipsoid_parameters( ; fovs, u)
+    ob = @inferred ellipsoid(param)
+    @test ob isa Vector{<:Object3d}
 end
