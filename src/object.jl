@@ -132,7 +132,7 @@ function Object(
     wy::RealU = wx,
     ϕ::RealU = 0,
     value::Number = 1,
-) where {C <: RealU}
+)
     Object(shape, (cx, cy), (wx, wy), (ϕ,), value)
 end
 
@@ -152,7 +152,7 @@ function Object(
     ϕ::RealU = 0,
     θ::RealU = 0,
     value::Number = 1,
-) where {C <: RealU}
+)
     Object(shape, (cx, cy, cz), (wx, wy, wz), (ϕ, θ), value)
 end
 
