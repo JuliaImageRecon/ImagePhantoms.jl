@@ -32,7 +32,6 @@ using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
 using FFTW: fft, fftshift, ifftshift
 using Unitful: mm, unit, °
-using UnitfulRecipes
 using Plots: plot, plot!, scatter!, default
 default(markerstrokecolor=:auto)
 

@@ -29,7 +29,6 @@ This page was generated from a single Julia file:
 #src using ImagePhantoms
 #src using ImageGeoms: ImageGeom, axesf
 #src using MIRTjim: jim, prompt
-#src using UnitfulRecipes
 #src using Unitful: mm
 
 

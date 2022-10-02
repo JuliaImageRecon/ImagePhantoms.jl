@@ -33,7 +33,6 @@ using MIRTjim: jim, prompt, mid3
 using FFTW: fft, fftshift, ifftshift
 using LazyGrids: ndgrid
 using Unitful: mm, unit, °
-using UnitfulRecipes
 using Plots: plot, plot!, scatter!, default
 using Plots # gif @animate
 default(markerstrokecolor=:auto)

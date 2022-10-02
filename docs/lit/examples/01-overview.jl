@@ -26,12 +26,11 @@ This page was generated from a single Julia file:
 # Packages needed here.
 
 #nb import Pkg
-#nb Pkg.add(["ImageGeoms", "MIRTjim", "UnitfulRecipes", "Unitful"])
+#nb Pkg.add(["ImageGeoms", "MIRTjim", "Unitful"])
 
 using ImagePhantoms
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
-using UnitfulRecipes
 using Unitful: mm
 using InteractiveUtils: versioninfo
 
