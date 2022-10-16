@@ -59,17 +59,17 @@ end
 # constructors
 function test3_construct(Shape, shape)
     @test Shape <: AbstractShape{3}
-    @isob3 @inferred Object(Shape(), (1,2,3), (4,5,6), (π, π/4), 5.0f0)
-    @isob3 @inferred Object(Shape(), (1,2,3), (4,5,6), (0, 0), 5.0f0)
+    @isob3 @inferred Object(Shape(), (1,2,3), (4,5,6), (π, π/4, 0), 5.0f0)
+    @isob3 @inferred Object(Shape(), (1,2,3), (4,5,6), (0, 0, 0), 5.0f0)
     @isob3 @inferred Object(Shape(), center=(1,2,3))
-    @isob3 @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
-    @isob3 @inferred shape(1, 2., 3, 4//1, 5, 6., π, π/4, 5.0f0)
+    @isob3 @inferred shape((1,2.,3), (4,5//1,6), (π, π/4, 0), 5.0f0)
+    @isob3 @inferred shape(1, 2., 3, 4//1, 5, 6., π, π/4, 0, 5.0f0)
 end
 
 
 # basic methods
 function test3_op(Shape, shape)
-    ob = @inferred shape((1,2.,3), (4,5//1,6), (π, π/4), 5.0f0)
+    ob = @inferred shape((1,2.,3), (4,5//1,6), (π, π/4, 0), 5.0f0)
 
     @isob3 @inferred IP.rotate(ob, π)
 
@@ -124,7 +124,7 @@ for (Shape, shape, lmax, lmax1, tol1, tolk, tolp) in list
     y = LinRange(-1,1,12)*5
     z = LinRange(-1,1,11)*5
 
-    ob = @inferred shape((1, 2., 3), (4//1, 5, 6), (π/6, 0), 5.0f0)
+    ob = @inferred shape((1, 2., 3), (4//1, 5, 6), (π/6, 0, 0), 5.0f0)
 
     show(devnull, ob)
     @test (@inferred eltype(ob)) == Float32
@@ -171,7 +171,7 @@ for (Shape, shape, lmax, lmax1, tol1, tolk, tolp) in list
             width = (30m, 40m, 50m)
             center = (8m, 7m, 6m)
             ϕ = π/6
-            ob = shape(center, width, (ϕ, 0), 1.0f0)
+            ob = shape(center, width, (ϕ, 0, 0), 1.0f0)
             @inferred IP._radon(ob, 0m, (1//2)m, 3f0, 4.)
             x1 = radon([center[1]], [center[3]], [0], [0], [ob])[1]
             x2 = radon([center[1]], [center[3]], 0, 0, [ob])[1]
@@ -186,7 +186,7 @@ for (Shape, shape, lmax, lmax1, tol1, tolk, tolp) in list
     (L,M,N) = (2^7,2^7+2,2^7+3) # odd
     ig = ImageGeom( dims=(L,M,N), deltas=(1.0m, 1.1m, 1.2m), offsets=:dsp)
     width = (30m, 40m, 50m)
-    ob = shape((8m, 7m, 6m), width, (π/6, 0), 5.0f0)
+    ob = shape((8m, 7m, 6m), width, (π/6, 0, 0), 5.0f0)
     volume = IP.volume(ob)
     zscale = 1 / (ob.value * volume) # normalize spectra
 
@@ -211,7 +211,7 @@ for (Shape, shape, lmax, lmax1, tol1, tolk, tolp) in list
   @testset "proj-slice" begin # Fourier-slice theorem
     center = (20mm, 10mm, 5mm)
     width = (25mm, 35mm, 15mm)
-    angles = (π/6, 0)
+    angles = (π/6, 0, 0)
     ob = shape(center, width, angles, 1.0f0)
 
     pg = ImageGeom((2^8,2^7), (0.6mm,1.0mm), (0.5,0.5)) # projection sampling

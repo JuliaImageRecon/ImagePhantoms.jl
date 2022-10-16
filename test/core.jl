@@ -38,8 +38,8 @@ end
 @testset "helpers" begin
     @test collect(@inferred IP.rotate2d(2, 1, π/2)) ≈ [1,-2]
     @test all((@inferred IP.rotate2d((2, 1), π/2)) .≈ (1,-2))
-    @test ≈(collect(@inferred IP.rotate3d(2, 1, 3, π/2, 0)), [1,-2,3]; atol= 1e-15)
-    @test all((@inferred IP.rotate3d((2, 1, 3), π/2, 0)) .≈ (1,-2, 3))
+    @test ≈(collect(@inferred IP.rotate3d(2, 1, 3, π/2, 0, 0)), [1,-2,3]; atol= 1e-15)
+    @test all((@inferred IP.rotate3d((2, 1, 3), π/2, 0, 0)) .≈ (1,-2, 3))
     @test (@inferred IP.coords(square(3m), 9m, 6m)) == (3, 2)
 
     @inferred IP.xray_shift(1.0f0, π/3, 3, 4//5)

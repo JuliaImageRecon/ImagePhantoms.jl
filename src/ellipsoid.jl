@@ -16,7 +16,7 @@ struct Ellipsoid <: AbstractShape{3} end
 
 """
     ellipsoid(cx, cy, cz, rx=1, ry=1, rz=1, Φ=0, Θ=0, value::Number = 1)
-    ellipsoid(center::NTuple{3,RealU}, radii::NTuple{3,RealU}, angle::NTuple{2,RealU}, v)
+    ellipsoid(center::NTuple{3,RealU}, radii::NTuple{3,RealU}, angle::NTuple{3,RealU}, v)
 Construct `Object{Ellipsoid}` from parameters.
 """
 ellipsoid(args... ; kwargs...) = Object(Ellipsoid(), args...; kwargs...)

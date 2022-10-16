@@ -18,7 +18,7 @@ using Test: @test, @testset, @inferred
 end
 
 @testset "iter3" begin
-    ob = cuboid((1m, 2m, 3m), (4m, 5m, 6m), (π/6, 0), 1.0f0 / m^2)
+    ob = cuboid((1m, 2m, 3m), (4m, 5m, 6m), (π/6, 0, 0), 1.0f0 / m^2)
     nu, du = 2^4, 0.02m
     nv, dv = 2^3, 0.03m
     u = (-nu÷2:nu÷2-1) * du

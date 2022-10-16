@@ -62,9 +62,9 @@ center = (20mm, 10mm, 5mm)
 width = (25mm, 35mm, 15mm) # x radius, y radius, height
 ϕ0s = :(π/6) # symbol version for nice plot titles
 ϕ0 = eval(ϕ0s)
-angles = (ϕ0, 0)
+angles = (ϕ0, 0, 0)
 Object(Cylinder(), center, width, angles, 1.0f0) # top-level constructor
-cylinder( 20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 1.0f0) # 9 arguments
+cylinder( 20mm, 10mm, 5mm, 25mm, 35mm, 15mm, π/6, 0, 0, 1.0f0) # 9 arguments
 ob = cylinder(center, width, angles, 1.0f0) # tuples (recommended use)
 
 

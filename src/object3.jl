@@ -19,9 +19,9 @@ volume(ob::Object3d{S}) where S = volume1(S()) * prod(ob.width)
     rotate(ob::Object3d, α, β=0)
 Rotate a 3D object.
 """
-rotate(ob::Object3d{S}, θ::NTuple{2,RealU}) where S =
+rotate(ob::Object3d{S}, θ::NTuple{3,RealU}) where S =
     Object(S(), ob.center, ob.width, ob.angle .+ θ, ob.value)
-rotate(ob::Object3d, α::RealU, β::RealU=0) = rotate(ob, (α,β))
+rotate(ob::Object3d, α::RealU, β::RealU=0, γ::RealU=0) = rotate(ob, (α,β,γ))
 
 
 """
@@ -30,7 +30,7 @@ Put coordinates `(x,y,z)` in canonical axes associated with `object`.
 """
 function coords(ob::Object3d, x::RealU, y::RealU, z::RealU)
     xyz = rotate3d(x - ob.center[1], y - ob.center[2], z - ob.center[3],
-        ob.angle[1], ob.angle[2])
+        ob.angle[1], ob.angle[2], ob.angle[3])
     return xyz ./ ob.width # unitless
 end
 
@@ -177,7 +177,7 @@ end
 # this gateway seems to help type inference
 function _radon(ob::Object3d{S}, u::RealU, v::RealU, ϕ::RealU, θ::RealU) where S
     T = radon_type(ob)
-    return T(ob.value * _xray(S(), ob.center, ob.width, ob.angle, u, v, ϕ, θ))::T
+    return T(ob.value * _xray(S(), ob.center, ob.width, ob.angle[1:2], u, v, ϕ, θ))::T
 end
 
 
@@ -247,8 +247,8 @@ end
 
 
 # apply rotate, translate, and scale properties of 3D Fourier transform
-function _spectrum(ob::Object3d, fx, fy, fz, cx, cy, cz, rx, ry, rz, Φ, Θ)
-    (kx, ky, kz) = rotate3d(fx, fy, fz, Φ, Θ) # rotate then translate
+function _spectrum(ob::Object3d, fx, fy, fz, cx, cy, cz, rx, ry, rz, Φ, Θ, ψ)
+    (kx, ky, kz) = rotate3d(fx, fy, fz, Φ, Θ, ψ) # rotate then translate
     return rx * ry * rz * cispi(-2*(fx*cx + fy*cy + fz*cz)) *
         spectrum1(ob, (rx*kx, ry*ky, rz*kz))
 end
@@ -300,10 +300,14 @@ end
 # helper
 
 
-function rotate3d(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU)
-    θ == 0 || throw(ArgumentError("θ ≂̸ 0 unsupported currently"))
-    (s, c) = sincos(ϕ)
-    return (c * x + s * y, -s * x + c * y, z)
+function rotate3d(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU, ψ::RealU)
+    sinϕ, cosϕ = sincos(ψ)
+    sinθ, cosθ = sincos(θ)
+    sinψ, cosψ = sincos(-ϕ)
+
+    return (cosθ*cosψ*x + cosθ*-sinψ*y + sinθ*z,
+           (sinϕ*sinθ*cosψ + cosϕ*sinψ)*x + (sinϕ*sinθ*-sinψ + cosϕ*cosψ)*y + -sinϕ*cosθ*z,
+           (cosϕ*-sinθ*cosψ + sinϕ*sinψ)*x + (cosϕ*sinθ*sinψ + sinϕ*cosψ)*y + cosϕ*cosθ*z)    
 end
 
-rotate3d(xyz::NTuple{3,RealU}, ϕ::RealU, θ::RealU) = rotate3d(xyz..., ϕ, θ)
+rotate3d(xyz::NTuple{3,RealU}, ϕ::RealU, θ::RealU, ψ::RealU) = rotate3d(xyz..., ϕ, θ, ψ)

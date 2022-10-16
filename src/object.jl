@@ -61,7 +61,7 @@ struct Object{S, D, V, C, A, Da} <: AbstractObject
         value::V,
     ) where {S <: AbstractShape, D, Da, V <: Number}
         D == ndims(S()) || throw(ArgumentError("D=$D vs ndims(S)=$(ndims(S)) for S=$S"))
-        1 ≤ Da == D-1 || throw(ArgumentError("Da=$Da != D-1, where D=$D"))
+        D == 2 == Da + 1 || D == Da == 3 || throw(ArgumentError("Da=$Da does not fit to D=$D"))
 
         all(width .> zero(eltype(width))) || throw(ArgumentError("widths must be positive"))
 
@@ -109,13 +109,13 @@ function Object(
     shape::AbstractShape{D},
     _center::NTuple{D,RealU} = _tuple(0, D),
     _width::NTuple{D,RealU} = _tuple(1, D),
-    _angle::Union{RealU, NTuple{Da,RealU}} where Da = _tuple(0, D-1),
+    _angle::Union{RealU, NTuple{Da,RealU}} = _tuple(0, D == 2 ? 1 : 3),
     _value::Number = 1f0 ;
     center::NTuple{D,RealU} = _center,
     width::NTuple{D,RealU} = _width,
-    angle::Union{RealU, NTuple{Da,RealU}} where Da = _angle,
+    angle::Union{RealU, NTuple{Da,RealU}} = _angle,
     value::Number = _value,
-) where {D}
+) where {D,Da}
     Object{typeof(shape)}(center, width, angle, value)
 end
 
@@ -138,7 +138,7 @@ end
 
 
 """
-    Object(shape ; cx, cy, cz, wx=1, wy=wx, wz=wx, ϕ=0, θ=0, value=1)
+    Object(shape ; cx, cy, cz, wx=1, wy=wx, wz=wx, ϕ=0, θ=0, ψ=0, value=1)
 3D object constructor from values (without tuples).
 """
 function Object(
@@ -151,9 +151,10 @@ function Object(
     wz::RealU = wx,
     ϕ::RealU = 0,
     θ::RealU = 0,
+    ψ::RealU = 0,
     value::Number = 1,
 )
-    Object(shape, (cx, cy, cz), (wx, wy, wz), (ϕ, θ), value)
+    Object(shape, (cx, cy, cz), (wx, wy, wz), (ϕ, θ, ψ), value)
 end
 
 
