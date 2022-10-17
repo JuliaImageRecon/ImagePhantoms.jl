@@ -31,6 +31,7 @@ This page was generated from a single Julia file:
 using ImagePhantoms
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
+using Plots; default(markerstrokecolor=:auto, label="")
 using Unitful: mm
 using InteractiveUtils: versioninfo
 
@@ -55,7 +56,7 @@ image = shepp_logan(256) # CT version by default
 jim(image, "SheppLogan"; clim=(0.9, 1.1))
 
 
-# ### Sinograms and spectra
+# ## Sinograms
 
 #=
 Often for image reconstruction algorithm development,
@@ -84,7 +85,7 @@ to use `ImageGeoms` to help with the sampling.
 
 ig = ImageGeom(dims=(200,256), deltas=(1mm,1mm))
 image = phantom(axes(ig)..., objects)
-jim(axes(ig), image, xlabel="x", ylabel="y", title="SheppLoganToft")
+jim(axes(ig), image; xlabel="x", ylabel="y", title="SheppLoganToft")
 
 
 # Here is the sinogram corresponding to this phantom,
@@ -93,22 +94,81 @@ jim(axes(ig), image, xlabel="x", ylabel="y", title="SheppLoganToft")
 r = LinRange(-100mm,100mm,401)
 ϕ = deg2rad.(0:180)
 sino = radon(r, ϕ, objects)
-jim(r, ϕ, sino, title="Sinogram")
+jim(r, ϕ, sino; title="Sinogram", xlabel="r", ylabel="ϕ")
 
 
-# Here is the 2D spectrum (Fourier transform) of this phantom,
-# computed analytically from the ellipse parameters using `spectrum`:
+#=
+## Spectra
+Here is the 2D spectrum (Fourier transform) of this phantom,
+computed analytically from the ellipse parameters using `spectrum`:
+=#
 
 kspace = spectrum(axesf(ig)..., objects)
-jim(axesf(ig), log10.(abs.(kspace/(1mm)^2)), xlabel="ν₁", ylabel="ν₂", title="log10|Spectrum|")
+jim(axesf(ig), log10.(abs.(kspace/(1mm)^2)); xlabel="ν₁", ylabel="ν₂", title="log10|Spectrum|")
 
 #=
 The 2D Fourier transform formula used here is:
-``F(ν_1, ν_2) = ∫ ∫ f(x,y) \mathrm{e}^{-ı 2π (ν_1 x + ν_2 y)} \, \mathrm{d} x \mathrm{d} y``,
+```math
+F(ν_1, ν_2) = ∫ ∫ f(x,y) \, \mathrm{e}^{-ı 2π (ν_1 x + ν_2 y)} \, \mathrm{d} x \, \mathrm{d} y,
+```
 so if ``x`` and ``y`` have units mm (for example),
 then the units of the spatial frequency variables
 ``ν_1`` and ``ν_2`` are cycles/mm.
 =#
+
+
+#=
+## 2D Rotation
+
+All of the 2D objects (ellipses etc.)
+in this package can be rotated by an angle ``ϕ``.
+
+This package treats the rotation angle ``ϕ``
+as defining a
+[rotation of the object](https://en.wikipedia.org/wiki/Rotation_(mathematics)#Two_dimensions).
+Be aware that a
+[rotation of the axes](https://en.wikipedia.org/wiki/Rotation_of_axes)
+has the opposite sign convention.
+
+After rotation by ``ϕ``,
+any point ``(x,y)`` in the original ellipse
+becomes the point
+```math
+\left[ \begin{matrix}
+x' \\ y'
+\end{matrix} \right]
+=
+\left[ \begin{matrix}
+\cos(ϕ) & -\sin(ϕ) \\ \sin(ϕ) & \cos(ϕ)
+\end{matrix} \right]
+\left[ \begin{matrix}
+x \\ y
+\end{matrix} \right],
+```
+as illustrated by the blue star below
+when rotating an ellipse
+by ``ϕ = π/6``.
+=#
+
+ellipse0 = ellipse(0, 0, 8, 4, 0, 1)
+ϕ1s = :(π/6)
+ϕ1 = eval(ϕ1s)
+ellipse1 = ellipse(0, 0, 8, 4, ϕ1, 1)
+
+x = LinRange(-9, 9, 181)
+y = LinRange(-8, 8, 161)
+pic0 = phantom(x, y, [ellipse0])
+pic1 = phantom(x, y, [ellipse1])
+
+p0 = jim(x, y, pic0, "Original ellipse"; prompt=:false)
+x0,y0 = 7,0
+scatter!([x0], [y0], marker=:star, color=:blue)
+point1 = [cos(ϕ1) -sin(ϕ1); sin(ϕ1) cos(ϕ1)] * [x0; y0] # rotate point
+x1,y1 = point1[1], point1[2]
+p1 = jim(x, y, pic1, "Rotated by ϕ = $ϕ1s"; prompt=:false)
+scatter!([x1], [y1], marker=:star, color=:blue)
+jim(p0, p1)
+
 
 
 # ## Reproducibility
