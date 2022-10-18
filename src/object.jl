@@ -48,6 +48,9 @@ struct Object{S, D, V, C, A, Da} <: AbstractObject
     "'intensity' value for this shape"
     value::V
 
+    sin::NTuple{Da,A} # sin.(angle) todo
+    cos::NTuple{Da,A} # cos.(angle)
+
     """
         Object{S}(center, width, angle, value)
     Inner constructor for `S <: AbstractShape`.
@@ -60,15 +63,17 @@ struct Object{S, D, V, C, A, Da} <: AbstractObject
         angle::NTuple{Da,RealU},
         value::V,
     ) where {S <: AbstractShape, D, Da, V <: Number}
-        D == ndims(S()) || throw(ArgumentError("D=$D vs ndims(S)=$(ndims(S)) for S=$S"))
-        D == 2 == Da + 1 || D == Da == 3 || throw(ArgumentError("Da=$Da does not fit to D=$D"))
-
-        all(width .> zero(eltype(width))) || throw(ArgumentError("widths must be positive"))
+        D == ndims(S()) ||
+            throw(ArgumentError("D=$D vs ndims(S)=$(ndims(S)) for S=$S"))
+        D == 2 == Da + 1 || D == Da == 3 ||
+            throw(ArgumentError("Da=$Da does not fit to D=$D"))
+        all(width .> zero(eltype(width))) ||
+            throw(ArgumentError("widths must be positive"))
 
         C = promote_type(eltype.(center)..., eltype.(width)...)
-        angle = promote(angle...)
+        angle = promote((1f0 .* angle)...) # ensure at least Float32
         A = eltype(angle)
-        new{S,D,V,C,A,Da}(C.(center), C.(width), angle, value)
+        new{S,D,V,C,A,Da}(C.(center), C.(width), angle, value, sin.(angle), cos.(angle))
     end
 end
 
