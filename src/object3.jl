@@ -305,9 +305,16 @@ function rotate3d(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU, ψ::RealU)
     sinθ, cosθ = sincos(θ)
     sinψ, cosψ = sincos(-ϕ)
 
-    return (cosθ*cosψ*x + cosθ*-sinψ*y + sinθ*z,
-           (sinϕ*sinθ*cosψ + cosϕ*sinψ)*x + (sinϕ*sinθ*-sinψ + cosϕ*cosψ)*y + -sinϕ*cosθ*z,
-           (cosϕ*-sinθ*cosψ + sinϕ*sinψ)*x + (cosϕ*sinθ*sinψ + sinϕ*cosψ)*y + cosϕ*cosθ*z)    
+    return (
+        cosθ * cosψ * x + cosθ * -sinψ * y + sinθ * z,
+        (sinϕ * sinθ * cosψ + cosϕ * sinψ) * x +
+        (sinϕ * sinθ * -sinψ + cosϕ * cosψ) * y +
+        -sinϕ * cosθ * z,
+        (cosϕ * -sinθ * cosψ + sinϕ * sinψ) * x +
+        (cosϕ * sinθ * sinψ + sinϕ * cosψ) * y +
+        cosϕ * cosθ * z,
+    )
 end
 
-rotate3d(xyz::NTuple{3,RealU}, ϕ::RealU, θ::RealU, ψ::RealU) = rotate3d(xyz..., ϕ, θ, ψ)
+rotate3d(xyz::NTuple{3,RealU}, ϕ::RealU, θ::RealU, ψ::RealU) =
+    rotate3d(xyz..., ϕ, θ, ψ)
