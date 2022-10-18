@@ -29,7 +29,10 @@ rotate(ob::Object3d, α::RealU, β::RealU=0, γ::RealU=0) = rotate(ob, (α,β,γ
 Put coordinates `(x,y,z)` in canonical axes associated with `object`.
 """
 function coords(ob::Object3d, x::RealU, y::RealU, z::RealU)
-    xyz = rotate3d(x - ob.center[1], y - ob.center[2], z - ob.center[3],
+# todo
+#   xyz = rotate3d(x - ob.center[1], y - ob.center[2], z - ob.center[3],
+#       -ob.angle[1], -ob.angle[2], -ob.angle[3])
+    xyz = Rxyz_transpose(x - ob.center[1], y - ob.center[2], z - ob.center[3],
         ob.angle[1], ob.angle[2], ob.angle[3])
     return xyz ./ ob.width # unitless
 end
@@ -300,6 +303,67 @@ end
 # helper
 
 
+"""
+    Rxyz(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU, ψ::RealU)
+    Rxyz(x::RealU, y::RealU, sinϕ, sinθ, sinψ, cosϕ, cosθ, cosψ)
+Multiply `Rx(ψ) * Ry(θ) * Rz(ϕ) * [x, y, z]` for 3D rotation.
+"""
+function Rxyz(x::RealU, y::RealU, z::RealU,
+    sinϕ::Real, sinθ::Real, sinψ::Real,
+    cosϕ::Real, cosθ::Real, cosψ::Real,
+)
+    return (
+        cosθ * x +
+         sinθ * sinϕ * y +
+         sinθ * cosϕ * z,
+        (sinψ * sinθ) * x +
+         (cosψ * cosϕ - sinψ * cosθ * sinϕ) * y +
+         (cosψ * - sinϕ) * z,
+        (cosψ * -sinθ) * x +
+         (sinψ * cosϕ - sinψ * cosθ * sinϕ) * y +
+         (sinψ * -sinϕ + cosψ * cosθ * cosϕ) * z
+    )
+end
+
+function Rxyz(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU, ψ::RealU)
+    sinϕ, cosϕ = sincos(ϕ)
+    sinθ, cosθ = sincos(θ)
+    sinψ, cosψ = sincos(ψ)
+    return Rxyz(x, y, z, sinϕ, sinθ, sinψ, cosϕ, cosθ, cosψ)
+end
+
+
+"""
+    Rxyz_transpose(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU, ψ::RealU)
+    Rxyz_transpose(x::RealU, y::RealU, sinϕ, sinθ, sinψ, cosϕ, cosθ, cosψ)
+Multiply `Rz(-ϕ) * Ry(-θ) * Rz(-ψ) * [x, y, z]` for 3D (inverse) rotation.
+"""
+function Rxyz_transpose(x::RealU, y::RealU, z::RealU,
+    sinϕ::Real, sinθ::Real, sinψ::Real,
+    cosϕ::Real, cosθ::Real, cosψ::Real,
+)
+    return (
+        cosθ * x +
+        (sinψ * sinθ) * y +
+        (cosψ * -sinθ) * z,
+         sinθ * sinϕ * x +
+         (cosψ * cosϕ - sinψ * cosθ * sinϕ) * y +
+         (sinψ * cosϕ - sinψ * cosθ * sinϕ) * z,
+         sinθ * cosϕ * x +
+         (cosψ * - sinϕ) * y +
+         (sinψ * -sinϕ + cosψ * cosθ * cosϕ) * z,
+    )
+end
+
+function Rxyz_transpose(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU, ψ::RealU)
+    sinϕ, cosϕ = sincos(ϕ)
+    sinθ, cosθ = sincos(θ)
+    sinψ, cosψ = sincos(ψ)
+    return Rxyz_transpose(x, y, z, sinϕ, sinθ, sinψ, cosϕ, cosθ, cosψ)
+end
+
+
+#=
 function rotate3d(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU, ψ::RealU)
     sinϕ, cosϕ = sincos(ψ)
     sinθ, cosθ = sincos(θ)
@@ -318,3 +382,4 @@ end
 
 rotate3d(xyz::NTuple{3,RealU}, ϕ::RealU, θ::RealU, ψ::RealU) =
     rotate3d(xyz..., ϕ, θ, ψ)
+=#
