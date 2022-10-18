@@ -31,6 +31,7 @@ This page was generated from a single Julia file:
 using ImagePhantoms
 using ImageGeoms: ImageGeom, axesf
 using MIRTjim: jim, prompt
+using Plots; default(markerstrokecolor=:auto, label="")
 using Unitful: mm
 using InteractiveUtils: versioninfo
 
@@ -55,7 +56,7 @@ image = shepp_logan(256) # CT version by default
 jim(image, "SheppLogan"; clim=(0.9, 1.1))
 
 
-# ### Sinograms and spectra
+# ## Sinograms
 
 #=
 Often for image reconstruction algorithm development,
@@ -84,7 +85,7 @@ to use `ImageGeoms` to help with the sampling.
 
 ig = ImageGeom(dims=(200,256), deltas=(1mm,1mm))
 image = phantom(axes(ig)..., objects)
-jim(axes(ig), image, xlabel="x", ylabel="y", title="SheppLoganToft")
+jim(axes(ig), image; xlabel="x", ylabel="y", title="SheppLoganToft")
 
 
 # Here is the sinogram corresponding to this phantom,
@@ -93,22 +94,268 @@ jim(axes(ig), image, xlabel="x", ylabel="y", title="SheppLoganToft")
 r = LinRange(-100mm,100mm,401)
 ϕ = deg2rad.(0:180)
 sino = radon(r, ϕ, objects)
-jim(r, ϕ, sino, title="Sinogram")
+jim(r, ϕ, sino; title="Sinogram", xlabel="r", ylabel="ϕ")
 
 
-# Here is the 2D spectrum (Fourier transform) of this phantom,
-# computed analytically from the ellipse parameters using `spectrum`:
+#=
+## Spectra
+Here is the 2D spectrum (Fourier transform) of this phantom,
+computed analytically from the ellipse parameters using `spectrum`:
+=#
 
 kspace = spectrum(axesf(ig)..., objects)
-jim(axesf(ig), log10.(abs.(kspace/(1mm)^2)), xlabel="ν₁", ylabel="ν₂", title="log10|Spectrum|")
+jim(axesf(ig), log10.(abs.(kspace/(1mm)^2)); xlabel="ν₁", ylabel="ν₂", title="log10|Spectrum|")
 
 #=
 The 2D Fourier transform formula used here is:
-``F(ν_1, ν_2) = ∫ ∫ f(x,y) \mathrm{e}^{-ı 2π (ν_1 x + ν_2 y)} \, \mathrm{d} x \mathrm{d} y``,
+```math
+F(ν_1, ν_2) = ∫ ∫ f(x,y) \, \mathrm{e}^{-ı 2π (ν_1 x + ν_2 y)} \, \mathrm{d} x \, \mathrm{d} y,
+```
 so if ``x`` and ``y`` have units mm (for example),
 then the units of the spatial frequency variables
 ``ν_1`` and ``ν_2`` are cycles/mm.
 =#
+
+
+#=
+## 2D Rotation
+
+All of the 2D objects (ellipses etc.)
+in this package can be rotated by an angle ``ϕ``.
+
+This package treats the rotation angle ``ϕ``
+as defining a
+[rotation of the object](https://en.wikipedia.org/wiki/Rotation_(mathematics)#Two_dimensions).
+Be aware that a
+[rotation of the axes](https://en.wikipedia.org/wiki/Rotation_of_axes)
+has the opposite sign convention.
+
+After rotation by ``ϕ``,
+any point ``(x,y)`` in the original ellipse
+becomes the point
+```math
+\left[ \begin{matrix}
+x' \\ y'
+\end{matrix} \right]
+=
+\left[ \begin{matrix}
+\cos(ϕ) & -\sin(ϕ) \\ \sin(ϕ) & \cos(ϕ)
+\end{matrix} \right]
+\left[ \begin{matrix}
+x \\ y
+\end{matrix} \right],
+```
+as illustrated by the blue star below
+when rotating an ellipse
+by ``ϕ = π/6``.
+=#
+
+ellipse0 = ellipse(0, 0, 8, 4, 0, 1)
+ϕ1s = :(π/6)
+ϕ1 = eval(ϕ1s)
+ellipse1 = ellipse(0, 0, 8, 4, ϕ1, 1)
+
+x = LinRange(-9, 9, 181)
+y = LinRange(-8, 8, 161)
+pic0 = phantom(x, y, [ellipse0])
+pic1 = phantom(x, y, [ellipse1])
+
+default(marker=:star)
+p0 = jim(x, y, pic0, "Original ellipse";
+    xlabel="x", ylabel="y", prompt=:false)
+x0,y0 = 7,0
+scatter!([x0], [y0], color=:blue)
+point1 = [cos(ϕ1) -sin(ϕ1); sin(ϕ1) cos(ϕ1)] * [x0; y0] # rotate point
+x1,y1 = point1[1], point1[2]
+p1 = jim(x, y, pic1, "Rotated by ϕ = $ϕ1s";
+    xlabel="x", ylabel="y", prompt=:false)
+scatter!([x1], [y1], color=:blue)
+jim(p0, p1)
+
+
+#=
+## 3D Rotation
+
+For a 3D object,
+there are three rotation angles,
+often called
+[Euler_angles](https://en.wikipedia.org/wiki/Euler_angles),
+and there are many possible conventions
+for the names and ordering of these angles.
+
+This package denotes
+the three angles as ``ϕ,θ,ψ,``
+where,
+for consistency with the 2D case,
+the first of the three angles,
+``ϕ``,
+denotes rotation in the ``(x,y)`` plane,
+i.e., around the ``z``-axis.
+
+In
+[wikipedia notation](https://en.wikipedia.org/w/index.php?title=Rotation_matrix&section=9#In_three_dimensions)
+this is
+``R_z(ϕ)``.
+
+Here is an illustration
+for $ϕ = π/6$.
+=#
+
+ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 1)
+ϕ1s = :(π/6)
+ϕ1 = eval(ϕ1s)
+ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (ϕ1, 0, 0), 1)
+
+x = LinRange(-9, 9, 181)
+y = LinRange(-8, 8, 161)
+z = [0]
+pic0 = phantom(x, y, z, [ellipsoid0])
+pic1 = phantom(x, y, z, [ellipsoid1])
+
+p0z = jim(x, y, pic0,
+    "Original ellipsoid:\n(x,y) slice";
+    xlabel="x", ylabel="y", prompt=:false)
+x0,y0 = 7,0
+scatter!([x0], [y0], color=:blue)
+point1 = [cos(ϕ1) -sin(ϕ1); sin(ϕ1) cos(ϕ1)] * [x0; y0] # rotate point
+x1,y1 = point1[1], point1[2]
+p1z = jim(x, y, pic1,
+    "Rotated about z\nby ϕ = $ϕ1s\n(z out of 'board')";
+    xlabel="x", ylabel="y", prompt=:false)
+scatter!([x1], [y1], color=:blue)
+jim(p0z, p1z)
+
+
+#=
+The 2nd of the three angles,
+``θ``,
+corresponds to rotation around the ``y``-axis,
+which has the opposite sign
+when using the
+[right hand rule](https://en.wikipedia.org/wiki/Right-hand_rule#A_rotating_body):
+```math
+\left[ \begin{matrix}
+x' \\ y' \\ z'
+\end{matrix} \right]
+=
+\left[ \begin{matrix}
+\cos(θ) & 0 & \sin(θ)
+\\
+0 & 1 & 0
+\\
+-\sin(θ) & 0 & \cos(θ)
+\\
+\end{matrix} \right]
+\left[ \begin{matrix}
+x \\ y \\ z
+\end{matrix} \right],
+```
+as illustrated by the green star below.
+
+In
+[wikipedia notation](https://en.wikipedia.org/w/index.php?title=Rotation_matrix&section=9#In_three_dimensions)
+this is
+``R_y(θ)``.
+
+Here is an illustration
+of rotating an ellipsoid
+for ``θ = π/6``.
+=#
+
+ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 1)
+θ1s = :(π/6)
+θ1 = eval(θ1s)
+ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (0, θ1, 0), 1)
+
+x = LinRange(-9, 9, 181)
+y = [0]
+z = LinRange(-8, 8, 161)
+pic0 = phantom(x, y, z, [ellipsoid0]); pic0 = selectdim(pic0, 2, 1)
+pic1 = phantom(x, y, z, [ellipsoid1]); pic1 = selectdim(pic1, 2, 1)
+
+p0y = jim(x, z, pic0,
+    "Original ellipsoid:\n (x,z) slice";
+    xlabel="x", ylabel="z", prompt=false)
+x0,z0 = 7,0
+scatter!([x0], [z0], color=:green)
+point1 = [cos(θ1) sin(θ1); -sin(θ1) cos(θ1)] * [x0; z0] # rotate point
+x1,z1 = point1[1], point1[2]
+p1y = jim(x, z, pic1,
+    "Rotated about y\nby θ = $θ1s\n(y into 'board')";
+    xlabel="x", ylabel="z", prompt=false)
+scatter!([x1], [z1], color=:green)
+jim(p0y, p1y)
+
+
+#=
+The 3rd of the three angles,
+``ψ``,
+corresponds to rotation around the ``x``-axis:
+
+```math
+\left[ \begin{matrix}
+x' \\ y' \\ z'
+\end{matrix} \right]
+=
+\left[ \begin{matrix}
+0 & \cos(ψ) & -\sin(ψ)
+\\
+1 & 0 & 0
+\\
+0 & \sin(ψ) & \cos(ψ)
+\\
+\end{matrix} \right]
+\left[ \begin{matrix}
+x \\ y \\ z
+\end{matrix} \right],
+```
+as illustrated by the red star below.
+
+In
+[wikipedia notation](https://en.wikipedia.org/w/index.php?title=Rotation_matrix&section=9#In_three_dimensions)
+this is
+``R_x(ψ)``.
+
+Here is an illustration
+of rotating an ellipsoid
+for ``ψ = π/6``.
+=#
+
+ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 1)
+ψ1s = :(π/6)
+ψ1 = eval(ψ1s)
+ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, ψ1), 1)
+
+x = [0]
+y = LinRange(-9, 9, 181)
+z = LinRange(-8, 8, 161)
+pic0 = phantom(x, y, z, [ellipsoid0]); pic0 = selectdim(pic0, 1, 1)
+pic1 = phantom(x, y, z, [ellipsoid1]); pic1 = selectdim(pic1, 1, 1)
+
+p0x = jim(y, z, pic0,
+    "Original ellipsoid:\n (y,z) slice)";
+    xlabel="y", ylabel="z", prompt=false)
+y0,z0 = 3,0
+scatter!([y0], [z0], color=:red)
+point1 = [cos(ψ1) -sin(ψ1); sin(ψ1) cos(ψ1)] * [y0; z0] # rotate point
+y1,z1 = point1[1], point1[2]
+p1x = jim(y, z, pic1,
+    "Rotated about x\nby ψ = $ψ1s\n(x out of 'board')";
+    xlabel="y", ylabel="z", prompt=false)
+scatter!([y1], [z1], color=:red)
+jim(p0x, p1x)
+
+
+#src # Summarizing all in one plot:
+jim(p0x, p0y, p0z, p1x, p1y, p1z)
+
+
+#=
+The remaining issue is the multiplication order
+for multiple rotations.
+
+=#
+# todo discuss order
 
 
 # ## Reproducibility
