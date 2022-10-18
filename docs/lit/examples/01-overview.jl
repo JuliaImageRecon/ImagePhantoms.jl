@@ -160,15 +160,88 @@ y = LinRange(-8, 8, 161)
 pic0 = phantom(x, y, [ellipse0])
 pic1 = phantom(x, y, [ellipse1])
 
-p0 = jim(x, y, pic0, "Original ellipse"; prompt=:false)
+default(marker=:star)
+p0 = jim(x, y, pic0, "Original ellipse";
+    xlabel="x", ylabel="y", prompt=:false)
 x0,y0 = 7,0
-scatter!([x0], [y0], marker=:star, color=:blue)
+scatter!([x0], [y0], color=:blue)
 point1 = [cos(ϕ1) -sin(ϕ1); sin(ϕ1) cos(ϕ1)] * [x0; y0] # rotate point
 x1,y1 = point1[1], point1[2]
-p1 = jim(x, y, pic1, "Rotated by ϕ = $ϕ1s"; prompt=:false)
-scatter!([x1], [y1], marker=:star, color=:blue)
+p1 = jim(x, y, pic1, "Rotated by ϕ = $ϕ1s";
+    xlabel="x", ylabel="y", prompt=:false)
+scatter!([x1], [y1], color=:blue)
 jim(p0, p1)
 
+
+#=
+## 3D Rotation
+
+For a 3D object,
+there are three rotation angles,
+often called
+[Euler_angles](https://en.wikipedia.org/wiki/Euler_angles),
+and there are many possible conventions
+for the names and ordering of these angles.
+
+This package denotes
+the three angles as ``ϕ,θ,ψ,``
+where,
+for consistency with the 2D case,
+``ϕ`` denotes rotation in the ``(x,y)`` plane,
+i.e., around the z-axis.
+Here is an illustration.
+=#
+
+ellipsoid0 = ellipsoid(0, 0, 0, 8, 4, 2, 0, 0, #= 0, =# 1)
+ϕ1s = :(π/6)
+ϕ1 = eval(ϕ1s)
+ellipsoid1 = ellipsoid(0, 0, 0, 8, 4, 2, ϕ1, 0, #= 0, =# 1)
+
+x = LinRange(-9, 9, 181)
+y = LinRange(-8, 8, 161)
+z = [0]
+pic0 = phantom(x, y, z, [ellipsoid0])
+pic1 = phantom(x, y, z, [ellipsoid1])
+
+p0 = jim(x, y, pic0, "Original ellipsoid:\n (x,y) slice)";
+    xlabel="x", ylabel="y", prompt=:false)
+x0,y0 = 7,0
+scatter!([x0], [y0], color=:blue)
+point1 = [cos(ϕ1) -sin(ϕ1); sin(ϕ1) cos(ϕ1)] * [x0; y0] # rotate point
+x1,y1 = point1[1], point1[2]
+p1 = jim(x, y, pic1, "Rotated by ϕ = $ϕ1s";
+    xlabel="x", ylabel="y", prompt=:false)
+scatter!([x1], [y1], color=:blue)
+jim(p0, p1)
+
+
+# θ rotation
+
+ellipsoid0 = ellipsoid(0, 0, 0, 8, 4, 2, 0, 0, #= 0, =# 1)
+θ1s = :(π/6)
+θ1s = :(0) # todo
+θ1 = eval(θ1s)
+ellipsoid1 = ellipsoid(0, 0, 0, 8, 4, 2, 0, θ1, #= 0, =# 1)
+
+x = LinRange(-9, 9, 181)
+y = [0]
+z = LinRange(-8, 8, 161)
+pic0 = phantom(x, y, z, [ellipsoid0]); pic0 = selectdim(pic0, 2, 1)
+pic1 = phantom(x, y, z, [ellipsoid1]); pic1 = selectdim(pic1, 2, 1)
+
+p0 = jim(x, z, pic0, "Original ellipsoid:\n (x,z) slice)";
+    xlabel="x", ylabel="z", prompt=false)
+x0,z0 = 7,0
+scatter!([x0], [z0], color=:blue)
+point1 = [cos(θ1) -sin(θ1); sin(θ1) cos(θ1)] * [x0; z0] # rotate point
+x1,z1 = point1[1], point1[2]
+p1 = jim(x, z, pic1, "Rotated by θ = $θ1s";
+    xlabel="x", ylabel="z", prompt=false)
+scatter!([x1], [z1], color=:blue)
+jim(p0, p1)
+
+
+# todo discuss order
 
 
 # ## Reproducibility
