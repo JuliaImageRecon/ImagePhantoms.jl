@@ -157,8 +157,8 @@ function Object(
     wy::RealU = wx,
     wz::RealU = wx,
     ϕ::RealU = 0,
-    θ::RealU = 0,
-    ψ::RealU = 0,
+    θ::RealU = zero(ϕ),
+    ψ::RealU = zero(ϕ),
     value::Number = 1,
 )
     Object(shape, (cx, cy, cz), (wx, wy, wz), (ϕ, θ, ψ), value)
