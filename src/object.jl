@@ -31,14 +31,14 @@ General container for 2D and 3D objects for defining image phantoms.
 
 ```jldoctest
 julia> Object(Ellipse(), (0,0), (1,2), 0.0, 1//2)
-Object2d{Ellipse, Rational{Int64}, Int64, Float64, 1} (S, D, V, ...)
+Object2d{Ellipse, Rational{Int64}, Int64, Float64, 1, Float64} (S, D, V, ...)
  center::NTuple{2,Int64} (0, 0)
  width::NTuple{2,Int64} (1, 2)
  angle::Tuple{Float64} (0.0,)
  value::Rational{Int64} 1//2
 ```
 """
-struct Object{S, D, V, C, A, Da} <: AbstractObject
+struct Object{S, D, V, C, A, Da, T} <: AbstractObject
     "x,y center coordinates"
     center::NTuple{D,C}
     "'width' along x',y' axes (FWHM for Gauss, radii for Ellipse)"
@@ -48,8 +48,8 @@ struct Object{S, D, V, C, A, Da} <: AbstractObject
     "'intensity' value for this shape"
     value::V
 
-    sin::NTuple{Da,A} # sin.(angle) todo
-    cos::NTuple{Da,A} # cos.(angle)
+    sin::NTuple{Da,T} # sin.(angle)
+    cos::NTuple{Da,T} # cos.(angle)
 
     """
         Object{S}(center, width, angle, value)
@@ -73,7 +73,9 @@ struct Object{S, D, V, C, A, Da} <: AbstractObject
         C = promote_type(eltype.(center)..., eltype.(width)...)
         angle = promote((1f0 .* angle)...) # ensure at least Float32
         A = eltype(angle)
-        new{S,D,V,C,A,Da}(C.(center), C.(width), angle, value, sin.(angle), cos.(angle))
+        T = eltype(one(A))
+        new{S,D,V,C,A,Da,T}(C.(center), C.(width), angle, value,
+            T.(sin.(angle)), T.(cos.(angle)))
     end
 end
 
