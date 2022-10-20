@@ -27,7 +27,8 @@ rotate(ob::Object2d{S}, θ::RealU) where S =
 Put coordinates `(x,y)` in canonical axes associated with `object`.
 """
 function coords(ob::Object2d, x::RealU, y::RealU)
-    xy = rotate2d(x - ob.center[1], y - ob.center[2], ob.angle[1])
+#   xy = rotate2d(x - ob.center[1], y - ob.center[2], ob.angle[1])
+    xy = rotate2d(x - ob.center[1], y - ob.center[2], ob.sin[1], ob.cos[1])
     return xy ./ ob.width # unitless
 end
 
@@ -223,8 +224,9 @@ end
 
 
 # apply rotate, translate, and scale properties of 2D Fourier transform
-function _spectrum(ob::Object2d, fx, fy, cx, cy, rx, ry, Φ)
-    (kx, ky) = rotate2d(fx, fy, Φ) # rotate then translate
+function _spectrum(ob::Object2d, fx, fy, cx, cy, rx, ry) #, Φ)
+    # rotate then translate:
+    (kx, ky) = rotate2d(fx, fy, ob.sin[1], ob.cos[1])
     return rx * ry * cispi(-2*(fx*cx + fy*cy)) *
         spectrum1(ob, (rx*kx, ry*ky))
 end
@@ -241,7 +243,7 @@ of the units defining the object.
 """
 function spectrum(ob::Object2d)
     return (fx,fy) -> ob.value *
-        _spectrum(ob, fx, fy, ob.center..., ob.width..., ob.angle[1])
+        _spectrum(ob, fx, fy, ob.center..., ob.width...) #, ob.angle[1])
 end
 
 
@@ -274,10 +276,9 @@ end
 
 # helper
 
-
-function rotate2d(x::RealU, y::RealU, θ::RealU)
-    (s, c) = sincos(θ)
-    return (c * x + s * y, -s * x + c * y)
+function rotate2d(x::RealU, y::RealU, sinθ::Real, cosθ::Real)
+    return (cosθ * x + sinθ * y, -sinθ * x + cosθ * y)
 end
 
-rotate2d(xy::NTuple{2,RealU}, θ::RealU) = rotate2d(xy..., θ)
+rotate2d(x::RealU, y::RealU, θ::RealU) = rotate2d(x, y, sincos(θ)...)
+rotate2d(xy::NTuple{2,RealU}, args...) = rotate2d(xy..., args...)
