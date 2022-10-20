@@ -378,8 +378,67 @@ jim(p0x, p1x)
 The remaining issue is the multiplication order
 for multiple rotations.
 
+To address that,
+we first describe
+how phantoms are generated in this package.
+Every phantom shape
+starts with a base function
+that is translated, rotated, and scaled
+to make the final object.
+For example,
+an ellipsoid is a transformed sphere.
+Specifically,
+if ``e(r)`` is the ellipsoid function,
+and ``s(r)`` is the unit sphere function,
+where
+``r = (x,y,z)``,
+then
+```math
+e(r) = s( (R_{xyz}^T (r - c)) ⊘ w )
+```
+where ``c`` is the `center` of the ellipsoid,
+and ``r`` is the `width` parameter (actually radii),
+``⊘`` denotes element-wise division,
+and ``R_{xyz}^T``
+is the *inverse*
+of the 3D rotation matrix
+``R_{xyz}``
+defined by
+``R_{xyz} = R_x(ψ) R_y(θ) R_z(ϕ)``.
+
+Note that ``r`` and ``c`` and ``w``
+all must have identical units
+and the argument
+``(R_{xyz}^T (r - c)) ⊘ w``
+passed the unit sphere function
+is unitless,
+as it must be.
+The non-exported `phantom1` function
+for each shape
+defines the base shape function.
+For the unit sphere it is simply
+`sum(abs2, r) ≤ 1`.
+
+Rearranging the equation
+``r' = (R_{xyz}^T (r - c)) ⊘ w``
+yields
+``r = R_{xyz} (w ⊙ r') + c``
+so the process of transforming a unit sphere
+to an ellipsoid starts with scaling,
+then rotation by
+``R_{xyz}``,
+which rotates first around the ``z``-axis,
+and then finally translating.
+
+todo: need some illustration
+
+The `spectrum` method
+accounts for the translation, rotation, and scaling
+of the base shape function
+using elementary Fourier transform properties.
+
+todo: check with full 3D rotation!
 =#
-# todo discuss order
 
 
 # ## Reproducibility
