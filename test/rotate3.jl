@@ -51,4 +51,6 @@ end
 
     R = Rxyz_mat(0, 0, c)
     @test R ≈ Rx(c)
+
+    @test all((@inferred IP.Rxyz_inv((2, 1, 3), π/2, 0, 0)) .≈ (1,-2, 3))
 end

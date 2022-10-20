@@ -28,7 +28,7 @@ using Test: @test, @testset, @inferred
     @test radon(zeros(2), zeros(3), [ob]) == 2*ones(2,3)
 
     @test spectrum([ob]) isa Function
-    @test spectrum([ob])(0,0) ≈ π
+    @test spectrum([ob])(0.,0.) ≈ π
     @test spectrum(zeros(2), zeros(3), [ob]) ≈ π*ones(2,3)
 
     @inferred IP.radon_type(ob)
@@ -38,8 +38,10 @@ end
 @testset "helpers" begin
     @test collect(@inferred IP.rotate2d(2, 1, π/2)) ≈ [1,-2]
     @test all((@inferred IP.rotate2d((2, 1), π/2)) .≈ (1,-2))
+#=
     @test ≈(collect(@inferred IP.rotate3d(2, 1, 3, π/2, 0, 0)), [1,-2,3]; atol= 1e-15)
     @test all((@inferred IP.rotate3d((2, 1, 3), π/2, 0, 0)) .≈ (1,-2, 3))
+=#
     @test (@inferred IP.coords(square(3m), 9m, 6m)) == (3, 2)
 
     @inferred IP.xray_shift(1.0f0, π/3, 3, 4//5)
