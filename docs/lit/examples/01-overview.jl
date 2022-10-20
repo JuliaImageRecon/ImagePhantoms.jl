@@ -179,23 +179,43 @@ jim(p0, p1)
 For a 3D object,
 there are three rotation angles,
 often called
-[Euler_angles](https://en.wikipedia.org/wiki/Euler_angles),
+[Euler angles](https://en.wikipedia.org/wiki/Euler_angles),
 and there are many possible conventions
 for the names and ordering of these angles.
 
 This package denotes
-the three angles as ``ϕ,θ,ψ,``
-where,
-for consistency with the 2D case,
+the three angles as ``ϕ,θ,ψ.``
+
+### Rotation about ``z`` by ``ϕ``
+
+For consistency with the 2D case,
 the first of the three angles,
 ``ϕ``,
 denotes rotation in the ``(x,y)`` plane,
 i.e., around the ``z``-axis.
-
 In
-[wikipedia notation](https://en.wikipedia.org/w/index.php?title=Rotation_matrix&section=9#In_three_dimensions)
+[wikipedia's notation](https://en.wikipedia.org/w/index.php?title=Rotation_matrix&section=9#In_three_dimensions)
 this is
-``R_z(ϕ)``.
+``R_z(ϕ)``,
+defined as
+```math
+\left[ \begin{matrix}
+x' \\ y' \\ z'
+\end{matrix} \right]
+=
+\left[ \begin{matrix}
+\cos(θ) & -\sin(θ) & 0
+\\
+\sin(θ) & \cos(θ) & 0
+\\
+0 & 0 & 1
+\\
+\end{matrix} \right]
+\left[ \begin{matrix}
+x \\ y \\ z
+\end{matrix} \right]
+```
+as illustrated by the blue star below.
 
 Here is an illustration
 for $ϕ = π/6$.
@@ -227,6 +247,8 @@ jim(p0z, p1z)
 
 
 #=
+### Rotation about ``y`` by ``θ``
+
 The 2nd of the three angles,
 ``θ``,
 corresponds to rotation around the ``y``-axis,
@@ -288,6 +310,8 @@ jim(p0y, p1y)
 
 
 #=
+### Rotation about ``x`` by ``ψ``
+
 The 3rd of the three angles,
 ``ψ``,
 corresponds to rotation around the ``x``-axis:
@@ -298,9 +322,9 @@ x' \\ y' \\ z'
 \end{matrix} \right]
 =
 \left[ \begin{matrix}
-0 & \cos(ψ) & -\sin(ψ)
-\\
 1 & 0 & 0
+\\
+0 & \cos(ψ) & -\sin(ψ)
 \\
 0 & \sin(ψ) & \cos(ψ)
 \\
@@ -347,7 +371,7 @@ jim(p0x, p1x)
 
 
 #src # Summarizing all in one plot:
-jim(p0x, p0y, p0z, p1x, p1y, p1z)
+#src jim(p0x, p0y, p0z, p1x, p1y, p1z)
 
 
 #=
