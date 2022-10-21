@@ -1,6 +1,8 @@
 # test/rotate3.jl
 
 using ImagePhantoms: RealU, Rxyz_mul, Rxyz_inv
+using ImagePhantoms: ellipsoid, spectrum
+import ImagePhantoms as IP
 using LinearAlgebra: I
 using Test: @testset, @test, @inferred
 
@@ -53,4 +55,22 @@ end
     @test R ≈ Rx(c)
 
     @test all((@inferred IP.Rxyz_inv((2, 1, 3), π/2, 0, 0)) .≈ (1,-2, 3))
+end
+
+
+# test spectral rotation (no translation)
+@testset "krotate" begin
+    ϕ, θ, ψ = π/6, π/7, π/8
+    ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 5)
+    ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (ϕ, θ, ψ), 5)
+    kx = LinRange(-1,1,15)
+    ky = LinRange(-1,1,13)
+    kz = LinRange(-1,1,11)
+    k = Iterators.product(kx, ky, kz) # tuples of (kx,ky,kz) values
+    kspace0 = spectrum(k, [ellipsoid0])
+    kspace1 = spectrum(k, [ellipsoid1])
+    R = Rx(ψ) * Ry(θ) * Rz(ϕ) # Rxyz rotation matrix
+    kr = (tuple((R' * collect(k))...) for k in k) # rotate each k-space tuple
+    kspace0r = spectrum(kr, [ellipsoid0]) # evaluate spectrum at rotated tuple
+    @test kspace0r ≈ kspace1
 end
