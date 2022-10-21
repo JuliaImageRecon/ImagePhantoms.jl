@@ -252,6 +252,22 @@ end
 
 
 """
+    phantom(itr, oa::Array{<:Object})
+Return phantom values
+sampled at locations
+returned by generator (or iterator) `itr`.
+Returned array size matches `size(itr)`.
+"""
+function phantom(
+    itr,
+    oa::Array{<:Object},
+)
+    fun = phantom(oa)
+    return [fun(i...) for i in itr]
+end
+
+
+"""
     radon(itr, oa::Array{<:Object})
 Return parallel-beam projections
 sampled at locations
@@ -263,5 +279,21 @@ function radon(
     oa::Array{<:Object},
 )
     fun = radon(oa)
+    return [fun(i...) for i in itr]
+end
+
+
+"""
+    spectrum(itr, oa::Array{<:Object})
+Return spectrum of object(s)
+sampled at k-space locations
+returned by generator (or iterator) `itr`.
+Returned array size matches `size(itr)`.
+"""
+function spectrum(
+    itr,
+    oa::Array{<:Object},
+)
+    fun = spectrum(oa)
     return [fun(i...) for i in itr]
 end
