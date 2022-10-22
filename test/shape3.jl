@@ -87,7 +87,7 @@ end
 
 function test3_radon(Shape, shape, ob)
     @inferred IP.xray1(Shape(), 0.5f0, 0.3, π/6, π/5)
-    @inferred IP._xray(Shape(), (0., 0., 0.), (2,2,2), (π/3,0), 0.5f0, 0.3, π/6, π/5)
+    @inferred IP._xray(Shape(), (0., 0., 0.), (2,2,2), (π/3,0,0), 0.5f0, 0.3, π/6, π/5)
 
     @test (@inferred IP.xray1(Shape(), 0, 0, 0, 0)) > 0
     @test (@inferred IP.xray1(Shape(), 0f0, 0., 0, 0)) > 0

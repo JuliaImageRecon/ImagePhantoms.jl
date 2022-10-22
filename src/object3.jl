@@ -126,10 +126,12 @@ end
 # rotation property (only axial for now)
 function xray_rotate(
     Δu::RealU, Δv::RealU, ϕ::RealU, θ::RealU, # projection coordinates
-    Φazim::RealU,
+    Φazim::RealU, # object angles
     Θpolar::RealU,
+    ψ::RealU,
 )
-    Θpolar == zero(Θpolar) || throw("nonzero polar object angle not done")
+    iszero(Θpolar) || throw("nonzero polar object angle not done")
+    iszero(ψ) || throw("nonzero ψ object angle not done for radon") # todo
     return (Δu, Δv, ϕ - Φazim, θ)
 end
 
@@ -162,9 +164,9 @@ end
 # interface to xray1 after applying shift, rotate, scale properties
 function _xray(
     type::AbstractShape{3},
-    center::Tuple,
-    width::Tuple,
-    angle::Tuple,
+    center::NTuple{3,RealU},
+    width::NTuple{3,RealU},
+    angle::NTuple{3,RealU},
     u::RealU, v::RealU, ϕ::RealU, θ::RealU,
 )
     Δu, Δv, ϕ, θ = xray_shift(u, v, ϕ, θ, center...)
@@ -177,7 +179,7 @@ end
 # this gateway seems to help type inference
 function _radon(ob::Object3d{S}, u::RealU, v::RealU, ϕ::RealU, θ::RealU) where S
     T = radon_type(ob)
-    return T(ob.value * _xray(S(), ob.center, ob.width, ob.angle[1:2], u, v, ϕ, θ))::T
+    return T(ob.value * _xray(S(), ob.center, ob.width, ob.angle, u, v, ϕ, θ))::T
 end
 
 
