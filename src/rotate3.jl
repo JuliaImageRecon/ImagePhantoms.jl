@@ -9,6 +9,9 @@ rotate3.jl
     Rxyz_mul(x::RealU, y::RealU, sinϕ, sinθ, sinψ, cosϕ, cosθ, cosψ)
 Multiply `Rx(ψ) * Ry(θ) * Rz(ϕ) * [x, y, z]` for 3D rotation,
 where `ψ, θ, ϕ` denote rotation about `x, y, z` axes with right-hand rule.
+
+This is the reverse order of z-y′-x″ in
+https://en.wikipedia.org/wiki/Rotation_formalisms_in_three_dimensions#Euler_angles_(z-y%E2%80%B2-x%E2%80%B3_intrinsic)_%E2%86%92_rotation_matrix.
 """
 function Rxyz_mul(x::RealU, y::RealU, z::RealU,
     sinϕ::Real, sinθ::Real, sinψ::Real,
