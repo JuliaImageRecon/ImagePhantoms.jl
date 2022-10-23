@@ -113,7 +113,7 @@ Currently the package supports
 the following 2D shapes:
 ellipses/circles, rectangles/squares, gaussians, triangles,
 and the following 3D shapes:
-ellipsoids/spheres, cuboids/cubes, gaussians, cylinders.
+ellipsoids/spheres, cuboids/cubes, gaussians, cylinders, cones.
 
 
 ### Dependents
