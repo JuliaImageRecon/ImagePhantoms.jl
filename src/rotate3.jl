@@ -75,28 +75,5 @@ end
 
 
 Rxyz_mul(xyz::NTuple{3,RealU}, args...) = Rxyz_mul(xyz..., args...)
+
 Rxyz_inv(xyz::NTuple{3,RealU}, args...) = Rxyz_inv(xyz..., args...)
-
-
-#=
-function rotate3d(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU, ψ::RealU)
-    sinϕ, cosϕ = sincos(ψ)
-    sinθ, cosθ = sincos(θ)
-    sinψ, cosψ = sincos(-ϕ)
-
-    return (
-        cosθ * cosψ * x + cosθ * -sinψ * y + sinθ * z,
-
-        (sinϕ * sinθ * cosψ + cosϕ * sinψ) * x +
-        (sinϕ * sinθ * -sinψ + cosϕ * cosψ) * y +
-        -sinϕ * cosθ * z,
-
-        (cosϕ * -sinθ * cosψ + sinϕ * sinψ) * x +
-        (cosϕ * sinθ * sinψ + sinϕ * cosψ) * y +
-        cosϕ * cosθ * z,
-    )
-end
-
-rotate3d(xyz::NTuple{3,RealU}, ϕ::RealU, θ::RealU, ψ::RealU) =
-    rotate3d(xyz..., ϕ, θ, ψ)
-=#
