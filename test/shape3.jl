@@ -4,6 +4,7 @@ using ImagePhantoms: Object3d, sphere, cube
 using ImagePhantoms: Object, AbstractShape, phantom, radon, spectrum
 using ImagePhantoms: Gauss3, gauss3
 using ImagePhantoms: Ellipsoid, ellipsoid
+using ImagePhantoms: Cone, cone
 using ImagePhantoms: Cuboid, cuboid
 using ImagePhantoms: Cylinder, cylinder
 using ImagePhantoms: Dirac3, dirac3
@@ -43,12 +44,14 @@ end
 
 # parameters for testing each shape
 # (Shape, shape, lmax, lmax1, tol1, tolk, tolp)
+# for width = (4//1, 5, 6)
 list = [
  (Dirac3, dirac3, 6, 1, Inf, Inf, Inf)
  (Ellipsoid, ellipsoid, 12, 2, 1e-2, 4e-4, 1e-3)
  (Gauss3, gauss3, IP.fwhm2spread(6), IP.fwhm2spread(1), 1e-2, 5e-4, 1e-5)
  (Cuboid, cuboid, sqrt(4^2 + 5^2 + 6^2), √3, 1e-2, 2e-2, 2e-3)
  (Cylinder, cylinder, sqrt(10^2 + 6^2), √5, 2e-2, 2e-2, 1e-3)
+ (Cone, cone, 10, 2, Inf, Inf, Inf)
 ]
 
 macro isob3(ex) # macro to streamline tests
@@ -109,11 +112,11 @@ for (Shape, shape, lmax, lmax1, tol1, tolk, tolp) in list
 
     has_xray = hasmethod(IP.xray1, (Shape, Real, Real, Real, Real))
     has_phantom = hasmethod(IP.phantom1, (typeof(shape()), NTuple{3,Real}))
+    has_spectrum = hasmethod(IP.spectrum1, (typeof(shape()), NTuple{3,Real}))
 
     @testset "construct-$shape" begin
         test3_construct(Shape, shape)
     end
-
 
     @testset "operations" begin
         test3_op(Shape, shape)
@@ -161,8 +164,10 @@ for (Shape, shape, lmax, lmax1, tol1, tolk, tolp) in list
 
     volume = IP.volume(ob)
 
-    fun = @inferred spectrum([ob])
-    @test (@inferred fun(0,0,0)) ≈ ob.value * volume
+    if has_spectrum
+        fun = @inferred spectrum([ob])
+        @test (@inferred fun(0,0,0)) ≈ ob.value * volume
+    end
 
     if has_xray
         test3_radon(Shape, shape, ob)
@@ -190,10 +195,12 @@ for (Shape, shape, lmax, lmax1, tol1, tolk, tolp) in list
     volume = IP.volume(ob)
     zscale = 1 / (ob.value * volume) # normalize spectra
 
-    kspace = (@inferred spectrum(axesf(ig)..., [ob])) * zscale
-    @test spectrum(ob)(0/m, 0/m, 0/m) * zscale ≈ 1
-    @test maximum(abs, kspace) ≈ 1
-    @test kspace[L÷2+1,M÷2+1,N÷2+1] ≈ 1
+    if has_spectrum
+        kspace = (@inferred spectrum(axesf(ig)..., [ob])) * zscale
+        @test spectrum(ob)(0/m, 0/m, 0/m) * zscale ≈ 1
+        @test maximum(abs, kspace) ≈ 1
+        @test kspace[L÷2+1,M÷2+1,N÷2+1] ≈ 1
+    end
 
     if has_phantom
         oversample = 2
@@ -202,8 +209,11 @@ for (Shape, shape, lmax, lmax1, tol1, tolk, tolp) in list
         X = myfft(img) * (prod(ig.deltas) * zscale)
 
         @test abs(maximum(abs, X) - 1) < tol1
-        errk = maximum(abs, kspace - X) / maximum(abs, kspace)
-        @test errk < tolk
+
+        if has_spectrum
+            errk = maximum(abs, kspace - X) / maximum(abs, kspace)
+            @test errk < tolk
+        end
     end
   end
 
