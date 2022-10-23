@@ -18,11 +18,12 @@ include("rect.jl")
 include("triangle.jl")
 
 # 3d:
+include("cone.jl")
+include("cuboid.jl")
+include("cylinder.jl")
 include("dirac3.jl")
 include("ellipsoid.jl")
 include("gauss3.jl")
-include("cuboid.jl")
-include("cylinder.jl")
 
 # phantoms:
 include("shepplogan.jl")
