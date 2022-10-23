@@ -31,14 +31,14 @@ General container for 2D and 3D objects for defining image phantoms.
 
 ```jldoctest
 julia> Object(Ellipse(), (0,0), (1,2), 0.0, 1//2)
-Object2d{Ellipse, Rational{Int64}, Int64, Float64, 1} (S, D, V, ...)
+Object2d{Ellipse, Rational{Int64}, Int64, Float64, 1, Float64} (S, D, V, ...)
  center::NTuple{2,Int64} (0, 0)
  width::NTuple{2,Int64} (1, 2)
  angle::Tuple{Float64} (0.0,)
  value::Rational{Int64} 1//2
 ```
 """
-struct Object{S, D, V, C, A, Da} <: AbstractObject
+struct Object{S, D, V, C, A, Da, T} <: AbstractObject
     "x,y center coordinates"
     center::NTuple{D,C}
     "'width' along x',y' axes (FWHM for Gauss, radii for Ellipse)"
@@ -47,6 +47,9 @@ struct Object{S, D, V, C, A, Da} <: AbstractObject
     angle::NTuple{Da,A}
     "'intensity' value for this shape"
     value::V
+
+    sin::NTuple{Da,T} # sin.(angle)
+    cos::NTuple{Da,T} # cos.(angle)
 
     """
         Object{S}(center, width, angle, value)
@@ -60,15 +63,19 @@ struct Object{S, D, V, C, A, Da} <: AbstractObject
         angle::NTuple{Da,RealU},
         value::V,
     ) where {S <: AbstractShape, D, Da, V <: Number}
-        D == ndims(S()) || throw(ArgumentError("D=$D vs ndims(S)=$(ndims(S)) for S=$S"))
-        1 ≤ Da == D-1 || throw(ArgumentError("Da=$Da != D-1, where D=$D"))
-
-        all(width .> zero(eltype(width))) || throw(ArgumentError("widths must be positive"))
+        D == ndims(S()) ||
+            throw(ArgumentError("D=$D vs ndims(S)=$(ndims(S)) for S=$S"))
+        D == 2 == Da + 1 || D == Da == 3 ||
+            throw(ArgumentError("Da=$Da does not fit to D=$D"))
+        all(width .> zero(eltype(width))) ||
+            throw(ArgumentError("widths must be positive"))
 
         C = promote_type(eltype.(center)..., eltype.(width)...)
-        angle = promote(angle...)
+        angle = promote((1f0 .* angle)...) # ensure at least Float32
         A = eltype(angle)
-        new{S,D,V,C,A,Da}(C.(center), C.(width), angle, value)
+        T = eltype(one(A))
+        new{S,D,V,C,A,Da,T}(C.(center), C.(width), angle, value,
+            T.(sin.(angle)), T.(cos.(angle)))
     end
 end
 
@@ -109,13 +116,13 @@ function Object(
     shape::AbstractShape{D},
     _center::NTuple{D,RealU} = _tuple(0, D),
     _width::NTuple{D,RealU} = _tuple(1, D),
-    _angle::Union{RealU, NTuple{Da,RealU}} where Da = _tuple(0, D-1),
+    _angle::Union{RealU, NTuple{Da,RealU}} = _tuple(0, D == 2 ? 1 : 3),
     _value::Number = 1f0 ;
     center::NTuple{D,RealU} = _center,
     width::NTuple{D,RealU} = _width,
-    angle::Union{RealU, NTuple{Da,RealU}} where Da = _angle,
+    angle::Union{RealU, NTuple{Da,RealU}} = _angle,
     value::Number = _value,
-) where {D}
+) where {D,Da}
     Object{typeof(shape)}(center, width, angle, value)
 end
 
@@ -138,7 +145,7 @@ end
 
 
 """
-    Object(shape ; cx, cy, cz, wx=1, wy=wx, wz=wx, ϕ=0, θ=0, value=1)
+    Object(shape ; cx, cy, cz, wx=1, wy=wx, wz=wx, ϕ=0, θ=0, ψ=0, value=1)
 3D object constructor from values (without tuples).
 """
 function Object(
@@ -150,10 +157,11 @@ function Object(
     wy::RealU = wx,
     wz::RealU = wx,
     ϕ::RealU = 0,
-    θ::RealU = 0,
+    θ::RealU = zero(ϕ),
+    ψ::RealU = zero(ϕ),
     value::Number = 1,
 )
-    Object(shape, (cx, cy, cz), (wx, wy, wz), (ϕ, θ), value)
+    Object(shape, (cx, cy, cz), (wx, wy, wz), (ϕ, θ, ψ), value)
 end
 
 
@@ -244,6 +252,22 @@ end
 
 
 """
+    phantom(itr, oa::Array{<:Object})
+Return phantom values
+sampled at locations
+returned by generator (or iterator) `itr`.
+Returned array size matches `size(itr)`.
+"""
+function phantom(
+    itr,
+    oa::Array{<:Object},
+)
+    fun = phantom(oa)
+    return [fun(i...) for i in itr]
+end
+
+
+"""
     radon(itr, oa::Array{<:Object})
 Return parallel-beam projections
 sampled at locations
@@ -255,5 +279,21 @@ function radon(
     oa::Array{<:Object},
 )
     fun = radon(oa)
+    return [fun(i...) for i in itr]
+end
+
+
+"""
+    spectrum(itr, oa::Array{<:Object})
+Return spectrum of object(s)
+sampled at k-space locations
+returned by generator (or iterator) `itr`.
+Returned array size matches `size(itr)`.
+"""
+function spectrum(
+    itr,
+    oa::Array{<:Object},
+)
+    fun = spectrum(oa)
     return [fun(i...) for i in itr]
 end

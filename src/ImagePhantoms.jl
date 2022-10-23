@@ -4,6 +4,7 @@ const RealU = Number # Union{Real, Unitful.Length}
 
 # core:
 include("shape.jl")
+include("rotate3.jl")
 include("object.jl")
 include("object2.jl")
 include("object3.jl")

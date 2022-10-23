@@ -311,19 +311,19 @@ who said that the Kak&Slaney 1988 values are incorrect.
     ]
     params[:,1:6] ./= 2 # radii
     params[:,7] .*= π/180 # radians
-    out = [params[:,1:7] zeros(size(params,1)) params[:,8]] # Θ=0
+    out = [params[:,1:7] zeros(size(params,1)) zeros(size(params,1)) params[:,8]] # Θ=0, ψ=0
     return out
 end
 
 
 """
-    oa = ellipsoid(Vector{Tuple{9 params}})
+    oa = ellipsoid(Vector{Tuple{10 params}})
 Return vector of `Object{Ellipsoid}`,
 one for each element of input vector of tuples.
 Often the input comes from `ellipsoid_parameters`.
 """
 function ellipsoid(params::Vector{<:Tuple})
-    length(params[1]) == 9 || throw("ellipsoids need 9 parameters")
+    length(params[1]) == 10 || throw("ellipsoids need 10 parameters")
     out = [ellipsoid(p...) for p in params]
     return out
 end
@@ -349,9 +349,9 @@ function ellipsoid_parameters_uscale(
     C = eltype(oneunit(Tf) * oneunit(Tc) * one(Tp))
     A = eltype(oneunit(Ta) * one(Tp))
     V = eltype(oneunit(Tv) * one(Tp))
-    T = Tuple{C, C, C, C, C, C, A, A, V}
+    T = Tuple{C, C, C, C, C, C, A, A, A, V}
 
-    size(params,2) == 9 || throw(ArgumentError("params not N × 9"))
+    size(params,2) == 10 || throw(ArgumentError("params not N × 10"))
     N = size(params,1)
     out = Vector{T}(undef, N)
     for n in 1:N
@@ -359,7 +359,7 @@ function ellipsoid_parameters_uscale(
         tmp = (
             (tmp[1:3] * uc .* fovs)...,
             (tmp[4:6] * uc .* fovs)...,
-            (tmp[7:8] * ua)...,
+            (tmp[7:9] * ua)...,
             tmp[9] * uv,
         )
         out[n] = tmp

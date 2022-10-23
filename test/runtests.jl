@@ -6,6 +6,7 @@ using ImagePhantoms
 include("helper.jl")
 
 include("core.jl")
+include("rotate3.jl")
 
 include("shape2.jl")
 include("shepplogan.jl")

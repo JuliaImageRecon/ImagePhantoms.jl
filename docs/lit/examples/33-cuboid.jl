@@ -62,9 +62,9 @@ center = (10mm, 8mm, 6mm)
 width = (35mm, 25mm, 15mm)
 ϕ0s = :(π/6) # symbol version for nice plot titles
 ϕ0 = eval(ϕ0s)
-angles = (ϕ0, 0)
+angles = (ϕ0, 0, 0)
 Object(Cuboid(), center, width, angles, 1.0f0) # top-level constructor
-cuboid( 10mm, 8mm, 6mm, 35mm, 25mm, 15mm, π/6, 0, 1.0f0 ) # 9 arguments
+cuboid( 10mm, 8mm, 6mm, 35mm, 25mm, 15mm, π/6, 0, 0, 1.0f0 ) # 9 arguments
 ob = cuboid(center, width, angles, 1.0f0) # tuples (recommended use)
 
 

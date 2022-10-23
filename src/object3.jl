@@ -19,9 +19,9 @@ volume(ob::Object3d{S}) where S = volume1(S()) * prod(ob.width)
     rotate(ob::Object3d, α, β=0)
 Rotate a 3D object.
 """
-rotate(ob::Object3d{S}, θ::NTuple{2,RealU}) where S =
+rotate(ob::Object3d{S}, θ::NTuple{3,RealU}) where S =
     Object(S(), ob.center, ob.width, ob.angle .+ θ, ob.value)
-rotate(ob::Object3d, α::RealU, β::RealU=0) = rotate(ob, (α,β))
+rotate(ob::Object3d, α::RealU, β::RealU=0, γ::RealU=0) = rotate(ob, (α,β,γ))
 
 
 """
@@ -29,8 +29,8 @@ rotate(ob::Object3d, α::RealU, β::RealU=0) = rotate(ob, (α,β))
 Put coordinates `(x,y,z)` in canonical axes associated with `object`.
 """
 function coords(ob::Object3d, x::RealU, y::RealU, z::RealU)
-    xyz = rotate3d(x - ob.center[1], y - ob.center[2], z - ob.center[3],
-        ob.angle[1], ob.angle[2])
+    xyz = Rxyz_inv(x - ob.center[1], y - ob.center[2], z - ob.center[3],
+        ob.sin..., ob.cos...)
     return xyz ./ ob.width # unitless
 end
 
@@ -126,10 +126,12 @@ end
 # rotation property (only axial for now)
 function xray_rotate(
     Δu::RealU, Δv::RealU, ϕ::RealU, θ::RealU, # projection coordinates
-    Φazim::RealU,
+    Φazim::RealU, # object angles
     Θpolar::RealU,
+    ψ::RealU,
 )
-    Θpolar == zero(Θpolar) || throw("nonzero polar object angle not done")
+    iszero(Θpolar) || throw("nonzero polar object angle not done")
+    iszero(ψ) || throw("nonzero ψ object angle not done for radon") # todo
     return (Δu, Δv, ϕ - Φazim, θ)
 end
 
@@ -162,9 +164,9 @@ end
 # interface to xray1 after applying shift, rotate, scale properties
 function _xray(
     type::AbstractShape{3},
-    center::Tuple,
-    width::Tuple,
-    angle::Tuple,
+    center::NTuple{3,RealU},
+    width::NTuple{3,RealU},
+    angle::NTuple{3,RealU},
     u::RealU, v::RealU, ϕ::RealU, θ::RealU,
 )
     Δu, Δv, ϕ, θ = xray_shift(u, v, ϕ, θ, center...)
@@ -247,8 +249,10 @@ end
 
 
 # apply rotate, translate, and scale properties of 3D Fourier transform
-function _spectrum(ob::Object3d, fx, fy, fz, cx, cy, cz, rx, ry, rz, Φ, Θ)
-    (kx, ky, kz) = rotate3d(fx, fy, fz, Φ, Θ) # rotate then translate
+function _spectrum(ob::Object3d, fx, fy, fz, cx, cy, cz, rx, ry, rz) #, Φ, Θ, ψ)
+    # rotate then translate:
+#   (kx, ky, kz) = Rxyz_inv(fx, fy, fz, Φ, Θ, ψ)
+    (kx, ky, kz) = Rxyz_inv(fx, fy, fz, ob.sin..., ob.cos...)
     return rx * ry * rz * cispi(-2*(fx*cx + fy*cy + fz*cz)) *
         spectrum1(ob, (rx*kx, ry*ky, rz*kz))
 end
@@ -265,7 +269,7 @@ of the units defining the object.
 """
 function spectrum(ob::Object3d)
     return (fx,fy,fz) -> ob.value *
-        _spectrum(ob, fx, fy, fz, ob.center..., ob.width..., ob.angle...)
+        _spectrum(ob, fx, fy, fz, ob.center..., ob.width...) #, ob.angle...)
 end
 
 
@@ -295,15 +299,3 @@ function spectrum(
 )
     return spectrum(oa).(ndgrid(fx,fy,fz)...)
 end
-
-
-# helper
-
-
-function rotate3d(x::RealU, y::RealU, z::RealU, ϕ::RealU, θ::RealU)
-    θ == 0 || throw(ArgumentError("θ ≂̸ 0 unsupported currently"))
-    (s, c) = sincos(ϕ)
-    return (c * x + s * y, -s * x + c * y, z)
-end
-
-rotate3d(xyz::NTuple{3,RealU}, ϕ::RealU, θ::RealU) = rotate3d(xyz..., ϕ, θ)

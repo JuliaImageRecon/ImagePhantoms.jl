@@ -17,7 +17,7 @@ struct Cylinder <: AbstractShape{3} end
 
 """
     cylinder(cx, cy, cz, wx, wy, wz, Φ, Θ, value::Number)
-    cylinder(center::NTuple{3,RealU}, width::NTuple{3,RealU}, angle::NTuple{2,RealU}, v)
+    cylinder(center::NTuple{3,RealU}, width::NTuple{3,RealU}, angle::NTuple{3,RealU}, v)
 Construct `Object{Cylinder}` from parameters;
 here `width` is the *radius* in x,y and the *height* in z.
 """
@@ -49,19 +49,19 @@ phantom1(ob::Object3d{Cylinder}, xyz::NTuple{3,Real}) =
 # line integral through rectangle of width (wx,wy) at (r,ϕ)
 function _rect_proj(wx::Real, wy::Real, r::Real, ϕ::Real)
     (sϕ, cϕ) = sincos(ϕ)
-	rp = sqrt((wx * cϕ)^2 + (wy * sϕ)^2) # projected radius
-	dis = r / rp # scaled distance from center
-	abs_cos_ang_pi = wx * abs(cϕ) / rp
-	abs_sin_ang_pi = wy * abs(sϕ) / rp
+    rp = sqrt((wx * cϕ)^2 + (wy * sϕ)^2) # projected radius
+    dis = r / rp # scaled distance from center
+    abs_cos_ang_pi = wx * abs(cϕ) / rp
+    abs_sin_ang_pi = wy * abs(sϕ) / rp
 
-	# break points of the trapezoid
-	len = 1 / max(abs_cos_ang_pi, abs_sin_ang_pi)
-	dmax = (abs_cos_ang_pi + abs_sin_ang_pi) / 2
-	dbreak = abs(abs_cos_ang_pi - abs_sin_ang_pi) / 2
-	dmax_break = dmax - dbreak
-	scale = wx * wy / rp * len #lmax
+    # break points of the trapezoid
+    len = 1 / max(abs_cos_ang_pi, abs_sin_ang_pi)
+    dmax = (abs_cos_ang_pi + abs_sin_ang_pi) / 2
+    dbreak = abs(abs_cos_ang_pi - abs_sin_ang_pi) / 2
+    dmax_break = dmax - dbreak
+    scale = wx * wy / rp * len #lmax
 
-	return scale * trapezoid(dis, -dmax, -dbreak, dbreak, dmax)
+    return scale * trapezoid(dis, -dmax, -dbreak, dbreak, dmax)
 end
 
 
