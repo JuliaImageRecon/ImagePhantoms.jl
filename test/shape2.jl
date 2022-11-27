@@ -96,7 +96,7 @@ function test2_radon(Shape, shape, ob)
     fun = @inferred radon([ob])
     @inferred fun(0,0)
 
-    r = LinRange(-1,1,51)*2
+    r = range(-1,1,51)*2
     s1 = @inferred radon(r, [0], [ob])
     s2 = @inferred radon(r, 0, [ob])
     @test s1[:] == s2
@@ -125,8 +125,8 @@ for (Shape, shape, lmax, lmax1, tol1, tolk, tolp, swidth) in list
     end
 
   @testset "method" begin
-    x = LinRange(-1,1,51)*5
-    y = LinRange(-1,1,50)*5
+    x = range(-1,1,51)*5
+    y = range(-1,1,50)*5
 
     ob = @inferred shape((2, 1.), (4//1, 3), π/6, 5.0f0)
 

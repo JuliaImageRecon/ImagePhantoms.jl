@@ -8,7 +8,7 @@ using Test: @test, @testset, @inferred
     ob = @inferred focus_chart( ; nspoke=20)
     @test ob isa Vector{<: Object2d{Triangle}}
 
-    x = LinRange(-1,1,2^9) * 1.1
+    x = range(-1,1,2^9) * 1.1
     image = phantom(ob).(x,x')
     @test image isa Matrix
 end

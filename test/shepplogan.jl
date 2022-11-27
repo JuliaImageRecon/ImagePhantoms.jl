@@ -31,22 +31,22 @@ using Test: @test, @testset, @inferred
     @test image0 == image3
 
     ob = @inferred shepp_logan(SheppLoganEmis())
-    x = LinRange(-1,1,M) * 0.5
-    y = LinRange(-1,1,N) * 0.5
+    x = range(-1,1,M) * 0.5
+    y = range(-1,1,N) * 0.5
     image = @inferred phantom(x, y, ob)
     @test image isa Matrix
     image = phantom(ob).(x,y')
     @test image isa Matrix
 
-    r = LinRange(-0.5,0.5,2^5)
+    r = range(-0.5,0.5,2^5)
     ϕ = (0:30:180) * deg2rad(1)
     sino = radon(ob).(r,ϕ')
     @test sino isa Matrix
     sino = radon(r, ϕ, ob)
     @test sino isa Matrix
 
-    kx = LinRange(-1,1,M) * 9
-    ky = LinRange(-1,1,N+1) * 9
+    kx = range(-1,1,M) * 9
+    ky = range(-1,1,N+1) * 9
     kspace = spectrum(ob).(kx, ky')
     @test kspace isa Matrix
     kspace = spectrum(kx, ky, ob)

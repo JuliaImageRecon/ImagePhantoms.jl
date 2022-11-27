@@ -123,9 +123,9 @@ for (Shape, shape, lmax, lmax1, tol1, tolk, tolp) in list
     end
 
   @testset "method" begin
-    x = LinRange(-1,1,13)*5
-    y = LinRange(-1,1,12)*5
-    z = LinRange(-1,1,11)*5
+    x = range(-1,1,13)*5
+    y = range(-1,1,12)*5
+    z = range(-1,1,11)*5
 
     ob = @inferred shape((1, 2., 3), (4//1, 5, 6), (π/6, 0, 0), 5.0f0)
 

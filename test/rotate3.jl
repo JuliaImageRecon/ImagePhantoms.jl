@@ -63,9 +63,9 @@ end
     ϕ, θ, ψ = π/6, π/7, π/8
     ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 5)
     ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (ϕ, θ, ψ), 5)
-    kx = LinRange(-1,1,15)
-    ky = LinRange(-1,1,13)
-    kz = LinRange(-1,1,11)
+    kx = range(-1,1,15)
+    ky = range(-1,1,13)
+    kz = range(-1,1,11)
     k = Iterators.product(kx, ky, kz) # tuples of (kx,ky,kz) values
     kspace0 = spectrum(k, [ellipsoid0])
     kspace1 = spectrum(k, [ellipsoid1])

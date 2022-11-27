@@ -11,8 +11,8 @@ using Test: @test, @testset, @inferred
 @testset "iter2" begin
     ob = rect((4m, 3m), (2m, 5m), π/6, 1.0f0 / m^2)
 
-    x = LinRange(-1,6,17) * 1m
-    y = LinRange(-1,7,19) * 1m
+    x = range(-1,6,17) * 1m
+    y = range(-1,7,19) * 1m
     p1 = @inferred phantom(x, y, [ob])
     itr = Iterators.product(x, y)
     p2 = @inferred phantom(itr, [ob])
@@ -26,8 +26,8 @@ using Test: @test, @testset, @inferred
     sino2 = @inferred radon(itr, [ob])
     @test sino1 == sino2
 
-    kx = LinRange(-1,1,17) / 2m
-    ky = LinRange(-1,1,19) / 3m
+    kx = range(-1,1,17) / 2m
+    ky = range(-1,1,19) / 3m
     s1 = @inferred spectrum(kx, ky, [ob])
     itr = Iterators.product(kx, ky)
     s2 = @inferred spectrum(itr, [ob])

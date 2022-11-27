@@ -111,8 +111,8 @@ function shepp_logan(
     kwargs...
 )
     ob = shepp_logan(case ; kwargs...)
-    x = LinRange(-0.5, 0.5, M)
-    y = LinRange(-0.5, 0.5, N)
+    x = range(-0.5, 0.5, M)
+    y = range(-0.5, 0.5, N)
     if yflip
         y = reverse(y)
     end
@@ -133,8 +133,8 @@ function shepp_logan(
 )
     oversample == 1 || throw("oversample must be 1 for BrainWeb()")
     ob = shepp_logan(case ; kwargs...)
-    x = LinRange(-0.5, 0.5, M)
-    y = LinRange(-0.5, 0.5, N)
+    x = range(-0.5, 0.5, M)
+    y = range(-0.5, 0.5, N)
     if yflip
         y = reverse(y)
     end

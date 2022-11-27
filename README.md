@@ -46,7 +46,7 @@ using ImagePhantoms
 image = shepp_logan(256)
 
 p = shepp_logan(SheppLoganToft())
-sinogram = radon(LinRange(-1,1,101), deg2rad.(0:180), p) # 101 × 181
+sinogram = radon(range(-1,1,101), deg2rad.(0:180), p) # 101 × 181
 ```
 
 
@@ -135,7 +135,7 @@ ellipsoids/spheres, cuboids/cubes, gaussians, cylinders, cones.
 
 ### Compatibility
 
-Tested with Julia ≥ 1.6.
+Tested with Julia ≥ 1.7.
 
 <!-- URLs -->
 [action-img]: https://github.com/JuliaImageRecon/ImagePhantoms.jl/workflows/CI/badge.svg
