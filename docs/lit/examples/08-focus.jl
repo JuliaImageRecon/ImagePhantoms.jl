@@ -38,7 +38,7 @@ one can define a focus chart phantom.
 =#
 
 ob = focus_chart( ; nspoke = 56, value = 4)
-x = LinRange(-1,1,2^9) * 1.1
+x = range(-1,1,2^9) * 1.1
 y = x
 image = phantom(ob).(x, y')
 jim(x, y, image; title = "Focus chart phantom")

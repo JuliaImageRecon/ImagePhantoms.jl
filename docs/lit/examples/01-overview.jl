@@ -91,7 +91,7 @@ jim(axes(ig), image; xlabel="x", ylabel="y", title="SheppLoganToft")
 # Here is the sinogram corresponding to this phantom,
 # computed analytically from the ellipse parameters using `radon`:
 
-r = LinRange(-100mm,100mm,401)
+r = range(-100mm,100mm,401)
 ϕ = deg2rad.(0:180)
 sino = radon(r, ϕ, objects)
 jim(r, ϕ, sino; title="Sinogram", xlabel="r", ylabel="ϕ")
@@ -155,8 +155,8 @@ ellipse0 = ellipse(0, 0, 8, 4, 0, 1)
 ϕ1 = eval(ϕ1s)
 ellipse1 = ellipse(0, 0, 8, 4, ϕ1, 1)
 
-x = LinRange(-9, 9, 181)
-y = LinRange(-8, 8, 161)
+x = range(-9, 9, 181)
+y = range(-8, 8, 161)
 pic0 = phantom(x, y, [ellipse0])
 pic1 = phantom(x, y, [ellipse1])
 
@@ -226,8 +226,8 @@ ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 1)
 ϕ1 = eval(ϕ1s)
 ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (ϕ1, 0, 0), 1)
 
-x = LinRange(-9, 9, 181)
-y = LinRange(-8, 8, 161)
+x = range(-9, 9, 181)
+y = range(-8, 8, 161)
 z = [0]
 pic0 = phantom(x, y, z, [ellipsoid0])
 pic1 = phantom(x, y, z, [ellipsoid1])
@@ -290,9 +290,9 @@ ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 1)
 θ1 = eval(θ1s)
 ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (0, θ1, 0), 1)
 
-x = LinRange(-9, 9, 181)
+x = range(-9, 9, 181)
 y = [0]
-z = LinRange(-8, 8, 161)
+z = range(-8, 8, 161)
 pic0 = phantom(x, y, z, [ellipsoid0]); pic0 = selectdim(pic0, 2, 1)
 pic1 = phantom(x, y, z, [ellipsoid1]); pic1 = selectdim(pic1, 2, 1)
 
@@ -353,8 +353,8 @@ ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 1)
 ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, ψ1), 1)
 
 x = [0]
-y = LinRange(-9, 9, 181)
-z = LinRange(-8, 8, 161)
+y = range(-9, 9, 181)
+z = range(-8, 8, 161)
 pic0 = phantom(x, y, z, [ellipsoid0]); pic0 = selectdim(pic0, 1, 1)
 pic1 = phantom(x, y, z, [ellipsoid1]); pic1 = selectdim(pic1, 1, 1)
 
@@ -446,9 +446,9 @@ ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 1)
 ψ1 = eval(ψ1s)
 ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (ϕ1, θ1, ψ1), 1)
 
-x = LinRange(-9, 9, 181)
-y = LinRange(-8, 8, 161)
-z = LinRange(-7, 7, 71)
+x = range(-9, 9, 181)
+y = range(-8, 8, 161)
+z = range(-7, 7, 71)
 pic0 = phantom(x, y, z, [ellipsoid0])
 pic1 = phantom(x, y, z, [ellipsoid1])
 

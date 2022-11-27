@@ -161,8 +161,8 @@ to have the middle ellipses be non-overlapping:
 params = ellipse_parameters(SheppLoganBrainWeb(), disjoint=true)
 params = [(p[1:5]..., i) for (i, p) in enumerate(params)]
 ob = ellipse(params)
-x = LinRange(-0.4, 0.4, 206)
-y = LinRange(-0.5, 0.5, 256)
+x = range(-0.4, 0.4, 206)
+y = range(-0.5, 0.5, 256)
 oversample = 3
 image5 = phantom(x, y, ob, oversample)
 jim(x, y, image5, "Disjoint"; aspect_ratio = 1)
