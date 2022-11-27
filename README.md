@@ -135,7 +135,7 @@ ellipsoids/spheres, cuboids/cubes, gaussians, cylinders, cones.
 
 ### Compatibility
 
-Tested with Julia ≥ 1.6.
+Tested with Julia ≥ 1.7.
 
 <!-- URLs -->
 [action-img]: https://github.com/JuliaImageRecon/ImagePhantoms.jl/workflows/CI/badge.svg
