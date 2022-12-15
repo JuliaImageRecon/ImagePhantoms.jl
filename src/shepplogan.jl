@@ -285,8 +285,9 @@ struct SheppLogan3 <: EllipsoidPhantomVersion end
 
 """
     ellipsoid_parameters_shepplogan( ; disjoint::Bool)
-`12 × 9 Matrix{Float64}` of 3D Shepp-Logan ellipsoid parameters.
-By default the first 6 columns are unitless "fractions of field of view",
+`12 × 10 Matrix{Float64}` of 3D Shepp-Logan ellipsoid parameters
+`(cx,cy,cz, rx,ry rz, Φ,Θ=0,Ψ=0, ρ)`.
+By default the first 6 columns are unitless "fractions of field of view".
 """
 function ellipsoid_parameters_shepplogan()
 
@@ -311,7 +312,9 @@ who said that the Kak&Slaney 1988 values are incorrect.
     ]
     params[:,1:6] ./= 2 # radii
     params[:,7] .*= π/180 # radians
-    out = [params[:,1:7] zeros(size(params,1)) zeros(size(params,1)) params[:,8]] # Θ=0, ψ=0
+    Θ = zeros(size(params,1))
+    Ψ = zeros(size(params,1))
+    out = [params[:,1:7] Θ Ψ params[:,8]] # (12,10)
     return out
 end
 
@@ -360,7 +363,7 @@ function ellipsoid_parameters_uscale(
             (tmp[1:3] * uc .* fovs)...,
             (tmp[4:6] * uc .* fovs)...,
             (tmp[7:9] * ua)...,
-            tmp[9] * uv,
+            tmp[10] * uv,
         )
         out[n] = tmp
     end
@@ -390,10 +393,10 @@ function ellipsoid_parameters(
     u::NTuple{3,Number} = (1,1,1), # unit scaling
 )
 
-    params = ellipsoid_parameters_shepplogan() # (N,9)
+    params = ellipsoid_parameters_shepplogan() # (N,10)
 
-    case == SheppLogan3() || throw("unsupported")
-#   params[:,9] = shepp_logan_values(case)
+    case == SheppLogan3() || error("unsupported case $case")
+#   params[:,10] = shepp_logan_values(case)
 
     out = ellipsoid_parameters_uscale(params, fovs, u...)
 end
