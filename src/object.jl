@@ -193,7 +193,7 @@ Base.ndims(::AbstractShape{D}) where D = D
 function Base.show(io::IO, ::MIME"text/plain", ob::Object{S,D}) where {S,D}
     println(io, typeof(ob), " (S, D, V, ...)")
     for f in (:center, :width, :angle, :value)
-        p = getproperty(ob, f)
+        p = getfield(ob, f)
         t = typeof(p)
         t = t == NTuple{D,eltype(t)} ? "NTuple{$D,$(eltype(t))}" : "$t"
         println(io, " ", f, "::", t, " ", p)
