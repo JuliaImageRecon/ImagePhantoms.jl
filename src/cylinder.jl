@@ -74,7 +74,7 @@ function xray1(
     ϕ::RealU, # azim (irrelevant)
     θ::RealU, # polar
 )
-    T = promote_type(eltype(u), eltype(v), Float32)
+    T = promote_type(typeof(u), typeof(v), Float32)
 
     r = abs(u)
     if r > 1

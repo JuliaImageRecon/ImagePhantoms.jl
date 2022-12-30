@@ -72,7 +72,7 @@ function cube_bounds(p::T, e::T) where T <: AbstractFloat
         _sort((-T(0.5) - p) / e, ( T(0.5) - p) / e)
 end
 function cube_bounds(p::Real, e::Real)
-   T = promote_type(eltype(p), eltype(e), Float32)
+   T = promote_type(typeof(p), typeof(e), Float32)
    return cube_bounds(T(p), T(e))
 end
 

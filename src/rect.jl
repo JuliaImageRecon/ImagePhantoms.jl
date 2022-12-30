@@ -48,7 +48,7 @@ Unit-height trapezoid with breakpoints `t1`, `t2`, `t3`, `t4`.
 """
 function trapezoid(t::Real, t1::Real, t2::Real, t3::Real, t4::Real)
     (t, t1, t2, t3, t4) = promote(t, t1, t2, t3, t4)
-    T = eltype(t)
+    T = typeof(t)
     if t1 < t < t2
         return (t - t1) / (t2 - t1)
     elseif t2 ≤ t ≤ t3
