@@ -197,9 +197,9 @@ function ellipse_parameters_uscale(
     Tv <: Number,
 }
 
-    C = eltype(oneunit(Tf) * oneunit(Tc) * one(Tp))
-    A = eltype(oneunit(Ta) * one(Tp))
-    V = eltype(oneunit(Tv) * one(Tp))
+    C = typeof(oneunit(Tf) * oneunit(Tc) * one(Tp))
+    A = typeof(oneunit(Ta) * one(Tp))
+    V = typeof(oneunit(Tv) * one(Tp))
     T = Tuple{C, C, C, C, A, V}
 
     size(params,2) == 6 || throw(ArgumentError("params not N × 6"))
@@ -349,9 +349,9 @@ function ellipsoid_parameters_uscale(
     Ta <: RealU,
     Tv <: Number,
 }
-    C = eltype(oneunit(Tf) * oneunit(Tc) * one(Tp))
-    A = eltype(oneunit(Ta) * one(Tp))
-    V = eltype(oneunit(Tv) * one(Tp))
+    C = typeof(oneunit(Tf) * oneunit(Tc) * one(Tp))
+    A = typeof(oneunit(Ta) * one(Tp))
+    V = typeof(oneunit(Tv) * one(Tp))
     T = Tuple{C, C, C, C, C, C, A, A, A, V}
 
     size(params,2) == 10 || throw(ArgumentError("params not N × 10"))

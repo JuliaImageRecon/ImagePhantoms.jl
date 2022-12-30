@@ -86,7 +86,7 @@ function phantom(
     y::AbstractVector,
     oa::Array{<:Object2d},
     oversample::Int ;
-    T::DataType = eltype(1f0 * oneunit(promote_type(eltype.(oa)...))),
+    T::DataType = typeof(1f0 * oneunit(promote_type(eltype.(oa)...))),
 )
 
     oversample < 1 && throw(ArgumentError("oversample $oversample"))
@@ -157,7 +157,7 @@ end
 
 # this gateway seems to help type inference
 function _radon(ob::Object2d{S,V,C}, r::Tr, ϕ::Tϕ) where {S,V,C,Tr,Tϕ}
-    T = eltype(oneunit(C) * oneunit(V) * one(Tr) * one(Tϕ))
+    T = typeof(oneunit(C) * oneunit(V) * one(Tr) * one(Tϕ))
     return T(ob.value * _xray(S(), ob.center, ob.width, ob.angle, r, ϕ))
 end
 

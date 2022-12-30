@@ -73,7 +73,7 @@ struct Object{S, D, V, C, A, Da, T} <: AbstractObject
         C = promote_type(eltype.(center)..., eltype.(width)...)
         angle = promote((1f0 .* angle)...) # ensure at least Float32
         A = eltype(angle)
-        T = eltype(one(A))
+        T = typeof(one(A))
         new{S,D,V,C,A,Da,T}(C.(center), C.(width), angle, value,
             T.(sin.(angle)), T.(cos.(angle)))
     end
@@ -247,7 +247,7 @@ Determine the element type of the Radon transform of an object
 Ensures that its precision is at least `Float32`.
 """
 function radon_type(::Object{S, D, V, C, A}) where {S, D, V <: Number, C <: RealU, A <: RealU}
-    return eltype(oneunit(C) * oneunit(V) * one(A) * 1f0) # at least Float32
+    return typeof(oneunit(C) * oneunit(V) * one(A) * 1f0) # at least Float32
 end
 
 
