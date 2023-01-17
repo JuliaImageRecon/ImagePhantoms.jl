@@ -14,7 +14,7 @@ used for testing image reconstruction algorithms.
 The most famous such phantom
 is the "Shepp Logan" phantom
 from this
-[1974 paper](http://doi.org/10.1109/TNS.1974.6499235).
+[1974 paper](https://doi.org/10.1109/TNS.1974.6499235).
 (A variant of that phantom serves
 as the
 logo for the
@@ -26,7 +26,7 @@ A phantom is a collection (iterable) of shapes
 One purpose of this package
 is to avoid
 the
-[inverse crime](http://doi.org/10.1016/j.cam.2005.09.027)
+[inverse crime](https://doi.org/10.1016/j.cam.2005.09.027)
 of using a discretized or sampled image
 to generate sinograms or spectra.
 

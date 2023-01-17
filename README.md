@@ -96,7 +96,7 @@ There are a few methods
 that are specific to simulating parallel MRI
 (multiple receive coils)
 based on the
-[2012 paper by Guerquin-Kern et al.](http://doi.org/10.1109/TMI.2011.2174158).
+[2012 paper by Guerquin-Kern et al.](https://doi.org/10.1109/TMI.2011.2174158).
 See the
 [documentation][docs-stable-url]
 for details.
@@ -152,5 +152,5 @@ Tested with Julia ≥ 1.7.
 [docs-stable-url]: https://JuliaImageRecon.github.io/ImagePhantoms.jl/stable
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-dev-url]: https://JuliaImageRecon.github.io/ImagePhantoms.jl/dev
-[license-img]: http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat
+[license-img]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat
 [license-url]: LICENSE

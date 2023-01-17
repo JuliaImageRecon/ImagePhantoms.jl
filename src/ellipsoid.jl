@@ -76,7 +76,7 @@ end
 Fourier transform of unit-radius sphere.
 The argument `f` is the radial coordinate in k-space and is unitless.
 See p253 of Bracewell 1978, The Fourier transform and its applications,
-or http://doi.org/10.1002/mrm.21292.
+or https://doi.org/10.1002/mrm.21292.
 
 Formula: `4/3 π` for `f ≈ 0`, otherwise
 `(sin(2πf) - 2πf cos(2πf)) / (2 * π^2 * f^3)`.
