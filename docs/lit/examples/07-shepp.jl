@@ -15,7 +15,7 @@ This page was generated from a single Julia file:
 #md # using the "Edit on GitHub" link in the top right.
 
 #md # The corresponding notebook can be viewed in
-#md # [nbviewer](http://nbviewer.jupyter.org/) here:
+#md # [nbviewer](https://nbviewer.org/) here:
 #md # [`07-shepp.ipynb`](@__NBVIEWER_ROOT_URL__/07-shepp.ipynb),
 #md # and opened in [binder](https://mybinder.org/) here:
 #md # [`07-shepp.ipynb`](@__BINDER_ROOT_URL__/07-shepp.ipynb).
@@ -50,7 +50,7 @@ Original version from:
 Larry A Shepp, Benjamin F Logan,
 "The Fourier reconstruction of a head section,"
 IEEE Transactions on Nuclear Science, 21(3):21-42, June 1974.
-[doi](http://doi.org/10.1109/TNS.1974.6499235)
+[doi](https://doi.org/10.1109/TNS.1974.6499235)
 
 This (default) version has low soft tissue contrast,
 so it usually should be displayed

@@ -1,7 +1,7 @@
 #=
 mri-sense.jl
 Methods for generating phantom spectra based on the 2012 paper
-[Guerquin-Kern et al.](http://doi.org/10.1109/TMI.2011.2174158)
+[Guerquin-Kern et al.](https://doi.org/10.1109/TMI.2011.2174158)
 that combines analytical k-space values of the phantom
 with an analytical model for MRI sensitivity maps.
 =#

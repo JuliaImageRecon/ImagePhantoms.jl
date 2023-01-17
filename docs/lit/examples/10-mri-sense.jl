@@ -17,7 +17,7 @@ This page was generated from a single Julia file:
 #md # using the "Edit on GitHub" link in the top right.
 
 #md # The corresponding notebook can be viewed in
-#md # [nbviewer](http://nbviewer.jupyter.org/) here:
+#md # [nbviewer](https://nbviewer.org/) here:
 #md # [`10-mri-sense.ipynb`](@__NBVIEWER_ROOT_URL__/10-mri-sense.ipynb),
 #md # and opened in [binder](https://mybinder.org/) here:
 #md # [`10-mri-sense.ipynb`](@__BINDER_ROOT_URL__/10-mri-sense.ipynb).
@@ -52,7 +52,7 @@ sensitivity maps analytically, rather than committing the "inverse crime"
 of using rasterized phantoms and maps.
 
 See the 2012 paper
-[Guerquin-Kern et al.](http://doi.org/10.1109/TMI.2011.2174158)
+[Guerquin-Kern et al.](https://doi.org/10.1109/TMI.2011.2174158)
 that combines analytical k-space values of the phantom
 with an analytical model for the sensitivity maps.
 This package follows the recommended approach from that paper.

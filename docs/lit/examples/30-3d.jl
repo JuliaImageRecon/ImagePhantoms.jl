@@ -16,7 +16,7 @@ This page was generated from a single Julia file:
 #md # using the "Edit on GitHub" link in the top right.
 
 #md # The corresponding notebook can be viewed in
-#md # [nbviewer](http://nbviewer.jupyter.org/) here:
+#md # [nbviewer](https://nbviewer.org/) here:
 #md # [`30-3d.ipynb`](@__NBVIEWER_ROOT_URL__/30-3d.ipynb),
 #md # and opened in [binder](https://mybinder.org/) here:
 #md # [`30-3d.ipynb`](@__BINDER_ROOT_URL__/30-3d.ipynb).
@@ -68,7 +68,7 @@ whereas the
 [X-ray transform](https://en.wikipedia.org/wiki/X-ray_transform)
 is a collection of (1D) line integrals.
 See
-[Section II.1, Natterer 2001](http://doi.org/10.1137/1.9780898719284).
+[Section II.1, Natterer 2001](https://doi.org/10.1137/1.9780898719284).
 So strictly speaking the `radon` function is a misnomer in 3D,
 whereas for 2D functions
 the Radon transform and the X-ray transform coincide.
