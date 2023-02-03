@@ -96,6 +96,6 @@ end
 Spectrum of unit cylinder at `(kx,ky,kz)`,
 for unitless spatial frequency coordinates.
 """
-function spectrum1(::Object3d{Cylinder}, kxyz::NTuple{3,Real})
-    return 4 * jinc(2 * sqrt(sum(abs2, kxyz[1:2]))) * sinc(kxyz[3])
+function spectrum1(::Object3d{Cylinder}, kxyz::NTuple{3,T}) where {T<:Real}
+    return T(π) * jinc(2 * sqrt(sum(abs2, kxyz[1:2]))) * sinc(kxyz[3])
 end
