@@ -4,7 +4,7 @@ jinc.jl
 
 export jinc
 
-using SpecialFunctions: besselj1
+import SpecialFunctions
 
 
 """
@@ -15,11 +15,10 @@ where `J1` is a Bessel function of the first kind.
 
 The argument `x` must be unitless.
 
-Return type is `promote_type(typeof(x), Float32)`.
+!!! note
+    `SpecialFunctions.jinc(0) = 1` whereas the convention here is `jinc(0) = π / 4`
+    which corresponds to the area of a disk of unit diameter.
 """
 function jinc(x::X) where {X <: Real}
-    T = promote_type(X, Float32)
-    if (x == 0) return convert(T, π/4) end
-    y = abs(x)
-    convert(T, besselj1(π*y) / (2*y))
+    X(π) / 4 * SpecialFunctions.jinc(x)
 end
