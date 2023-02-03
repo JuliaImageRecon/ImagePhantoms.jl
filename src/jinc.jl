@@ -17,6 +17,7 @@ The argument `x` must be unitless.
 
 !!! note
     `SpecialFunctions.jinc(0) = 1` whereas the convention here is `jinc(0) = π / 4`
+    which corresponds to the area of a disk of unit diameter.
 """
 function jinc(x::X) where {X <: Real}
     X(π) / 4 * SpecialFunctions.jinc(x)
