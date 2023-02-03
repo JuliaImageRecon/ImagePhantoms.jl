@@ -2,8 +2,6 @@ module ImagePhantoms
 
 const RealU = Number # Union{Real, Unitful.Length}
 
-using SpecialFunctions: jinc
-
 # core:
 include("shape.jl")
 include("rotate3.jl")
