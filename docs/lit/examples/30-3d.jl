@@ -1,28 +1,15 @@
-#---------------------------------------------------------
-# # [3D geometry](@id 30-3d)
-#---------------------------------------------------------
-
 #=
+# [3D geometry](@id 30-3d)
+
 This page explains the 3D X-ray transform geometry
 for the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
-
-This page was generated from a single Julia file:
-[30-3d.jl](@__REPO_ROOT_URL__/30-3d.jl).
 =#
 
-#md # In any such Julia documentation,
-#md # you can access the source code
-#md # using the "Edit on GitHub" link in the top right.
-
-#md # The corresponding notebook can be viewed in
-#md # [nbviewer](https://nbviewer.org/) here:
-#md # [`30-3d.ipynb`](@__NBVIEWER_ROOT_URL__/30-3d.ipynb),
-#md # and opened in [binder](https://mybinder.org/) here:
-#md # [`30-3d.ipynb`](@__BINDER_ROOT_URL__/30-3d.ipynb).
+#srcURL
 
 
-# ### Setup
+# ## Setup
 
 # Packages needed here.
 
@@ -39,13 +26,14 @@ This page was generated from a single Julia file:
 
 
 #=
-### Overview
+## Overview
 
 Most practical tomographic imaging problems are 3D,
 so this package also supports calculating
 3D line integrals through 3D phantom objects.
 
-### 3D projection geometry
+
+## 3D projection geometry
 
 Given a 3D phantom object,
 the function `radon`

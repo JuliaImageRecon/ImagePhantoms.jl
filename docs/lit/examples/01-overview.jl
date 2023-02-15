@@ -1,24 +1,11 @@
-#---------------------------------------------------------
-# # [ImagePhantoms overview](@id 01-overview)
-#---------------------------------------------------------
-
 #=
+# [ImagePhantoms overview](@id 01-overview)
+
 This page explains the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
-
-This page was generated from a single Julia file:
-[01-overview.jl](@__REPO_ROOT_URL__/01-overview.jl).
 =#
 
-#md # In any such Julia documentation,
-#md # you can access the source code
-#md # using the "Edit on GitHub" link in the top right.
-
-#md # The corresponding notebook can be viewed in
-#md # [nbviewer](https://nbviewer.org/) here:
-#md # [`01-overview.ipynb`](@__NBVIEWER_ROOT_URL__/01-overview.ipynb),
-#md # and opened in [binder](https://mybinder.org/) here:
-#md # [`01-overview.ipynb`](@__BINDER_ROOT_URL__/01-overview.ipynb).
+#srcURL
 
 
 # ### Setup
@@ -41,9 +28,9 @@ using InteractiveUtils: versioninfo
 isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 
-# ### Overview
-
 #=
+## Overview
+
 When developing image reconstruction methods,
 it can be helpful to simulate data (e.g., sinograms)
 using software-defined images called phantoms.
@@ -56,9 +43,9 @@ image = shepp_logan(256) # CT version by default
 jim(image, "SheppLogan"; clim=(0.9, 1.1))
 
 
-# ## Sinograms
-
 #=
+## Sinograms
+
 Often for image reconstruction algorithm development,
 we need not only the phantom image, but also its
 [sinogram, i.e., Radon transform](https://en.wikipedia.org/wiki/Radon_transform)
@@ -462,7 +449,7 @@ jim(p0a, p1a)
 
 
 #=
-### Spectra rotation
+## Spectra rotation
 
 The `spectrum` method
 accounts for the translation, rotation, and scaling
@@ -495,13 +482,4 @@ kspace0r = spectrum(kr, [ellipsoid0]) # evaluate spectrum at rotated tuples
 @assert kspace0r ≈ kspace1
 
 
-# ## Reproducibility
-
-# This page was generated with the following version of Julia:
-
-io = IOBuffer(); versioninfo(io); split(String(take!(io)), '\n')
-
-
-# And with the following package versions
-
-import Pkg; Pkg.status()
+include("../../../inc/reproduce.jl")

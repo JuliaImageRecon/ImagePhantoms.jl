@@ -1,24 +1,11 @@
-#---------------------------------------------------------
-# # [Shepp-Logan Phantoms](@id 07-shepp)
-#---------------------------------------------------------
-
 #=
+# [Shepp-Logan Phantoms](@id 07-shepp)
+
 This page illustrates the Shepp-Logan phantoms in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
-
-This page was generated from a single Julia file:
-[07-shepp.jl](@__REPO_ROOT_URL__/07-shepp.jl).
 =#
 
-#md # In any such Julia documentation,
-#md # you can access the source code
-#md # using the "Edit on GitHub" link in the top right.
-
-#md # The corresponding notebook can be viewed in
-#md # [nbviewer](https://nbviewer.org/) here:
-#md # [`07-shepp.ipynb`](@__NBVIEWER_ROOT_URL__/07-shepp.ipynb),
-#md # and opened in [binder](https://mybinder.org/) here:
-#md # [`07-shepp.ipynb`](@__BINDER_ROOT_URL__/07-shepp.ipynb).
+#srcURL
 
 
 # ### Setup
@@ -38,7 +25,7 @@ using Unitful: g, cm
 isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 
-# ### Overview
+# ## Overview
 
 # There are several variations of the Shepp-Logan phantom available.
 

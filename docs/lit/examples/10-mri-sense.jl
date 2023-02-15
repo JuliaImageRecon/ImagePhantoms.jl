@@ -1,27 +1,13 @@
-#---------------------------------------------------------
-# # [MRI SENSE](@id 10-mri-sense)
-#---------------------------------------------------------
-
 #=
+# [MRI SENSE](@id 10-mri-sense)
+
 This page illustrates the `mri_smap_fit` and `mri_spectra` methods
 in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl)
 for performing MRI simulations with realistic sensitivity encoding (SENSE).
-
-This page was generated from a single Julia file:
-[10-mri-sense.jl](@__REPO_ROOT_URL__/10-mri-sense.jl).
 =#
 
-#md # In any such Julia documentation,
-#md # you can access the source code
-#md # using the "Edit on GitHub" link in the top right.
-
-#md # The corresponding notebook can be viewed in
-#md # [nbviewer](https://nbviewer.org/) here:
-#md # [`10-mri-sense.ipynb`](@__NBVIEWER_ROOT_URL__/10-mri-sense.ipynb),
-#md # and opened in [binder](https://mybinder.org/) here:
-#md # [`10-mri-sense.ipynb`](@__BINDER_ROOT_URL__/10-mri-sense.ipynb).
-
+#srcURL
 
 # ### Setup
 
@@ -43,7 +29,7 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 
 #=
-### Overview
+## Overview
 
 Modern MRI scanners use multiple receive coils
 each of which has its own "sensitivity map" (or "coil profile").
@@ -72,7 +58,7 @@ function myfft(x::AbstractArray{T}) where {T <: Number}
 end
 
 
-# ### Phantom
+# ## Phantom
 
 # Image geometry:
 
@@ -113,7 +99,7 @@ jim(x, y, mask, "mask")
 
 
 #=
-### Sensitivity maps
+## Sensitivity maps
 
 Here we use highly idealized sensitivity maps,
 roughly corresponding to the
@@ -166,7 +152,7 @@ jim(x, y, cfun(smaps), "Sensitivity maps (masked and normalized)")
 
 
 #=
-### Sensitivity map fitting using complex exponentials
+## Sensitivity map fitting using complex exponentials
 
 The `mri_smap_fit` function fits each `smap`
 with a linear combination of complex exponential signals.
@@ -190,7 +176,7 @@ coefs = map(x -> reshape(x, 2kmax+1, 2kmax+1), fit.coefs)
 jim(-kmax:kmax, -kmax:kmax, cfun(coefs), "Coefficients")
 
 
-# ### Compare FFT with analytical spectra
+# ## Compare FFT with analytical spectra
 
 # Frequency sample vectors:
 fx = (-(nx÷2):(nx÷2-1)) / (nx*dx) # crucial to match `mri_smap_basis` internals!

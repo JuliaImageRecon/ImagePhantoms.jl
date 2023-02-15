@@ -1,24 +1,11 @@
-#---------------------------------------------------------
-# # [Random Disks](@id 09-disk)
-#---------------------------------------------------------
-
 #=
+# [Random Disks](@id 09-disk)
+
 This page illustrates the `disk_phantom_params` method in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
-
-This page was generated from a single Julia file:
-[09-disk.jl](@__REPO_ROOT_URL__/09-disk.jl).
 =#
 
-#md # In any such Julia documentation,
-#md # you can access the source code
-#md # using the "Edit on GitHub" link in the top right.
-
-#md # The corresponding notebook can be viewed in
-#md # [nbviewer](https://nbviewer.org/) here:
-#md # [`09-disk.ipynb`](@__NBVIEWER_ROOT_URL__/09-disk.ipynb),
-#md # and opened in [binder](https://mybinder.org/) here:
-#md # [`09-disk.ipynb`](@__BINDER_ROOT_URL__/09-disk.ipynb).
+#srcURL
 
 
 # ### Setup
@@ -35,9 +22,9 @@ using Plots # @animate, gif
 
 isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
-# ### Overview
-
 #=
+## Overview
+
 For training machine-learning methods for image reconstruction,
 it can be helpful to have a way to generate a family of phantoms
 drawn from some common distribution,
@@ -48,7 +35,7 @@ one can use the tools in this package to generate such phantoms.
 =#
 
 
-# ### A single disk phantom image
+# ## A single disk phantom image
 
 # Make a digital image of it using `phantom` and display it.
 function disk_phantom(title::String)
@@ -65,7 +52,7 @@ end
 disk_phantom("A single disk phantom realization")
 
 
-# ### Several realizations
+# ## Several realizations
 
 anim = @animate for i in 1:8
     disk_phantom("Realization $i")

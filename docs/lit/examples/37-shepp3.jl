@@ -1,25 +1,12 @@
-#---------------------------------------------------------
-# # [3D Shepp-Logan Phantom](@id 37-shepp3)
-#---------------------------------------------------------
-
 #=
+# [3D Shepp-Logan Phantom](@id 37-shepp3)
+
 This page illustrates the 3D Shepp-Logan phantom(s)
 in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
-
-This page was generated from a single Julia file:
-[37-shepp3.jl](@__REPO_ROOT_URL__/37-shepp3.jl).
 =#
 
-#md # In any such Julia documentation,
-#md # you can access the source code
-#md # using the "Edit on GitHub" link in the top right.
-
-#md # The corresponding notebook can be viewed in
-#md # [nbviewer](https://nbviewer.org/) here:
-#md # [`37-shepp3.ipynb`](@__NBVIEWER_ROOT_URL__/37-shepp3.ipynb),
-#md # and opened in [binder](https://mybinder.org/) here:
-#md # [`37-shepp3.ipynb`](@__BINDER_ROOT_URL__/37-shepp3.ipynb).
+#srcURL
 
 
 # ### Setup
@@ -39,7 +26,7 @@ isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 
 #=
-### Overview
+## Overview
 
 Currently this package provides
 one version of a 3D Shepp-Logan phantom

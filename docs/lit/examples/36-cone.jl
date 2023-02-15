@@ -1,24 +1,11 @@
-#---------------------------------------------------------
-# # [Cone](@id 36-cone)
-#---------------------------------------------------------
-
 #=
+# [Cone](@id 36-cone)
+
 This page illustrates the `Cone` shape in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
-
-This page was generated from a single Julia file:
-[36-cone.jl](@__REPO_ROOT_URL__/36-cone.jl).
 =#
 
-#md # In any such Julia documentation,
-#md # you can access the source code
-#md # using the "Edit on GitHub" link in the top right.
-
-#md # The corresponding notebook can be viewed in
-#md # [nbviewer](https://nbviewer.org/) here:
-#md # [`36-cone.ipynb`](@__NBVIEWER_ROOT_URL__/36-cone.ipynb),
-#md # and opened in [binder](https://mybinder.org/) here:
-#md # [`36-cone.ipynb`](@__BINDER_ROOT_URL__/36-cone.ipynb).
+#srcURL
 
 
 # ### Setup
@@ -44,9 +31,9 @@ default(markerstrokecolor=:auto)
 isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 
-# ### Overview
-
 #=
+## Overview
+
 A basic shape used in constructing 3D digital image phantoms
 is the cone,
 specified by its center, base radii, height, angle(s) and value.
@@ -69,7 +56,7 @@ ob = cone(center, width, angles, 1.0f0) # tuples (recommended use)
 
 
 #=
-### Phantom image using `phantom`
+## Phantom image using `phantom`
 
 Make a 3D digital image of it using `phantom` and display it.
 We use `ImageGeoms` to simplify the indexing.

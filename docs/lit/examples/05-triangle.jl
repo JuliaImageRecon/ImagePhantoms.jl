@@ -1,24 +1,11 @@
-#---------------------------------------------------------
-# # [Triangle](@id 05-triangle)
-#---------------------------------------------------------
-
 #=
+# [Triangle](@id 05-triangle)
+
 This page illustrates the `Triangle` shape in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
-
-This page was generated from a single Julia file:
-[05-triangle.jl](@__REPO_ROOT_URL__/05-triangle.jl).
 =#
 
-#md # In any such Julia documentation,
-#md # you can access the source code
-#md # using the "Edit on GitHub" link in the top right.
-
-#md # The corresponding notebook can be viewed in
-#md # [nbviewer](https://nbviewer.org/) here:
-#md # [`05-triangle.ipynb`](@__NBVIEWER_ROOT_URL__/05-triangle.ipynb),
-#md # and opened in [binder](https://mybinder.org/) here:
-#md # [`05-triangle.ipynb`](@__BINDER_ROOT_URL__/05-triangle.ipynb).
+#srcURL
 
 
 # ### Setup
@@ -41,9 +28,9 @@ default(markerstrokecolor=:auto)
 isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 
-# ### Overview
-
 #=
+## Overview
+
 For completeness, this package includes a triangle shape
 for constructing 2D digital image phantoms.
 (One could describe quite complicated phantoms with a triangular mesh.)
@@ -64,7 +51,7 @@ width = (20mm, 80mm)
 ob = triangle((40mm, 30mm), width, π/6, 1.0f0)
 
 
-# ### Phantom image using `phantom`
+# ## Phantom image using `phantom`
 
 # Make a digital image of it using `phantom` and display it.
 dx, dy = 0.8mm, 1.0mm
@@ -92,7 +79,7 @@ area = IP.area(ob)
 
 
 #=
-### Spectrum using `spectrum`
+## Spectrum using `spectrum`
 
 There are two ways to examine the spectrum of this image:
 * using the analytical Fourier transform of the object via `spectrum`
@@ -126,10 +113,12 @@ p4 = jim(axesf(ig), 1e3*abs.(spectrum_fft - spectrum_exact),
 jim(p1, p4, p2, p3)
 
 
-# ### Radon transform using `radon`
+#=
+## Radon transform using `radon`
 
-# Examine the Radon transform of the object using `radon`,
-# and validate it using the projection-slice theorem aka Fourier-slice theorem.
+Examine the Radon transform of the object using `radon`,
+and validate it using the projection-slice theorem aka Fourier-slice theorem.
+=#
 
 dr = 0.2mm # radial sample spacing
 nr = 2^10 # radial sinogram bins
@@ -154,7 +143,7 @@ but one could make a fan-beam sinogram by sampling `(r, ϕ)` appropriately.
 =#
 
 
-# ### Fourier-slice theorem illustration
+# ## Fourier-slice theorem illustration
 
 # Pick one particular view angle (55°) and look at its slice and spectra.
 ia = argmin(abs.(ϕ .- 55°))
@@ -190,7 +179,7 @@ for this shape.
 
 
 #=
-### Spectrum
+## Spectrum
 
 The spectrum of a triangle is not widely available;
 for a derivation, see this
