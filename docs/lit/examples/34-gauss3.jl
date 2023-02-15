@@ -1,24 +1,11 @@
-#---------------------------------------------------------
-# # [Gauss3](@id 34-gauss3)
-#---------------------------------------------------------
-
 #=
+# [Gauss3](@id 34-gauss3)
+
 This page illustrates the `Gauss3` shape in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
-
-This page was generated from a single Julia file:
-[34-gauss3.jl](@__REPO_ROOT_URL__/34-gauss3.jl).
 =#
 
-#md # In any such Julia documentation,
-#md # you can access the source code
-#md # using the "Edit on GitHub" link in the top right.
-
-#md # The corresponding notebook can be viewed in
-#md # [nbviewer](https://nbviewer.org/) here:
-#md # [`34-gauss3.ipynb`](@__NBVIEWER_ROOT_URL__/34-gauss3.ipynb),
-#md # and opened in [binder](https://mybinder.org/) here:
-#md # [`34-gauss3.ipynb`](@__BINDER_ROOT_URL__/34-gauss3.ipynb).
+#srcURL
 
 
 # ### Setup
@@ -44,9 +31,9 @@ default(markerstrokecolor=:auto)
 isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 
-# ### Overview
-
 #=
+## Overview
+
 A useful shape
 for constructing 3D digital image phantoms
 is the 3D gaussian,
@@ -70,7 +57,7 @@ ob = gauss3(center, width, angles, 1.0f0) # tuples (recommended use)
 
 
 #=
-### Phantom image using `phantom`
+## Phantom image using `phantom`
 
 Make a 3D digital image of it using `phantom` and display it.
 We use `ImageGeoms` to simplify the indexing.
@@ -95,7 +82,7 @@ jim(mid3(img), "Middle 3 planes")
 
 
 #=
-### Spectrum using `spectrum`
+## Spectrum using `spectrum`
 
 There are two ways to examine the spectrum of this 3D image:
 * using the analytical Fourier transform of the object via `spectrum`
@@ -131,7 +118,7 @@ jim(p1, p4, p2, p3)
 
 
 #=
-### Parallel-beam projections using `radon`
+## Parallel-beam projections using `radon`
 
 Compute 2D projection views of the object using `radon`.
 Validate it using the projection-slice theorem aka Fourier-slice theorem.
@@ -190,7 +177,7 @@ See Sinograms.jl.
 
 
 #=
-### Fourier-slice theorem illustration
+## Fourier-slice theorem illustration
 
 Pick one particular view and compare its FFT
 to a slice through the 3D object spectrum.

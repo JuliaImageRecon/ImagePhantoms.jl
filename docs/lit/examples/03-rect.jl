@@ -1,24 +1,11 @@
-#---------------------------------------------------------
-# # [Rectangle](@id 03-rect)
-#---------------------------------------------------------
-
 #=
+# [Rectangle](@id 03-rect)
+
 This page illustrates the `Rect` shape in the Julia package
 [`ImagePhantoms`](https://github.com/JuliaImageRecon/ImagePhantoms.jl).
-
-This page was generated from a single Julia file:
-[03-rect.jl](@__REPO_ROOT_URL__/03-rect.jl).
 =#
 
-#md # In any such Julia documentation,
-#md # you can access the source code
-#md # using the "Edit on GitHub" link in the top right.
-
-#md # The corresponding notebook can be viewed in
-#md # [nbviewer](https://nbviewer.org/) here:
-#md # [`03-rect.ipynb`](@__NBVIEWER_ROOT_URL__/03-rect.ipynb),
-#md # and opened in [binder](https://mybinder.org/) here:
-#md # [`03-rect.ipynb`](@__BINDER_ROOT_URL__/03-rect.ipynb).
+#srcURL
 
 
 # ### Setup
@@ -41,9 +28,9 @@ default(markerstrokecolor=:auto)
 isinteractive() ? jim(:prompt, true) : prompt(:draw);
 
 
-# ### Overview
-
 #=
+## Overview
+
 A useful shape
 for constructing 2D digital image phantoms
 is the rectangle,
@@ -88,7 +75,7 @@ area = IP.area(ob)
 
 
 #=
-### Spectrum using `spectrum`
+## Spectrum using `spectrum`
 
 There are two ways to examine the spectrum of this image:
 * using the analytical Fourier transform of the object via `spectrum`
@@ -122,10 +109,12 @@ p4 = jim(axesf(ig), 1e3*abs.(spectrum_fft - spectrum_exact),
 jim(p1, p4, p2, p3)
 
 
-# ### Radon transform using `radon`
+#=
+## Radon transform using `radon`
 
-# Examine the Radon transform of the object using `radon`,
-# and validate it using the projection-slice theorem aka Fourier-slice theorem.
+Examine the Radon transform of the object using `radon`,
+and validate it using the projection-slice theorem aka Fourier-slice theorem.
+=#
 
 dr = 0.2mm # radial sample spacing
 nr = 2^10 # radial sinogram bins
@@ -149,7 +138,7 @@ but one could make a fan-beam sinogram by sampling `(r, ϕ)` appropriately.
 =#
 
 
-# ### Fourier-slice theorem illustration
+# ## Fourier-slice theorem illustration
 
 # Pick one particular view angle (55°) and look at its slice and spectra.
 ia = argmin(abs.(ϕ .- 55°))
