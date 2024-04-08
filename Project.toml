@@ -9,6 +9,6 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [compat]
-LazyGrids = "0.4, 0.5"
+LazyGrids = "0.5"
 SpecialFunctions = "1.8, 2"
-julia = "1.9"
+julia = "1.10"
