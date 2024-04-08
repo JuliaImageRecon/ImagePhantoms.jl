@@ -29,7 +29,7 @@ leading to better boundary behavior than the DFT frequencies `k/N`.
 * `kmax::Int = 5` default frequency index -kmax:kmax in all dimensions
 * `kfun::Function = (k,N) -> k / (2N)` # DCT-II frequency
 * `deltas::NTuple{D,<:Number} = ones(D)` pixel sizes
-(For additional options `kmaxs`, `kt`, `ki`, see code.)
+(For additional options `kmaxs`, `kt`, `ki`, `T`, see code.)
 
 # Output
 * `(; B, ν)` where `B` is basis matrix of size `count(mask) × nk`
@@ -47,7 +47,7 @@ function mri_smap_basis(
     kfun::Function = (k,N) -> k / (2N), # DCT-II frequency
     nfun::Function = (N) -> -(N÷2):(N÷2)-1,
     basis::Function = (k,N) -> cispi.(2 * nfun(N) * kfun(k,N)), # 1D basis
-    T::DataType = ComplexF32,
+    T::Type{<:Complex{<:AbstractFloat}} = ComplexF32,
 ) where D
     B = zeros(T, count(mask), length(ki))
     for (i, k) in enumerate(ki)

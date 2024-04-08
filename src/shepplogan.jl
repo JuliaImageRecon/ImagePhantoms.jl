@@ -93,7 +93,7 @@ Convenience method for generating `M×N` samples of Shepp-Logan phantoms.
 # Options
 * `oversample::Int = 3` (usually)
 * `yflip::Bool = true` (reverse `y` samples for convenience.)
-* `T::DataType` default `Float32` (except `Int` for `BrainWeb` version)
+* `T::Type{<:Number}` default `Float32` (except `Int` for `BrainWeb` version)
 * `kwargs...` remaining options passed to `ellipse_parameters` for parameters.
 
 # Out
@@ -107,7 +107,7 @@ function shepp_logan(
     case::EllipsePhantomVersion ;
     oversample::Int = 3,
     yflip::Bool = true,
-    T::DataType = Float32,
+    T::Type{<:Number} = Float32,
     kwargs...
 )
     ob = shepp_logan(case ; kwargs...)

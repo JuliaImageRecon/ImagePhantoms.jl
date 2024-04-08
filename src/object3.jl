@@ -90,7 +90,7 @@ function phantom(
     z::AbstractVector,
     oa::Array{<:Object3d{S,V}},
     oversample::Int;
-    T::DataType = typeof(oneunit(V) * 1f0), # at least Float32
+    T::Type{<:Number} = typeof(oneunit(V) * 1f0), # at least Float32
 ) where {S, V <: Number}
 
     oversample < 1 && throw(ArgumentError("oversample $oversample"))
