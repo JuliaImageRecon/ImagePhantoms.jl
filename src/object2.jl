@@ -86,7 +86,7 @@ function phantom(
     y::AbstractVector,
     oa::Array{<:Object2d},
     oversample::Int ;
-    T::DataType = typeof(1f0 * oneunit(promote_type(eltype.(oa)...))),
+    T::Type{<:Number} = typeof(1f0 * oneunit(promote_type(eltype.(oa)...))),
 )
 
     oversample < 1 && throw(ArgumentError("oversample $oversample"))
