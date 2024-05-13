@@ -149,13 +149,13 @@ pic1 = phantom(x, y, [ellipse1])
 
 marker = :star
 p0 = jim(x, y, pic0, "Original ellipse";
-    xlabel="x", ylabel="y", prompt=:false)
+    xlabel="x", ylabel="y", size=(700,300), prompt=:false)
 x0,y0 = 7,0
 scatter!([x0], [y0], color=:blue; marker)
 point1 = [cos(ϕ1) -sin(ϕ1); sin(ϕ1) cos(ϕ1)] * [x0; y0] # rotate point
 x1,y1 = point1[1], point1[2]
 p1 = jim(x, y, pic1, "Rotated by ϕ = $ϕ1s";
-    xlabel="x", ylabel="y", prompt=:false)
+    xlabel="x", ylabel="y", size=(700,300), prompt=:false)
 scatter!([x1], [y1], color=:blue; marker)
 jim(p0, p1)
 
@@ -221,7 +221,7 @@ pic1 = phantom(x, y, z, [ellipsoid1])
 
 p0z = jim(x, y, pic0,
     "Original ellipsoid:\n(x,y) slice";
-    xlabel="x", ylabel="y", prompt=:false)
+    xlabel="x", ylabel="y", size=(700,300), prompt=:false)
 x0,y0 = 7,0
 scatter!([x0], [y0], color=:blue; marker)
 Rz(ϕ) = [cos(ϕ) -sin(ϕ) 0; sin(ϕ) cos(ϕ) 0; 0 0 1]
@@ -229,7 +229,7 @@ point1 = Rz(ϕ1) * [x0; y0; 0] # rotate point
 x1,y1 = point1[1], point1[2]
 p1z = jim(x, y, pic1,
     "Rotated about z\nby ϕ = $ϕ1s\n(z out of 'board')";
-    xlabel="x", ylabel="y", prompt=:false)
+    xlabel="x", ylabel="y", size=(700,350), prompt=:false)
 scatter!([x1], [y1], color=:blue; marker)
 jim(p0z, p1z)
 
@@ -285,7 +285,7 @@ pic1 = phantom(x, y, z, [ellipsoid1]); pic1 = selectdim(pic1, 2, 1)
 
 p0y = jim(x, z, pic0,
     "Original ellipsoid:\n (x,z) slice";
-    xlabel="x", ylabel="z", prompt=false)
+    xlabel="x", ylabel="z", size=(700,350), prompt=false)
 x0,z0 = 7,0
 scatter!([x0], [z0], color=:green; marker)
 Ry(θ) = [cos(θ) 0 sin(θ); 0 1 0; -sin(θ) 0 cos(θ)]
@@ -293,7 +293,7 @@ point1 = Ry(θ1) * [x0; 0; z0] # rotate point
 x1,z1 = point1[1], point1[3]
 p1y = jim(x, z, pic1,
     "Rotated about y\nby θ = $θ1s\n(y into 'board')";
-    xlabel="x", ylabel="z", prompt=false)
+    xlabel="x", ylabel="z", size=(700,350), prompt=false)
 scatter!([x1], [z1], color=:green; marker)
 jim(p0y, p1y)
 
@@ -347,7 +347,7 @@ pic1 = phantom(x, y, z, [ellipsoid1]); pic1 = selectdim(pic1, 1, 1)
 
 p0x = jim(y, z, pic0,
     "Original ellipsoid:\n (y,z) slice)";
-    xlabel="y", ylabel="z", prompt=false)
+    xlabel="y", ylabel="z", size=(700,350), prompt=false)
 y0,z0 = 3,0
 scatter!([y0], [z0], color=:red; marker)
 Rx(ψ) = [1 0 0 ; 0 cos(ψ) -sin(ψ); 0 sin(ψ) cos(ψ)]
@@ -355,7 +355,7 @@ point1 = Rx(ψ1) * [0; y0; z0] # rotate point
 y1,z1 = point1[2], point1[3]
 p1x = jim(y, z, pic1,
     "Rotated about x\nby ψ = $ψ1s\n(x out of 'board')";
-    xlabel="y", ylabel="z", prompt=false)
+    xlabel="y", ylabel="z", size=(700,350), prompt=false)
 scatter!([y1], [z1], color=:red; marker)
 jim(p0x, p1x)
 
@@ -441,10 +441,10 @@ pic1 = phantom(x, y, z, [ellipsoid1])
 
 p0a = jim(mid3(pic0),
     "Original ellipsoid\n(central slices)";
-    xlabel="x", ylabel="y", prompt=:false)
+    xlabel="x", ylabel="y", size=(700,320), prompt=:false)
 p1a = jim(mid3(pic1),
     "Rotated\nϕ = $ϕ1s, θ = $θ1s, ψ = $ψ1s";
-    xlabel="x", ylabel="y", prompt=:false)
+    xlabel="x", ylabel="y", size=(700,320), prompt=:false)
 jim(p0a, p1a)
 
 
