@@ -13,6 +13,7 @@ using ImageGeoms: ImageGeom, axesf
 using FFTW: fft, fftshift, ifftshift
 using Test: @test, @testset, @inferred
 
+include("helper.jl") # myfft
 
 @testset "circle-square" begin # special constructors
     args = [(1, 5.0f0), (1, 2, 3., 5.0f0), ((1, 2), 3., 5.0f0)]
@@ -178,7 +179,7 @@ end
 
   @testset "spectrum" begin
     (M,N) = (2^10,2^10+5) # odd
-    ig = ImageGeom( dims=(M,N), deltas=(0.02m, 0.025m), offsets=:dsp)
+    ig = ImageGeom(; dims=(M,N), deltas=(0.02m, 0.025m), offsets=:dsp)
     ob = shape((2m, -3m), swidth, π/6, 1.0f0)
     zscale = 1 / (ob.value * IP.area(ob)) # normalize spectra by area
 
