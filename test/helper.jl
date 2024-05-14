@@ -10,8 +10,10 @@ end
 =#
 
 
-# fft cannot handle units so this is a work-around
-function myfft(x::AbstractArray{<:Number})
-    u = oneunit(eltype(x))
-    return fftshift(fft(ifftshift(x) / u)) * u
+if !@isdefined myfft
+    # fft cannot handle units so this is a work-around
+    function myfft(x::AbstractArray{<:Number})
+        u = oneunit(eltype(x))
+        return fftshift(fft(ifftshift(x) / u)) * u
+    end
 end
