@@ -8,6 +8,7 @@ https://github.com/JuliaImageRecon/ImagePhantoms.jl
 [![license][license-img]][license-url]
 [![docs-stable][docs-stable-img]][docs-stable-url]
 [![docs-dev][docs-dev-img]][docs-dev-url]
+[![Aqua QA][aqua-img]][aqua-url]
 [![code-style][code-blue-img]][code-blue-url]
 <img src="https://github.com/JuliaImageRecon/ImagePhantoms.jl/blob/main/docs/src/assets/logo.svg" alt="logo" width="150"/>
 
@@ -154,3 +155,5 @@ Tested with Julia ≥ 1.10.
 [docs-dev-url]: https://JuliaImageRecon.github.io/ImagePhantoms.jl/dev
 [license-img]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat
 [license-url]: LICENSE
+[aqua-img]: https://img.shields.io/badge/Aqua.jl-%F0%9F%8C%A2-aqua.svg
+[aqua-url]: https://github.com/JuliaTesting/Aqua.jl

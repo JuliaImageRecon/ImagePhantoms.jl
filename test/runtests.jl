@@ -1,7 +1,9 @@
 # runtests.jl
 
 using Test: @test, @testset, detect_ambiguities
-using ImagePhantoms
+using ImagePhantoms: ImagePhantoms
+
+include("aqua.jl")
 
 include("helper.jl")
 
