@@ -116,13 +116,13 @@ function Object(
     shape::AbstractShape{D},
     _center::NTuple{D,RealU} = _tuple(0, D),
     _width::NTuple{D,RealU} = _tuple(1, D),
-    _angle::Union{RealU, NTuple{Da,RealU}} = _tuple(0, D == 2 ? 1 : 3),
+    _angle::Union{RealU, NTuple{Da,RealU}} where {Da} = _tuple(0, D == 2 ? 1 : 3),
     _value::Number = 1f0 ;
     center::NTuple{D,RealU} = _center,
     width::NTuple{D,RealU} = _width,
-    angle::Union{RealU, NTuple{Da,RealU}} = _angle,
+    angle::Union{RealU, NTuple{Da,RealU}} where {Da} = _angle,
     value::Number = _value,
-) where {D,Da}
+) where {D}
     Object{typeof(shape)}(center, width, angle, value)
 end
 
