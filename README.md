@@ -10,6 +10,9 @@ https://github.com/JuliaImageRecon/ImagePhantoms.jl
 [![docs-dev][docs-dev-img]][docs-dev-url]
 [![Aqua QA][aqua-img]][aqua-url]
 [![code-style][code-blue-img]][code-blue-url]
+[![deps](https://juliahub.com/docs/ImagePhantoms/deps.svg)](https://juliahub.com/ui/Packages/ImagePhantoms)
+[![version](https://juliahub.com/docs/ImagePhantoms/version.svg)](https://juliahub.com/ui/Packages/ImagePhantoms)
+[![pkgeval](https://juliahub.com/docs/ImagePhantoms/pkgeval.svg)](https://juliahub.com/ui/Packages/ImagePhantoms)
 <img src="https://github.com/JuliaImageRecon/ImagePhantoms.jl/blob/main/docs/src/assets/logo.svg" alt="logo" width="150"/>
 
 This Julia language repo
