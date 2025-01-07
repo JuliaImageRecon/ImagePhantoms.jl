@@ -121,7 +121,7 @@ end
 
 area1(::Triangle) = sqrt(3)/4 # area of unit base equilateral
 
-ℓmax1(::Triangle) = 1
+ℓmax1(::Triangle) = 1 # COV_EXCL_LINE
 
 ℓmax(ob::Object2d{Triangle}) = sqrt(
     (ob.width[1]/2)^2 +

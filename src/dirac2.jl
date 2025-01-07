@@ -31,7 +31,8 @@ dirac2(args... ; kwargs...) = Object(Dirac2(), args...; kwargs...)
 
 area1(::Dirac2) = 1^2
 
-ℓmax1(::Dirac) = 1 # max line integral
+# max line integral:
+ℓmax1(::Dirac) = 1 # COV_EXCL_LINE
 
 
 #=

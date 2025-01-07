@@ -32,7 +32,7 @@ cone(args... ; kwargs...) = Object(Cone(), args...; kwargs...)
 
 volume1(::Cone) = π/3 # volume of unit cone
 
-ℓmax1(::Cone) = 2 # max line integral through unit cone
+ℓmax1(::Cone) = 2*1 # max line integral through unit cone
 
 function ℓmax(ob::Object3d{Cone})
     rmax = maximum(ob.width[1:2])

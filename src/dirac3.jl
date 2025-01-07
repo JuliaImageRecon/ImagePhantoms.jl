@@ -55,4 +55,4 @@ xray1(::Dirac3, u::Real, v::Real, ϕ::RealU, θ::RealU) = ((u,v) == (0,0)) ? 1 :
 Spectrum of Dirac3 at `(kx,ky,kz)`,
 for unitless spatial frequency coordinates.
 """
-spectrum1(::Object3d{Dirac3}, kxyz::NTuple{3,Real}) = 1
+spectrum1(::Object3d{Dirac3}, kxyz::NTuple{3,Real}) = 1^3
