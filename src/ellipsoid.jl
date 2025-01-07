@@ -42,7 +42,7 @@ sphere(r::RealU, v::Number = 1) = sphere((zero(r), zero(r), zero(r)), v)
 
 volume1(::Ellipsoid) = 4/3 * π # volume of unit sphere
 
-ℓmax1(::Ellipsoid) = 2 # maximum chord through a unit sphere
+ℓmax1(::Ellipsoid) = 2*1 # maximum chord through a unit sphere
 
 
 """

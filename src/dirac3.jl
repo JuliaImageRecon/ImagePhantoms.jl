@@ -21,7 +21,7 @@ dirac3(args... ; kwargs...) = Object(Dirac3(), args...; kwargs...)
 # methods
 
 
-volume1(::Dirac3) = 1
+volume1(::Dirac3) = 1^3
 
 # ℓmax1(::Dirac) = 1 # max line integral
 

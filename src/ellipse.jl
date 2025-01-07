@@ -42,7 +42,7 @@ circle(r::RealU, v::Number = 1) = circle((zero(r), zero(r)), r, v)
 
 area1(::Ellipse) = π # area of unit circle
 
-ℓmax1(::Ellipse) = 2 # maximum chord through a unit circle
+ℓmax1(::Ellipse) = 2*1 # maximum chord through a unit circle
 
 
 """

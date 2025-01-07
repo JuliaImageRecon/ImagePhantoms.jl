@@ -63,7 +63,7 @@ end
 # methods
 
 
-area1(::Rect) = 1 # area of unit square
+area1(::Rect) = 1^2 # area of unit square
 
 ℓmax1(::Rect) = √2 # max line integral through unit square
 
