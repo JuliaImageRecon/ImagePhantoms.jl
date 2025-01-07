@@ -43,7 +43,7 @@ cube(w::RealU, v::Number = 1) = cube((zero(w), zero(w), zero(w)), v)
 # methods
 
 
-volume1(::Cuboid) = 1 # volume of unit cube
+volume1(::Cuboid) = 1^3 # volume of unit cube
 
 ℓmax1(::Cuboid) = √3 # max line integral through unit cuboid
 

@@ -29,9 +29,10 @@ dirac2(args... ; kwargs...) = Object(Dirac2(), args...; kwargs...)
 # methods
 
 
-area1(::Dirac2) = 1
+area1(::Dirac2) = 1^2
 
-ℓmax1(::Dirac) = 1 # max line integral
+# max line integral:
+ℓmax1(::Dirac) = 1 # COV_EXCL_LINE
 
 
 #=
@@ -63,5 +64,5 @@ xray1(::Dirac2, r::Real, ϕ::RealU) = (r == 0) ? 1 : 0
 Spectrum of Dirac2 at `(kx,ky)`,
 for unitless spatial frequency coordinates.
 """
-spectrum1(::Object2d{Dirac2}, kxy::NTuple{2,Real}) = 1
+spectrum1(::Object2d{Dirac2}, kxy::NTuple{2,Real}) = 1^2
 #spectrum1(::Object{Dirac, D, V}, kxy::NTuple{D,Real}) where {D, V} = one(V)
