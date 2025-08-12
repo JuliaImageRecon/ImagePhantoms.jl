@@ -16,6 +16,7 @@ using ImagePhantoms: ellipse, phantom, disk_phantom_params
 using ImageGeoms: ImageGeom
 using MIRTjim: jim, prompt
 using Plots # @animate, gif
+using Random: seed!
 
 # The following line is helpful when running this file as a script;
 # this way it will prompt user to hit a key after each figure is displayed.
@@ -49,6 +50,7 @@ function disk_phantom(title::String)
     img = phantom(x, y, objects, oversample)
     jim(x, y, img; title, clim=(0,1300))
 end
+seed!(0)
 disk_phantom("A single disk phantom realization")
 
 
