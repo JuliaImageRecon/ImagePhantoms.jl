@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>ImagePhantoms overview · ImagePhantoms.jl</title><meta name="title" content="ImagePhantoms overview · ImagePhantoms.jl"/><meta property="og:title" content="ImagePhantoms overview · ImagePhantoms.jl"/><meta property="twitter:title" content="ImagePhantoms overview · ImagePhantoms.jl"/><meta name="description" content="Documentation for ImagePhantoms.jl."/><meta property="og:description" content="Documentation for ImagePhantoms.jl."/><meta property="twitter:description" content="Documentation for ImagePhantoms.jl."/><meta property="og:url" content="https://JuliaImageRecon.github.io/ImagePhantoms.jl/stable/generated/examples/01-overview/"/><meta property="twitter:url" content="https://JuliaImageRecon.github.io/ImagePhantoms.jl/stable/generated/examples/01-overview/"/><link rel="canonical" href="https://JuliaImageRecon.github.io/ImagePhantoms.jl/stable/generated/examples/01-overview/"/><script data-outdated-warner src="../../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../../assets/documenter.js"></script><script src="../../../search_index.js"></script><script src="../../../siteinfo.js"></script><script src="../../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../../assets/themeswap.js"></script><link href="../../../assets/custom.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../../"><img src="../../../assets/logo.svg" alt="ImagePhantoms.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../../">ImagePhantoms.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../../">Home</a></li><li><a class="tocitem" href="../../../methods/">Methods</a></li><li><span class="tocitem">Examples</span><ul><li class="is-active"><a class="tocitem" href>ImagePhantoms overview</a><ul class="internal"><li><a class="tocitem" href="#Overview"><span>Overview</span></a></li><li><a class="tocitem" href="#Sinograms"><span>Sinograms</span></a></li><li><a class="tocitem" href="#Spectra"><span>Spectra</span></a></li><li><a class="tocitem" href="#2D-Rotation"><span>2D Rotation</span></a></li><li><a class="tocitem" href="#3D-Rotation"><span>3D Rotation</span></a></li><li><a class="tocitem" href="#Spectra-rotation"><span>Spectra rotation</span></a></li></ul></li><li><a class="tocitem" href="../02-ellipse/">Ellipse</a></li><li><a class="tocitem" href="../03-rect/">Rectangle</a></li><li><a class="tocitem" href="../04-gauss/">2D Gaussian</a></li><li><a class="tocitem" href="../05-triangle/">Triangle</a></li><li><a class="tocitem" href="../07-shepp/">Shepp-Logan Phantoms</a></li><li><a class="tocitem" href="../08-focus/">Focus Chart</a></li><li><a class="tocitem" href="../09-disk/">Random Disks</a></li><li><a class="tocitem" href="../10-mri-sense/">MRI SENSE</a></li><li><a class="tocitem" href="../30-3d/">3D geometry</a></li><li><a class="tocitem" href="../32-ellipsoid/">Ellipsoid</a></li><li><a class="tocitem" href="../33-cuboid/">Cuboid</a></li><li><a class="tocitem" href="../34-gauss3/">Gauss3</a></li><li><a class="tocitem" href="../35-cylinder/">Cylinder</a></li><li><a class="tocitem" href="../36-cone/">Cone</a></li><li><a class="tocitem" href="../37-shepp3/">3D Shepp-Logan Phantom</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>ImagePhantoms overview</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>ImagePhantoms overview</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaImageRecon/ImagePhantoms.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaImageRecon/ImagePhantoms.jl/blob/main/docs/lit/examples/01-overview.jl" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="01-overview"><a class="docs-heading-anchor" href="#01-overview">ImagePhantoms overview</a><a id="01-overview-1"></a><a class="docs-heading-anchor-permalink" href="#01-overview" title="Permalink"></a></h1><p>This page explains the Julia package <a href="https://github.com/JuliaImageRecon/ImagePhantoms.jl"><code>ImagePhantoms</code></a>.</p><p>This page comes from a single Julia file: <a href="https://github.com/JuliaImageRecon/ImagePhantoms.jl/blob/main/docs/lit/examples/01-overview.jl"><code>01-overview.jl</code></a>.</p><p>You can access the source code for such Julia documentation using the &#39;Edit on GitHub&#39; link in the top right. You can view the corresponding notebook in <a href="https://nbviewer.org/">nbviewer</a> here: <a href="https://nbviewer.org/github/JuliaImageRecon/ImagePhantoms.jl/tree/gh-pages/dev/generated/examples/01-overview.ipynb"><code>01-overview.ipynb</code></a>, or open it in <a href="https://mybinder.org/">binder</a> here: <a href="https://mybinder.org/v2/gh/JuliaImageRecon/ImagePhantoms.jl/gh-pages?filepath=dev/generated/examples/01-overview.ipynb"><code>01-overview.ipynb</code></a>.</p><h3 id="Setup"><a class="docs-heading-anchor" href="#Setup">Setup</a><a id="Setup-1"></a><a class="docs-heading-anchor-permalink" href="#Setup" title="Permalink"></a></h3><p>Packages needed here.</p><pre><code class="language-julia hljs">using ImagePhantoms
+using ImageGeoms: ImageGeom, axesf
+using MIRTjim: jim, prompt, mid3
+using Plots; default(markerstrokecolor=:auto, label=&quot;&quot;)
+using Unitful: mm
+using InteractiveUtils: versioninfo</code></pre><p>The following line is helpful when running this file as a script; this way it will prompt user to hit a key after each figure is displayed.</p><pre><code class="language-julia hljs">isinteractive() ? jim(:prompt, true) : prompt(:draw);</code></pre><h2 id="Overview"><a class="docs-heading-anchor" href="#Overview">Overview</a><a id="Overview-1"></a><a class="docs-heading-anchor-permalink" href="#Overview" title="Permalink"></a></h2><p>When developing image reconstruction methods, it can be helpful to simulate data (e.g., sinograms) using software-defined images called phantoms.</p><p>The simplest method here is to make a Shepp-Logan phantom image similar its use in other packages.</p><pre><code class="language-julia hljs">image = shepp_logan(256) # CT version by default
+jim(image, &quot;SheppLogan&quot;; clim=(0.9, 1.1))</code></pre><img src="9b446f29.svg" alt="Example block output"/><h2 id="Sinograms"><a class="docs-heading-anchor" href="#Sinograms">Sinograms</a><a id="Sinograms-1"></a><a class="docs-heading-anchor-permalink" href="#Sinograms" title="Permalink"></a></h2><p>Often for image reconstruction algorithm development, we need not only the phantom image, but also its <a href="https://en.wikipedia.org/wiki/Radon_transform">sinogram, i.e., Radon transform</a> and spectrum.</p><p>The 2D sinogram coordinate system used here is</p><p class="math-container">\[p(r, ϕ) = \int_{-∞}^{∞} f(r \cos ϕ - ℓ \sin ϕ, r \sin ϕ + ℓ \cos ϕ) \, \mathrm{d} ℓ.\]</p><p>We start with the vector of ellipses that defines the phantom, using a typical field of view (FOV) of 200mm for a head:</p><pre><code class="language-julia hljs">objects = shepp_logan(SheppLoganToft(); fovs=(200mm,200mm))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{Object2d{Ellipse, Float64, Unitful.Quantity{Float64, 𝐋, Unitful.FreeUnits{(mm,), 𝐋, nothing}}, Float64, 1, Float64}}:
+ Object2d{Ellipse, Float64, Unitful.Quantity{Float64, 𝐋, Unitful.FreeUnits{(mm,), 𝐋, nothing}}, Float64, 1, Float64}((0.0 mm, 0.0 mm), (92.0 mm, 69.0 mm), (1.5707963267948966,), 1.0, (1.0,), (6.123233995736766e-17,))
+ Object2d{Ellipse, Float64, Unitful.Quantity{Float64, 𝐋, Unitful.FreeUnits{(mm,), 𝐋, nothing}}, Float64, 1, Float64}((0.0 mm, -1.8399999999999999 mm), (87.4 mm, 66.24 mm), (1.5707963267948966,), -0.8, (1.0,), (6.123233995736766e-17,))
+ Object2d{Ellipse, Float64, Unitful.Quantity{Float64, 𝐋, Unitful.FreeUnits{(mm,), 𝐋, nothing}}, Float64, 1, Float64}((22.0 mm, 0.0 mm), (31.0 mm, 11.0 mm), (1.2566370614359172,), -0.2, (0.9510565162951535,), (0.30901699437494745,))
+ Object2d{Ellipse, Float64, Unitful.Quantity{Float64, 𝐋, Unitful.FreeUnits{(mm,), 𝐋, nothing}}, Float64, 1, Float64}((-22.0 mm, 0.0 mm), (41.0 mm, 16.0 mm), (1.8849555921538759,), -0.2, (0.9510565162951536,), (-0.30901699437494734,))
+ Object2d{Ellipse, Float64, Unitful.Quantity{Float64, 𝐋, Unitful.FreeUnits{(mm,), 𝐋, nothing}}, Float64, 1, Float64}((0.0 mm, 35.0 mm), (25.0 mm, 21.0 mm), (1.5707963267948966,), 0.1, (1.0,), (6.123233995736766e-17,))
+ Object2d{Ellipse, Float64, Unitful.Quantity{Float64, 𝐋, Unitful.FreeUnits{(mm,), 𝐋, nothing}}, Float64, 1, Float64}((0.0 mm, 10.0 mm), (4.6 mm, 4.6 mm), (0.0,), 0.1, (0.0,), (1.0,))
+ Object2d{Ellipse, Float64, Unitful.Quantity{Float64, 𝐋, Unitful.FreeUnits{(mm,), 𝐋, nothing}}, Float64, 1, Float64}((0.0 mm, -10.0 mm), (4.6 mm, 4.6 mm), (0.0,), 0.1, (0.0,), (1.0,))
+ Object2d{Ellipse, Float64, Unitful.Quantity{Float64, 𝐋, Unitful.FreeUnits{(mm,), 𝐋, nothing}}, Float64, 1, Float64}((-8.0 mm, -60.5 mm), (4.6 mm, 2.3 mm), (0.0,), 0.1, (0.0,), (1.0,))
+ Object2d{Ellipse, Float64, Unitful.Quantity{Float64, 𝐋, Unitful.FreeUnits{(mm,), 𝐋, nothing}}, Float64, 1, Float64}((0.0 mm, -60.5 mm), (2.3 mm, 2.3 mm), (0.0,), 0.1, (0.0,), (1.0,))
+ Object2d{Ellipse, Float64, Unitful.Quantity{Float64, 𝐋, Unitful.FreeUnits{(mm,), 𝐋, nothing}}, Float64, 1, Float64}((6.0 mm, -60.5 mm), (4.6 mm, 2.3 mm), (1.5707963267948966,), 0.1, (1.0,), (6.123233995736766e-17,))</code></pre><p>From that collection we can compute images, sinograms and spectra. Use <code>phantom</code> to make digital images. It is convenient (but not required) to use <code>ImageGeoms</code> to help with the sampling.</p><pre><code class="language-julia hljs">ig = ImageGeom(dims=(200,256), deltas=(1mm,1mm))
+image = phantom(axes(ig)..., objects)
+jim(axes(ig), image; xlabel=&quot;x&quot;, ylabel=&quot;y&quot;, title=&quot;SheppLoganToft&quot;)</code></pre><img src="1ccbaead.svg" alt="Example block output"/><p>Here is the sinogram corresponding to this phantom, computed analytically from the ellipse parameters using <code>radon</code>:</p><pre><code class="language-julia hljs">r = range(-100mm,100mm,401)
+ϕ = deg2rad.(0:180)
+sino = radon(r, ϕ, objects)
+jim(r, ϕ, sino; title=&quot;Sinogram&quot;, xlabel=&quot;r&quot;, ylabel=&quot;ϕ&quot;)</code></pre><img src="1a00dc0f.svg" alt="Example block output"/><h2 id="Spectra"><a class="docs-heading-anchor" href="#Spectra">Spectra</a><a id="Spectra-1"></a><a class="docs-heading-anchor-permalink" href="#Spectra" title="Permalink"></a></h2><p>Here is the 2D spectrum (Fourier transform) of this phantom, computed analytically from the ellipse parameters using <code>spectrum</code>:</p><pre><code class="language-julia hljs">kspace = spectrum(axesf(ig)..., objects)
+jim(axesf(ig), log10.(abs.(kspace/(1mm)^2)); xlabel=&quot;ν₁&quot;, ylabel=&quot;ν₂&quot;, title=&quot;log10|Spectrum|&quot;)</code></pre><img src="c0d4f678.svg" alt="Example block output"/><p>The 2D Fourier transform formula used here is:</p><p class="math-container">\[F(ν_1, ν_2) = ∫ ∫ f(x,y) \, \mathrm{e}^{-ı 2π (ν_1 x + ν_2 y)} \, \mathrm{d} x \, \mathrm{d} y,\]</p><p>so if <span>$x$</span> and <span>$y$</span> have units mm (for example), then the units of the spatial frequency variables <span>$ν_1$</span> and <span>$ν_2$</span> are cycles/mm.</p><h2 id="2D-Rotation"><a class="docs-heading-anchor" href="#2D-Rotation">2D Rotation</a><a id="2D-Rotation-1"></a><a class="docs-heading-anchor-permalink" href="#2D-Rotation" title="Permalink"></a></h2><p>All of the 2D objects (ellipses etc.) in this package can be rotated by an angle <span>$ϕ$</span>.</p><p>This package treats the rotation angle <span>$ϕ$</span> as defining a <a href="https://en.wikipedia.org/wiki/Rotation_(mathematics)#Two_dimensions">rotation of the object</a>. Be aware that a <a href="https://en.wikipedia.org/wiki/Rotation_of_axes">rotation of the axes</a> has the opposite sign convention.</p><p>After rotation by <span>$ϕ$</span>, any point <span>$(x,y)$</span> in the original ellipse becomes the point</p><p class="math-container">\[\left[ \begin{matrix}
+x&#39; \\ y&#39;
+\end{matrix} \right]
+=
+\left[ \begin{matrix}
+\cos(ϕ) &amp; -\sin(ϕ) \\ \sin(ϕ) &amp; \cos(ϕ)
+\end{matrix} \right]
+\left[ \begin{matrix}
+x \\ y
+\end{matrix} \right],\]</p><p>as illustrated by the blue star below when rotating an ellipse by <span>$ϕ = π/6$</span>.</p><pre><code class="language-julia hljs">ellipse0 = ellipse(0, 0, 8, 4, 0, 1)
+ϕ1s = :(π/6)
+ϕ1 = eval(ϕ1s)
+ellipse1 = ellipse(0, 0, 8, 4, ϕ1, 1)
+
+x = range(-9, 9, 181)
+y = range(-8, 8, 161)
+pic0 = phantom(x, y, [ellipse0])
+pic1 = phantom(x, y, [ellipse1])
+
+marker = :star
+p0 = jim(x, y, pic0, &quot;Original ellipse&quot;;
+    xlabel=&quot;x&quot;, ylabel=&quot;y&quot;, size=(700,300), prompt=:false)
+x0,y0 = 7,0
+scatter!([x0], [y0], color=:blue; marker)
+point1 = [cos(ϕ1) -sin(ϕ1); sin(ϕ1) cos(ϕ1)] * [x0; y0] # rotate point
+x1,y1 = point1[1], point1[2]
+p1 = jim(x, y, pic1, &quot;Rotated by ϕ = $ϕ1s&quot;;
+    xlabel=&quot;x&quot;, ylabel=&quot;y&quot;, size=(700,300), prompt=:false)
+scatter!([x1], [y1], color=:blue; marker)
+jim(p0, p1)</code></pre><img src="0655abc8.svg" alt="Example block output"/><h2 id="3D-Rotation"><a class="docs-heading-anchor" href="#3D-Rotation">3D Rotation</a><a id="3D-Rotation-1"></a><a class="docs-heading-anchor-permalink" href="#3D-Rotation" title="Permalink"></a></h2><p>For a 3D object, there are three rotation angles, often called <a href="https://en.wikipedia.org/wiki/Euler_angles">Euler angles</a>, and there are many possible conventions for the names and ordering of these angles.</p><p>This package denotes the three angles as <span>$ϕ,θ,ψ.$</span></p><h3 id="Rotation-about-z-by-ϕ"><a class="docs-heading-anchor" href="#Rotation-about-z-by-ϕ">Rotation about <span>$z$</span> by <span>$ϕ$</span></a><a id="Rotation-about-z-by-ϕ-1"></a><a class="docs-heading-anchor-permalink" href="#Rotation-about-z-by-ϕ" title="Permalink"></a></h3><p>For consistency with the 2D case, the first of the three angles, <span>$ϕ$</span>, denotes rotation in the <span>$(x,y)$</span> plane, i.e., around the <span>$z$</span>-axis. In <a href="https://en.wikipedia.org/w/index.php?title=Rotation_matrix&amp;section=9#In_three_dimensions">wikipedia&#39;s notation</a> this is <span>$R_z(ϕ)$</span>, defined as</p><p class="math-container">\[\left[ \begin{matrix}
+x&#39; \\ y&#39; \\ z&#39;
+\end{matrix} \right]
+=
+\left[ \begin{matrix}
+\cos(θ) &amp; -\sin(θ) &amp; 0
+\\
+\sin(θ) &amp; \cos(θ) &amp; 0
+\\
+0 &amp; 0 &amp; 1
+\\
+\end{matrix} \right]
+\left[ \begin{matrix}
+x \\ y \\ z
+\end{matrix} \right]\]</p><p>as illustrated by the blue star below.</p><p>Here is an illustration for <span>$ϕ = π/6$</span>.</p><pre><code class="language-julia hljs">ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 1)
+ϕ1s = :(π/6)
+ϕ1 = eval(ϕ1s)
+ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (ϕ1, 0, 0), 1)
+
+x = range(-9, 9, 181)
+y = range(-8, 8, 161)
+z = [0]
+pic0 = phantom(x, y, z, [ellipsoid0])
+pic1 = phantom(x, y, z, [ellipsoid1])
+
+p0z = jim(x, y, pic0,
+    &quot;Original ellipsoid:\n(x,y) slice&quot;;
+    xlabel=&quot;x&quot;, ylabel=&quot;y&quot;, size=(700,300), prompt=:false)
+x0,y0 = 7,0
+scatter!([x0], [y0], color=:blue; marker)
+Rz(ϕ) = [cos(ϕ) -sin(ϕ) 0; sin(ϕ) cos(ϕ) 0; 0 0 1]
+point1 = Rz(ϕ1) * [x0; y0; 0] # rotate point
+x1,y1 = point1[1], point1[2]
+p1z = jim(x, y, pic1,
+    &quot;Rotated about z\nby ϕ = $ϕ1s\n(z out of &#39;board&#39;)&quot;;
+    xlabel=&quot;x&quot;, ylabel=&quot;y&quot;, size=(700,350), prompt=:false)
+scatter!([x1], [y1], color=:blue; marker)
+jim(p0z, p1z)</code></pre><img src="1840491d.svg" alt="Example block output"/><h3 id="Rotation-about-y-by-θ"><a class="docs-heading-anchor" href="#Rotation-about-y-by-θ">Rotation about <span>$y$</span> by <span>$θ$</span></a><a id="Rotation-about-y-by-θ-1"></a><a class="docs-heading-anchor-permalink" href="#Rotation-about-y-by-θ" title="Permalink"></a></h3><p>The 2nd of the three angles, <span>$θ$</span>, corresponds to rotation around the <span>$y$</span>-axis, which has the opposite sign when using the <a href="https://en.wikipedia.org/wiki/Right-hand_rule#A_rotating_body">right hand rule</a>:</p><p class="math-container">\[\left[ \begin{matrix}
+x&#39; \\ y&#39; \\ z&#39;
+\end{matrix} \right]
+=
+\left[ \begin{matrix}
+\cos(θ) &amp; 0 &amp; \sin(θ)
+\\
+0 &amp; 1 &amp; 0
+\\
+-\sin(θ) &amp; 0 &amp; \cos(θ)
+\\
+\end{matrix} \right]
+\left[ \begin{matrix}
+x \\ y \\ z
+\end{matrix} \right],\]</p><p>as illustrated by the green star below.</p><p>In <a href="https://en.wikipedia.org/w/index.php?title=Rotation_matrix&amp;section=9#In_three_dimensions">wikipedia notation</a> this is <span>$R_y(θ)$</span>.</p><p>Here is an illustration of rotating an ellipsoid for <span>$θ = π/6$</span>.</p><pre><code class="language-julia hljs">ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 1)
+θ1s = :(π/6)
+θ1 = eval(θ1s)
+ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (0, θ1, 0), 1)
+
+x = range(-9, 9, 181)
+y = [0]
+z = range(-8, 8, 161)
+pic0 = phantom(x, y, z, [ellipsoid0]); pic0 = selectdim(pic0, 2, 1)
+pic1 = phantom(x, y, z, [ellipsoid1]); pic1 = selectdim(pic1, 2, 1)
+
+p0y = jim(x, z, pic0,
+    &quot;Original ellipsoid:\n (x,z) slice&quot;;
+    xlabel=&quot;x&quot;, ylabel=&quot;z&quot;, size=(700,350), prompt=false)
+x0,z0 = 7,0
+scatter!([x0], [z0], color=:green; marker)
+Ry(θ) = [cos(θ) 0 sin(θ); 0 1 0; -sin(θ) 0 cos(θ)]
+point1 = Ry(θ1) * [x0; 0; z0] # rotate point
+x1,z1 = point1[1], point1[3]
+p1y = jim(x, z, pic1,
+    &quot;Rotated about y\nby θ = $θ1s\n(y into &#39;board&#39;)&quot;;
+    xlabel=&quot;x&quot;, ylabel=&quot;z&quot;, size=(700,350), prompt=false)
+scatter!([x1], [z1], color=:green; marker)
+jim(p0y, p1y)</code></pre><img src="3f8eebe7.svg" alt="Example block output"/><h3 id="Rotation-about-x-by-ψ"><a class="docs-heading-anchor" href="#Rotation-about-x-by-ψ">Rotation about <span>$x$</span> by <span>$ψ$</span></a><a id="Rotation-about-x-by-ψ-1"></a><a class="docs-heading-anchor-permalink" href="#Rotation-about-x-by-ψ" title="Permalink"></a></h3><p>The 3rd of the three angles, <span>$ψ$</span>, corresponds to rotation around the <span>$x$</span>-axis:</p><p class="math-container">\[\left[ \begin{matrix}
+x&#39; \\ y&#39; \\ z&#39;
+\end{matrix} \right]
+=
+\left[ \begin{matrix}
+1 &amp; 0 &amp; 0
+\\
+0 &amp; \cos(ψ) &amp; -\sin(ψ)
+\\
+0 &amp; \sin(ψ) &amp; \cos(ψ)
+\\
+\end{matrix} \right]
+\left[ \begin{matrix}
+x \\ y \\ z
+\end{matrix} \right],\]</p><p>as illustrated by the red star below.</p><p>In <a href="https://en.wikipedia.org/w/index.php?title=Rotation_matrix&amp;section=9#In_three_dimensions">wikipedia notation</a> this is <span>$R_x(ψ)$</span>.</p><p>Here is an illustration of rotating an ellipsoid for <span>$ψ = π/6$</span>.</p><pre><code class="language-julia hljs">ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 1)
+ψ1s = :(π/6)
+ψ1 = eval(ψ1s)
+ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, ψ1), 1)
+
+x = [0]
+y = range(-9, 9, 181)
+z = range(-8, 8, 161)
+pic0 = phantom(x, y, z, [ellipsoid0]); pic0 = selectdim(pic0, 1, 1)
+pic1 = phantom(x, y, z, [ellipsoid1]); pic1 = selectdim(pic1, 1, 1)
+
+p0x = jim(y, z, pic0,
+    &quot;Original ellipsoid:\n (y,z) slice)&quot;;
+    xlabel=&quot;y&quot;, ylabel=&quot;z&quot;, size=(700,350), prompt=false)
+y0,z0 = 3,0
+scatter!([y0], [z0], color=:red; marker)
+Rx(ψ) = [1 0 0 ; 0 cos(ψ) -sin(ψ); 0 sin(ψ) cos(ψ)]
+point1 = Rx(ψ1) * [0; y0; z0] # rotate point
+y1,z1 = point1[2], point1[3]
+p1x = jim(y, z, pic1,
+    &quot;Rotated about x\nby ψ = $ψ1s\n(x out of &#39;board&#39;)&quot;;
+    xlabel=&quot;y&quot;, ylabel=&quot;z&quot;, size=(700,350), prompt=false)
+scatter!([y1], [z1], color=:red; marker)
+jim(p0x, p1x)</code></pre><img src="a5a2494e.svg" alt="Example block output"/><p>The remaining issue is the multiplication order for multiple rotations.</p><p>To address that, we first describe how phantoms are generated in this package. Every phantom shape starts with a base function that is translated, rotated, and scaled to make the final object. For example, an ellipsoid is a transformed sphere. Specifically, if <span>$e(r)$</span> is the ellipsoid function, and <span>$s(r)$</span> is the unit sphere function, where <span>$r = (x,y,z)$</span>, then</p><p class="math-container">\[e(r) = s( (R_{xyz}^T (r - c)) ⊘ w )\]</p><p>where <span>$c$</span> is the <code>center</code> of the ellipsoid, and <span>$r$</span> is the <code>width</code> parameter (actually radii), <span>$⊘$</span> denotes element-wise division, and <span>$R_{xyz}^T$</span> is the <em>inverse</em> of the 3D rotation matrix <span>$R_{xyz}$</span> defined by <span>$R_{xyz} = R_x(ψ) R_y(θ) R_z(ϕ)$</span>.</p><p>Note that <span>$r$</span> and <span>$c$</span> and <span>$w$</span> all must have identical units, so the argument <span>$(R_{xyz}^T (r - c)) ⊘ w$</span> passed the unit-sphere function is unitless, as it must be. The non-exported <code>phantom1</code> function for each shape defines the base shape function. For the unit sphere it is simply <code>sum(abs2, r) ≤ 1</code>.</p><p>Rearranging the equation <span>$r&#39; = (R_{xyz}^T (r - c)) ⊘ w$</span> yields <span>$r = R_{xyz} (w ⊙ r&#39;) + c$</span>. So the process of transforming a unit sphere to an ellipsoid starts with scaling, then rotation by <span>$R_{xyz}$</span>, which rotates first around the <span>$z$</span>-axis, and then finally translating.</p><p>Here is an illustration where one can see that all three axes were rotated.</p><pre><code class="language-julia hljs">ellipsoid0 = ellipsoid((0, 0, 0), (8, 4, 2), (0, 0, 0), 1)
+ϕ1s = :(π/6)
+ϕ1 = eval(ϕ1s)
+θ1s = :(π/7)
+θ1 = eval(θ1s)
+ψ1s = :(π/8)
+ψ1 = eval(ψ1s)
+ellipsoid1 = ellipsoid((0, 0, 0), (8, 4, 2), (ϕ1, θ1, ψ1), 1)
+
+x = range(-9, 9, 181)
+y = range(-8, 8, 161)
+z = range(-7, 7, 71)
+pic0 = phantom(x, y, z, [ellipsoid0])
+pic1 = phantom(x, y, z, [ellipsoid1])
+
+p0a = jim(mid3(pic0),
+    &quot;Original ellipsoid\n(central slices)&quot;;
+    xlabel=&quot;x&quot;, ylabel=&quot;y&quot;, size=(700,320), prompt=:false)
+p1a = jim(mid3(pic1),
+    &quot;Rotated\nϕ = $ϕ1s, θ = $θ1s, ψ = $ψ1s&quot;;
+    xlabel=&quot;x&quot;, ylabel=&quot;y&quot;, size=(700,320), prompt=:false)
+jim(p0a, p1a)</code></pre><img src="ea462a1d.svg" alt="Example block output"/><h2 id="Spectra-rotation"><a class="docs-heading-anchor" href="#Spectra-rotation">Spectra rotation</a><a id="Spectra-rotation-1"></a><a class="docs-heading-anchor-permalink" href="#Spectra-rotation" title="Permalink"></a></h2><p>The <code>spectrum</code> method accounts for the translation, rotation, and scaling of the base shape function using elementary Fourier transform properties.</p><p>The following code first shows the spectra of an ellipsoid before and after rotating it.</p><pre><code class="language-julia hljs">ig = ImageGeom(length.((x,y,z)), map(x -&gt; x[2]-x[1], (x,y,z)))
+kspace0 = spectrum(axesf(ig)..., [ellipsoid0])
+kspace1 = spectrum(axesf(ig)..., [ellipsoid1])
+@assert ImagePhantoms.volume(ellipsoid0) == ImagePhantoms.volume(ellipsoid1)
+
+clim = (-6, 0)
+p0s = jim(axesf(ig), log10.(abs.(kspace0 / ImagePhantoms.volume(ellipsoid0)));
+    clim, xlabel=&quot;ν₁&quot;, ylabel=&quot;ν₂&quot;, title=&quot;log10|Spectrum original ellipsoid|&quot;)</code></pre><img src="f41fcf48.svg" alt="Example block output"/><pre><code class="language-julia hljs">p1s = jim(axesf(ig), log10.(abs.(kspace1 / ImagePhantoms.volume(ellipsoid1)));
+    clim, xlabel=&quot;ν₁&quot;, ylabel=&quot;ν₂&quot;, title=&quot;log10|Spectrum rotated ellipsoid|&quot;)</code></pre><img src="105bacfa.svg" alt="Example block output"/><p>The following code verifies that the rotated spectrum matches</p><pre><code class="language-julia hljs">k = Iterators.product(axesf(ig)...) # tuples of (kx,ky,kz) values
+R = Rx(ψ1) * Ry(θ1) * Rz(ϕ1) # Rxyz rotation matrix
+kr = (tuple((R&#39; * collect(k))...) for k in k) # rotate each k-space tuple
+kspace0r = spectrum(kr, [ellipsoid0]) # evaluate spectrum at rotated tuples
+@assert kspace0r ≈ kspace1</code></pre><h3 id="Reproducibility"><a class="docs-heading-anchor" href="#Reproducibility">Reproducibility</a><a id="Reproducibility-1"></a><a class="docs-heading-anchor-permalink" href="#Reproducibility" title="Permalink"></a></h3><p>This page was generated with the following version of Julia:</p><pre><code class="language-julia hljs">using InteractiveUtils: versioninfo
+io = IOBuffer(); versioninfo(io); split(String(take!(io)), &#39;\n&#39;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">11-element Vector{SubString{String}}:
+ &quot;Julia Version 1.11.6&quot;
+ &quot;Commit 9615af0f269 (2025-07-09 12:58 UTC)&quot;
+ &quot;Build Info:&quot;
+ &quot;  Official https://julialang.org/ release&quot;
+ &quot;Platform Info:&quot;
+ &quot;  OS: Linux (x86_64-linux-gnu)&quot;
+ &quot;  CPU: 4 × AMD EPYC 7763 64-Core Processor&quot;
+ &quot;  WORD_SIZE: 64&quot;
+ &quot;  LLVM: libLLVM-16.0.6 (ORCJIT, znver3)&quot;
+ &quot;Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)&quot;
+ &quot;&quot;</code></pre><p>And with the following package versions</p><pre><code class="language-julia hljs">import Pkg; Pkg.status()</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Status `~/work/ImagePhantoms.jl/ImagePhantoms.jl/docs/Project.toml`
+  [e30172f5] Documenter v1.14.1
+  [7a1cc6ca] FFTW v1.9.0
+  [9ee76f2b] ImageGeoms v0.11.1
+  [71a99df6] ImagePhantoms v0.8.1 `~/work/ImagePhantoms.jl/ImagePhantoms.jl`
+  [7031d0ef] LazyGrids v1.1.0
+  [98b081ad] Literate v2.20.1
+  [170b2178] MIRTjim v0.25.0
+  [91a5bcdd] Plots v1.40.18
+  [1986cc42] Unitful v1.24.0
+  [b77e0a4c] InteractiveUtils v1.11.0
+  [9a3f8284] Random v1.11.0</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../../methods/">« Methods</a><a class="docs-footer-nextpage" href="../02-ellipse/">Ellipse »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Tuesday 12 August 2025 04:48">Tuesday 12 August 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

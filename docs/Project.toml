@@ -1,0 +1,14 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+ImageGeoms = "9ee76f2b-840d-4475-b6d6-e485c9297852"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
+MIRTjim = "170b2178-6dee-4cb0-8729-b3e8b57834cc"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+UnitfulRecipes = "42071c24-d89e-48dd-8a24-8a12d9b8861f"
+
+[compat]
+Documenter = "0.27.3"
+Literate = "2"
+MIRTjim = "0.12"
