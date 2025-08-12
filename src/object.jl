@@ -67,8 +67,8 @@ struct Object{S, D, V, C, A, Da, T} <: AbstractObject
             throw(ArgumentError("D=$D vs ndims(S)=$(ndims(S)) for S=$S"))
         D == 2 == Da + 1 || D == Da == 3 ||
             throw(ArgumentError("Da=$Da does not fit to D=$D"))
-        all(width .> zero(eltype(width))) ||
-            throw(ArgumentError("widths must be positive"))
+        all(>(zero(eltype(width))), width) ||
+            throw(ArgumentError("width $(minimum(width)) not positive"))
 
         C = promote_type(eltype.(center)..., eltype.(width)...)
         angle = promote((1f0 .* angle)...) # ensure at least Float32
