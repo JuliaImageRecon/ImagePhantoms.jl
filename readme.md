@@ -1,19 +1,17 @@
 # ImagePhantoms.jl
 
 https://github.com/JuliaImageRecon/ImagePhantoms.jl
+<img src="https://github.com/JuliaImageRecon/ImagePhantoms.jl/blob/main/docs/src/assets/logo.svg" alt="logo" width="150"/>
 
-[![action status][action-img]][action-url]
-[![pkgeval status][pkgeval-img]][pkgeval-url]
-[![codecov][codecov-img]][codecov-url]
-[![license][license-img]][license-url]
 [![docs-stable][docs-stable-img]][docs-stable-url]
 [![docs-dev][docs-dev-img]][docs-dev-url]
+[![action][action-img]][action-url]
 [![Aqua QA][aqua-img]][aqua-url]
-[![code-style][code-blue-img]][code-blue-url]
-[![deps](https://juliahub.com/docs/ImagePhantoms/deps.svg)](https://juliahub.com/ui/Packages/ImagePhantoms)
-[![version](https://juliahub.com/docs/ImagePhantoms/version.svg)](https://juliahub.com/ui/Packages/ImagePhantoms)
-[![pkgeval](https://juliahub.com/docs/ImagePhantoms/pkgeval.svg)](https://juliahub.com/ui/Packages/ImagePhantoms)
-<img src="https://github.com/JuliaImageRecon/ImagePhantoms.jl/blob/main/docs/src/assets/logo.svg" alt="logo" width="150"/>
+[![codecov][codecov-img]][codecov-url]
+[![deps][deps-img]][deps-url]
+[![license][license-img]][license-url]
+[![pkgeval][pkgeval-img]][pkgeval-url]
+[![version][ver-img]][ver-url]
 
 This Julia language repo
 provides tools for working with software-defined image phantoms
@@ -139,24 +137,31 @@ ellipsoids/spheres, cuboids/cubes, gaussians, cylinders, cones.
 
 ### Compatibility
 
-Tested with Julia ≥ 1.10.
+Tested with Julia ≥ 1.12.
 
 <!-- URLs -->
 [action-img]: https://github.com/JuliaImageRecon/ImagePhantoms.jl/workflows/CI/badge.svg
 [action-url]: https://github.com/JuliaImageRecon/ImagePhantoms.jl/actions
-[build-img]: https://github.com/JuliaImageRecon/ImagePhantoms.jl/workflows/CI/badge.svg?branch=main
-[build-url]: https://github.com/JuliaImageRecon/ImagePhantoms.jl/actions?query=workflow%3ACI+branch%3Amain
-[pkgeval-img]: https://juliaci.github.io/NanosoldierReports/pkgeval_badges/I/ImagePhantoms.svg
-[pkgeval-url]: https://juliaci.github.io/NanosoldierReports/pkgeval_badges/I/ImagePhantoms.html
-[code-blue-img]: https://img.shields.io/badge/code%20style-blue-4495d1.svg
-[code-blue-url]: https://github.com/invenia/BlueStyle
-[codecov-img]: https://codecov.io/github/JuliaImageRecon/ImagePhantoms.jl/coverage.svg?branch=main
-[codecov-url]: https://codecov.io/github/JuliaImageRecon/ImagePhantoms.jl?branch=main
-[docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
-[docs-stable-url]: https://JuliaImageRecon.github.io/ImagePhantoms.jl/stable
+
+[aqua-img]: https://juliatesting.github.io/Aqua.jl/dev/assets/badge.svg
+[aqua-url]: https://github.com/JuliaTesting/Aqua.jl
+
+[codecov-img]: https://codecov.io/github/JuliaImageRecon/ImagePhantoms.jl/coverage.svg
+[codecov-url]: https://codecov.io/github/JuliaImageRecon/ImagePhantoms.jl
+
+[deps-img]: https://juliahub.com/docs/ImagePhantoms/deps.svg
+[deps-url]: https://juliahub.com/ui/Packages/ImagePhantoms
+
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-dev-url]: https://JuliaImageRecon.github.io/ImagePhantoms.jl/dev
-[license-img]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat
+[docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
+[docs-stable-url]: https://JuliaImageRecon.github.io/ImagePhantoms.jl/stable
+
+[license-img]: https://img.shields.io/badge/license-MIT-brightgreen.svg
 [license-url]: LICENSE
-[aqua-img]: https://img.shields.io/badge/Aqua.jl-%F0%9F%8C%A2-aqua.svg
-[aqua-url]: https://github.com/JuliaTesting/Aqua.jl
+
+[pkgeval-img]: https://juliaci.github.io/NanosoldierReports/pkgeval_badges/I/ImagePhantoms.svg
+[pkgeval-url]: https://juliaci.github.io/NanosoldierReports/pkgeval_badges/I/ImagePhantoms.html
+
+[ver-img]: https://juliahub.com/docs/ImagePhantoms/version.svg
+[ver-url]: https://juliahub.com/ui/Packages/ImagePhantoms
