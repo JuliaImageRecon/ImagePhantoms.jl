@@ -37,12 +37,12 @@ Realistic MRI simulations should account for the effects of those
 sensitivity maps analytically, rather than committing the "inverse crime"
 of using rasterized phantoms and maps.
 
-See the 2012 paper
+The 2012 paper
 [Guerquin-Kern et al.](https://doi.org/10.1109/TMI.2011.2174158)
-that combines analytical k-space values of the phantom
+combines analytical k-space values of the phantom
 with an analytical model for the sensitivity maps.
 This package follows the recommended approach from that paper.
-We used the `mri_smap_fit` function to fit each sensitivity map
+We use the `mri_smap_fit` function to fit each sensitivity map
 with a modest number of complex exponential signals.
 Then, instead of using the `spectrum` function
 we use the `spectra` function
@@ -51,11 +51,11 @@ from analytical phantoms (like ellipses).
 =#
 
 
-# Because FFTW.fft cannot handle units, this function is a work-around.
+# Because `FFTW.fft` cannot handle units, this function is a work-around.
 function myfft(x::AbstractArray{T}) where {T <: Number}
     u = oneunit(T)
     return fftshift(fft(fftshift(x) / u)) * u
-end
+end;
 
 
 # ## Phantom
@@ -66,11 +66,12 @@ fovs = (256mm, 250mm)
 nx, ny = (128, 100) .* 2
 dx, dy = fovs ./ (nx,ny)
 x = (-(nx÷2):(nx÷2-1)) * dx
-y = (-(ny÷2):(ny÷2-1)) * dy
+y = (-(ny÷2):(ny÷2-1)) * dy;
 
 #=
 Define Shepp-Logan phantom object,
 with random complex phases
+per inner ellipse
 to make it a bit more realistic.
 =#
 
@@ -81,8 +82,8 @@ params = [(p[1:5]..., phases[i]) for (i, p) in enumerate(params)]
 oa = ellipse(params)
 oversample = 3
 image0 = phantom(x, y, oa, oversample)
-cfun = z -> cat(dims = ndims(z)+1, real(z), imag(z))
-jim(x, y, cfun(image0), "Digital phantom\n (real | imag)")
+ri_fun = z -> cat(dims = ndims(z)+1, real(z), imag(z))
+jim(x, y, ri_fun(image0), "Digital phantom\n (real | imag)")
 
 #=
 In practice, sensitivity maps are usually estimated
@@ -92,10 +93,10 @@ to exercise this issue.
 =#
 
 mask = trues(nx,ny)
-mask[:,[1:2;end-2:end]] .= false
+mask[:,[1:2;end-2:end]] .= false # mask out outer border of maps
 mask[[1:8;end-8:end],:] .= false
 @assert mask .* image0 == image0
-jim(x, y, mask, "mask")
+jim(x, y, mask, "mask"; xlabel="x", ylabel="y")
 
 
 #=
@@ -111,7 +112,10 @@ One wire is outside the upper right corner,
 the other is outside the left border.
 =#
 
-# response at (x,y) to wire at (wx,wy)
+"""
+    biot_savart_wire(x, y, wx, wy)
+Compute response at `(x,y)` to wire at `(wx,wy)`
+"""
 function biot_savart_wire(x, y, wx, wy)
     phase = cis(atan(y-wy, x-wx))
     return oneunit(x) / sqrt(sum(abs2, (x-wx, y-wy))) * phase # 1/r falloff
@@ -129,7 +133,9 @@ phase = angle.(smap)
 
 jim(
  jim(x, y, mag, "|Sensitivity maps raw|"; color=:cividis, ncol=1, prompt=false),
- jim(x, y, phase, "∠(Sensitivity maps raw)"; color=:hsv, ncol=1, prompt=false),
+ jim(x, y, phase, "∠(Sensitivity maps raw)"; color=:hsv, ncol=1, prompt=false,
+  clim=(-π,π), colorbar_ticks = ([-π, 0, π], ["-π", "0", "π"]),
+ )
 )
 
 #=
@@ -142,13 +148,16 @@ ssos = sqrt.(sum(abs.(smap).^2, dims=ndims(smap))) # SSoS
 ssos = selectdim(ssos, ndims(smap), 1)
 jim(x, y, ssos, "SSoS for ncoil=$ncoil"; color=:cividis, clim=(0,1))
 
-for ic=1:ncoil # normalize
+#
+prompt()
+
+
+for ic in 1:ncoil # normalize
     selectdim(smap, ndims(smap), ic) ./= ssos
 end
 smap .*= mask
-stacker = x -> [(@view x[:,:,i]) for i=1:size(x,3)]
-smaps = stacker(smap) # code hereafter expects vector of maps
-jim(x, y, cfun(smaps), "Sensitivity maps (masked and normalized)")
+smaps = collect(eachslice(smap, dims=3)) # code hereafter expects vector of maps
+jim(x, y, ri_fun(smaps), "Sensitivity maps (masked and normalized)")
 
 
 #=
@@ -164,16 +173,16 @@ deltas = (dx, dy)
 kmax = 9
 fit = mri_smap_fit(smaps, embed; mask, kmax, deltas)
 jim(
- jim(x, y, cfun(smaps), "Original maps"; prompt=false, clim=(-1,1)),
- jim(x, y, cfun(fit.smaps), "Fit maps"; prompt=false, clim=(-1,1)),
- jim(x, y, cfun(100 * (fit.smaps - smaps)), "error * 100"; prompt=false),
+ jim(x, y, ri_fun(smaps), "Original maps"; prompt=false, clim=(-1,1)),
+ jim(x, y, ri_fun(fit.smaps), "Fit maps"; prompt=false, clim=(-1,1)),
+ jim(x, y, ri_fun(100 * (fit.smaps - smaps)), "error * 100"; prompt=false),
 )
 
 # The fit coefficients are smaller near `±kmax`
 # so probably `kmax` is large enough.
 
 coefs = map(x -> reshape(x, 2kmax+1, 2kmax+1), fit.coefs)
-jim(-kmax:kmax, -kmax:kmax, cfun(coefs), "Coefficients")
+jim(-kmax:kmax, -kmax:kmax, ri_fun(coefs), "Coefficients")
 
 
 # ## Compare FFT with analytical spectra
@@ -187,15 +196,15 @@ gx, gy = ndgrid(fx, fy);
 # Note the `fit` argument.
 kspace1 = mri_spectra(vec(gx), vec(gy), oa, fit)
 kspace1 = [reshape(k, nx, ny) for k in kspace1]
-p1 = jim(fx, fy, cfun(kspace1), "Analytical")
+p1 = jim(fx, fy, ri_fun(kspace1), "Analytical")
 
 # FFT spectra computation based on digital image and sensitivity maps:
 image2 = [image0 .* s for s in smaps] # digital
 kspace2 = myfft.(image2) * (dx * dy)
-p2 = jim(fx, fy, cfun(kspace2), "FFT-based")
+p2 = jim(fx, fy, ri_fun(kspace2), "FFT-based")
 
 #
-p3 = jim(fx, fy, cfun(kspace2 - kspace1), "Error")
+p3 = jim(fx, fy, ri_fun(kspace2 - kspace1), "Error")
 
 
 # Zoom in to illustrate similarity:
@@ -211,6 +220,6 @@ jim(
 
 #=
 In summary, the `mri_smap_fit` and `mri_spectra` methods here
-reproduce the approach in the 2012 Guerquin-Kern paper, cited above,
+reproduce the approach in the 2012 Guerquin-Kern paper cited above,
 enabling parallel MRI simulations that avoid an inverse crime.
 =#
