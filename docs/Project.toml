@@ -12,3 +12,4 @@ Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
 ImageGeoms = "0.11"
+Literate = "2.21.0"
